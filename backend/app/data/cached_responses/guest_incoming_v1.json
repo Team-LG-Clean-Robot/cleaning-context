@@ -1,0 +1,103 @@
+{
+  "scenario_id": "guest_incoming",
+  "context_summary": "손님 방문 예정 · 시각 17:00 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "entrance",
+      "base": 30,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 30
+        },
+        {
+          "source": "guest_arriving_2h",
+          "label_ko": "손님 방문 임박",
+          "delta": 20
+        }
+      ],
+      "final": 50,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "living",
+      "base": 25,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 25
+        },
+        {
+          "source": "guest_arriving_2h",
+          "label_ko": "손님 방문 임박",
+          "delta": 25
+        }
+      ],
+      "final": 50,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "kitchen",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        },
+        {
+          "source": "guest_arriving_2h",
+          "label_ko": "손님 방문 임박",
+          "delta": 5
+        }
+      ],
+      "final": 25,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bathroom",
+      "base": 10,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 10
+        },
+        {
+          "source": "guest_arriving_2h",
+          "label_ko": "손님 방문 임박",
+          "delta": 10
+        }
+      ],
+      "final": 20,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 15,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 15
+        },
+        {
+          "source": "guest_arriving_2h",
+          "label_ko": "손님 방문 임박",
+          "delta": -10
+        }
+      ],
+      "final": 5,
+      "mode": "normal",
+      "exclusion_reason": null
+    }
+  ],
+  "explanation": "먼저 현관과 거실을 청소하는 이유는 손님 방문이 임박해 오염 가능성이 높기 때문입니다. 현관은 집에 들어오는 첫인상을 결정짓는 공간으로, 손님이 도착하기 전에 깨끗하게 유지하는 것이 중요합니다. 거실 또한 손님이 머무는 주요 공간이므로, 청결을 유지해야 합니다. 반면 침실은 사용자가 주로 머무르지 않으며, 손님 방문과 관련된 점수가 낮아 청소 우선순위에서 제외되었습니다. 또한, 취침 시간이 가까워짐에 따라 조용한 환경을 유지해야 하므로, 침실 청소는 지연될 수 있습니다. 이처럼 청소의 우선순위는 손님 방문과 관련된 공간을 중심으로 설정되어 있습니다.",
+  "fallback": false
+}

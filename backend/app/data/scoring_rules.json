@@ -1,0 +1,11 @@
+{
+  "modifiers": {
+    "user_occupancy_delta": -20,
+    "noise_sleep_extra_delta": -10,
+    "noise_sleep_threshold": 7,
+    "exclusion_threshold": 0,
+    "delayed_minutes": 30,
+    "quiet_noise_threshold": 4
+  },
+  "rule_version": "v1"
+}

@@ -1,0 +1,36 @@
+# Claude Code
+.claude/
+
+# 환경변수 / 시크릿
+.env
+.env.local
+secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv*/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Node / Next.js
+frontend/.next/
+frontend/node_modules/
+
+# 백엔드 캐시 (런타임 생성)
+backend/cache/
+
+# 임시 / 출력
+tmp/
+outputs/
+archive/
+
+# 내부용 (공개 X) — 팀 내부 메모, AI 지시문
+CLAUDE.md
+CLAUDE.local.md
+ROADMAP.md
+
+# 빌드 산출물
+.playwright-mcp/

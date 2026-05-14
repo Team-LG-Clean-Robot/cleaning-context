@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rainy_return",
+    "name_ko": "비 오는 날 귀가",
+    "description": "사용자가 비 오는 저녁 귀가, 취침 2시간 후",
+    "current_time": "20:30",
+    "sleep_time": "23:00",
+    "user_location": null,
+    "active_events": ["rain", "user_returned", "pre_sleep_2h"],
+    "gap_rooms": []
+  },
+  {
+    "id": "post_cooking",
+    "name_ko": "요리 직후",
+    "description": "요리 마치고 사용자가 거실에서 휴식",
+    "current_time": "19:20",
+    "sleep_time": "23:00",
+    "user_location": "living",
+    "active_events": ["cooking_done"],
+    "gap_rooms": []
+  },
+  {
+    "id": "pre_sleep",
+    "name_ko": "취침 직전",
+    "description": "사용자가 침실에 들어가 곧 취침",
+    "current_time": "22:50",
+    "sleep_time": "23:00",
+    "user_location": "bedroom",
+    "active_events": ["pre_sleep_30min"],
+    "gap_rooms": []
+  },
+  {
+    "id": "guest_incoming",
+    "name_ko": "손님 방문 예정",
+    "description": "2시간 후 손님 도착, 거실·현관 청소 공백",
+    "current_time": "17:00",
+    "sleep_time": "23:00",
+    "user_location": null,
+    "active_events": ["guest_arriving_2h"],
+    "gap_rooms": []
+  }
+]

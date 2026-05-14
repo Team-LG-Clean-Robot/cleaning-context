@@ -1,0 +1,88 @@
+{
+  "scenario_id": "post_cooking",
+  "context_summary": "요리 직후 · 시각 19:20 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "kitchen",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        },
+        {
+          "source": "cooking_done",
+          "label_ko": "요리 완료",
+          "delta": 30
+        }
+      ],
+      "final": 50,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "entrance",
+      "base": 30,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 30
+        }
+      ],
+      "final": 30,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 15,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 15
+        }
+      ],
+      "final": 15,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bathroom",
+      "base": 10,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 10
+        }
+      ],
+      "final": 10,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "living",
+      "base": 25,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 25
+        },
+        {
+          "source": "user_occupancy",
+          "label_ko": "사용자 머무름",
+          "delta": -20
+        }
+      ],
+      "final": 5,
+      "mode": "delayed",
+      "exclusion_reason": "30분 후 재시도"
+    }
+  ],
+  "explanation": "주방을 먼저 청소하는 이유는 요리 직후로 오염 가능성이 높기 때문입니다. 요리 완료로 인해 주방은 음식물 찌꺼기나 기름 등이 남아 있을 수 있어, 청소의 우선순위가 높습니다. 기본 점수 또한 주방의 청소 필요성을 뒷받침합니다. 반면, 거실은 사용자가 머무르고 있어 청소를 지연하는 것이 더 적합합니다. 사용자가 자주 활동하는 공간에서는 청소가 방해가 될 수 있으므로, 저소음 모드로 처리하여 사용자의 편안함을 유지하는 것이 중요합니다. 이처럼 각 공간의 청소 우선순위는 오염 정도와 사용자 활동을 고려하여 결정됩니다.",
+  "fallback": false
+}

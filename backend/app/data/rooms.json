@@ -1,0 +1,42 @@
+[
+  {
+    "id": "entrance",
+    "name_ko": "현관",
+    "base_score": 30,
+    "noise_sensitivity": 2,
+    "last_cleaned_hours": 48,
+    "bbox": {"x": 0, "y": 0, "w": 100, "h": 80}
+  },
+  {
+    "id": "living",
+    "name_ko": "거실",
+    "base_score": 25,
+    "noise_sensitivity": 5,
+    "last_cleaned_hours": 24,
+    "bbox": {"x": 100, "y": 0, "w": 200, "h": 160}
+  },
+  {
+    "id": "kitchen",
+    "name_ko": "주방",
+    "base_score": 20,
+    "noise_sensitivity": 4,
+    "last_cleaned_hours": 24,
+    "bbox": {"x": 300, "y": 0, "w": 120, "h": 80}
+  },
+  {
+    "id": "bedroom",
+    "name_ko": "침실",
+    "base_score": 15,
+    "noise_sensitivity": 9,
+    "last_cleaned_hours": 12,
+    "bbox": {"x": 100, "y": 160, "w": 200, "h": 120}
+  },
+  {
+    "id": "bathroom",
+    "name_ko": "욕실",
+    "base_score": 10,
+    "noise_sensitivity": 3,
+    "last_cleaned_hours": 24,
+    "bbox": {"x": 300, "y": 80, "w": 120, "h": 80}
+  }
+]

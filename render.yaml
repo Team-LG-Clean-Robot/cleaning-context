@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: cleaning-context-backend
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -e .
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: TIMELY_API_KEY
+        sync: false  # Render UI에서 수동 입력
+      - key: TIMELY_BASE_URL
+        value: https://hello.timelygpt.co.kr/api/v2/chat/bridge/openai
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: LLM_TIMEOUT_SEC
+        value: "10"
+      - key: CACHE_DIR
+        value: /tmp/cache/scenarios
+      - key: CORS_ORIGINS
+        sync: false  # Vercel 도메인 확정 후 입력

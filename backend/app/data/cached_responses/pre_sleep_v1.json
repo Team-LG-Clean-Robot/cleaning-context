@@ -1,0 +1,113 @@
+{
+  "scenario_id": "pre_sleep",
+  "context_summary": "취침 직전 · 시각 22:50 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "entrance",
+      "base": 30,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 30
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": -5
+        }
+      ],
+      "final": 25,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "kitchen",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": -5
+        }
+      ],
+      "final": 15,
+      "mode": "quiet",
+      "exclusion_reason": "취침 임박 — 저소음 모드"
+    },
+    {
+      "room_id": "living",
+      "base": 25,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 25
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": -15
+        }
+      ],
+      "final": 10,
+      "mode": "quiet",
+      "exclusion_reason": "취침 임박 — 저소음 모드"
+    },
+    {
+      "room_id": "bathroom",
+      "base": 10,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 10
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": -5
+        }
+      ],
+      "final": 5,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 15,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 15
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": -30
+        },
+        {
+          "source": "user_occupancy",
+          "label_ko": "사용자 머무름",
+          "delta": -20
+        },
+        {
+          "source": "noise_sleep_extra",
+          "label_ko": "소음 민감도×취침 임박",
+          "delta": -10
+        }
+      ],
+      "final": -45,
+      "mode": "excluded",
+      "exclusion_reason": "취침 30분 이내 (-30)"
+    }
+  ],
+  "explanation": "먼저, 현관을 청소하는 이유는 오염 가능성이 높기 때문입니다. 현관은 외부에서 들어오는 먼지와 오염물질이 쌓이기 쉬운 공간으로, 기본 점수에서 높은 평가를 받았고, 취침 시간이 가까워지면서 점수가 조금 감소했지만 여전히 청소가 필요합니다. 반면, 침실은 사용자 머무름과 취침 시간과의 근접성으로 인해 제외되었습니다. 사용자가 이미 머무르고 있는 공간에서 청소를 진행하면 방해가 될 수 있으므로, 청소를 하지 않는 것이 더 적절합니다. 또한, 거실과 주방은 저소음 모드로 청소하여 사용자의 편안한 환경을 유지하면서도 청소를 진행할 수 있도록 설정했습니다. 이러한 방식으로 청소의 효율성과 사용자의 편안함을 동시에 고려하고 있습니다.",
+  "fallback": false
+}

@@ -1,0 +1,103 @@
+{
+  "scenario_id": "rainy_return",
+  "context_summary": "비 오는 날 귀가 · 시각 20:30 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "entrance",
+      "base": 30,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 30
+        },
+        {
+          "source": "rain",
+          "label_ko": "비",
+          "delta": 20
+        },
+        {
+          "source": "user_returned",
+          "label_ko": "사용자 귀가",
+          "delta": 15
+        }
+      ],
+      "final": 65,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "living",
+      "base": 25,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 25
+        },
+        {
+          "source": "rain",
+          "label_ko": "비",
+          "delta": 5
+        },
+        {
+          "source": "user_returned",
+          "label_ko": "사용자 귀가",
+          "delta": 10
+        }
+      ],
+      "final": 40,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "kitchen",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        }
+      ],
+      "final": 20,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bathroom",
+      "base": 10,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 10
+        }
+      ],
+      "final": 10,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 15,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 15
+        },
+        {
+          "source": "pre_sleep_2h",
+          "label_ko": "취침 2시간 이내",
+          "delta": -30
+        }
+      ],
+      "final": -15,
+      "mode": "excluded",
+      "exclusion_reason": "취침 2시간 이내 (-30)"
+    }
+  ],
+  "explanation": "먼저 현관을 청소하는 이유는 비 오는 날 외부에서 들어온 오염물질이 많아 오염 가능성이 높기 때문입니다. 현관은 기본 점수에 비로 인한 추가 점수가 더해져 청소의 우선순위가 높아졌습니다. 다음으로 거실을 청소하는 이유는 사용자가 귀가한 직후로, 이 공간에서 시간을 많이 보낼 가능성이 크기 때문입니다. 반면, 침실은 취침 시간이 가까워 사용자에게 방해가 될 수 있어 청소를 제외했습니다. 이는 사용자의 편안한 수면을 위해 중요한 결정입니다. 따라서, 최상위 공간인 현관과 거실을 먼저 청소하고, 침실은 제외하는 방식으로 청소 계획을 세운 것입니다.",
+  "fallback": false
+}

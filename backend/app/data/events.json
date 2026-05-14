@@ -1,0 +1,62 @@
+[
+  {
+    "id": "rain",
+    "name_ko": "비",
+    "effects": [
+      {"room_id": "entrance", "delta": 20},
+      {"room_id": "living", "delta": 5}
+    ]
+  },
+  {
+    "id": "user_returned",
+    "name_ko": "사용자 귀가",
+    "effects": [
+      {"room_id": "entrance", "delta": 15},
+      {"room_id": "living", "delta": 10}
+    ]
+  },
+  {
+    "id": "cooking_done",
+    "name_ko": "요리 완료",
+    "effects": [
+      {"room_id": "kitchen", "delta": 30}
+    ]
+  },
+  {
+    "id": "guest_arriving_2h",
+    "name_ko": "손님 방문 임박",
+    "effects": [
+      {"room_id": "entrance", "delta": 20},
+      {"room_id": "living", "delta": 25},
+      {"room_id": "kitchen", "delta": 5},
+      {"room_id": "bedroom", "delta": -10},
+      {"room_id": "bathroom", "delta": 10}
+    ]
+  },
+  {
+    "id": "pre_sleep_2h",
+    "name_ko": "취침 2시간 이내",
+    "effects": [
+      {"room_id": "bedroom", "delta": -30}
+    ]
+  },
+  {
+    "id": "pre_sleep_30min",
+    "name_ko": "취침 30분 이내",
+    "effects": [
+      {"room_id": "entrance", "delta": -5},
+      {"room_id": "living", "delta": -15},
+      {"room_id": "kitchen", "delta": -5},
+      {"room_id": "bedroom", "delta": -30},
+      {"room_id": "bathroom", "delta": -5}
+    ]
+  },
+  {
+    "id": "guest_visit_recent",
+    "name_ko": "최근 손님 방문",
+    "effects": [
+      {"room_id": "living", "delta": 5},
+      {"room_id": "bathroom", "delta": 5}
+    ]
+  }
+]
