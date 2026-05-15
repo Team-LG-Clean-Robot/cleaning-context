@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.data_loader import load_events, load_rooms, load_rules, load_scenarios
-from app.routers import events, health, scenarios, simulate
+from app.routers import ask, events, health, scenarios, simulate
 
 
 def _seed_cache_from_disk() -> None:
@@ -46,3 +46,4 @@ app.include_router(health.router, prefix="/api")
 app.include_router(scenarios.router, prefix="/api")
 app.include_router(simulate.router, prefix="/api")
 app.include_router(events.router, prefix="/api")
+app.include_router(ask.router, prefix="/api")

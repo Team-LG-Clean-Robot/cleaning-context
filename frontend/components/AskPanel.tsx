@@ -1,0 +1,143 @@
+"use client";
+import { useState } from "react";
+import { askQuestion } from "@/lib/api";
+import type { SimulateResponse } from "@/lib/types";
+
+type Turn = { question: string; answer: string; fallback: boolean };
+
+type Props = { response: SimulateResponse };
+
+const SUGGESTIONS = [
+  "왜 거실이 우선이 아니야?",
+  "이 시간에 안전한 청소 모드는?",
+  "추가로 청소하면 좋은 공간 있어?",
+];
+
+export function AskPanel({ response }: Props) {
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [draft, setDraft] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function send(q: string) {
+    const question = q.trim();
+    if (!question || loading) return;
+    setDraft("");
+    setError(null);
+    setLoading(true);
+    setTurns((t) => [...t, { question, answer: "", fallback: false }]);
+    try {
+      const res = await askQuestion({
+        context_summary: response.context_summary,
+        rooms: response.rooms,
+        question,
+      });
+      setTurns((t) => {
+        const next = t.slice();
+        next[next.length - 1] = {
+          question,
+          answer: res.answer,
+          fallback: res.fallback,
+        };
+        return next;
+      });
+    } catch (e) {
+      setTurns((t) => t.slice(0, -1));
+      setError(String(e));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section
+      aria-label="AI 후속 질문"
+      className="bg-white border border-border-default rounded-xl p-5 shadow-sm space-y-3"
+    >
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-[16px] font-semibold text-text-default">
+          더 묻기
+        </h2>
+        <span className="text-[11px] text-gray-500">
+          이 결과에 대해 자유롭게 질문하세요
+        </span>
+      </div>
+
+      {turns.length === 0 && !loading && (
+        <div className="flex flex-wrap gap-1.5">
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => send(s)}
+              className="text-[12px] px-2.5 py-1 rounded-full bg-surface-muted border border-border-default text-text-default hover:bg-white transition"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {turns.length > 0 && (
+        <ol className="space-y-3">
+          {turns.map((t, i) => (
+            <li key={i} className="space-y-1.5">
+              <div className="text-[13px] font-medium text-text-default">
+                <span className="mr-1.5 text-gray-500">Q.</span>
+                {t.question}
+              </div>
+              <div className="text-[13px] leading-relaxed text-text-muted pl-5 border-l-2 border-border-default">
+                {t.answer ? (
+                  <>
+                    {t.fallback && (
+                      <span className="inline-block mr-1.5 text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-surface-muted border border-border-default text-text-muted">
+                        폴백
+                      </span>
+                    )}
+                    {t.answer}
+                  </>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-gray-500">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-text-muted animate-pulse" />
+                    답변 생성 중…
+                  </span>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {error && (
+        <div className="text-[12px] text-text-default bg-surface-muted border-l-4 border-l-text-default border border-border-default rounded-md p-2">
+          {error}
+        </div>
+      )}
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          send(draft);
+        }}
+        className="flex gap-2 pt-1"
+      >
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          maxLength={200}
+          placeholder="예: 왜 침실은 청소를 안 해?"
+          disabled={loading}
+          className="flex-1 px-3 py-2 text-[13px] bg-white border border-border-default rounded-md focus:outline-none focus:ring-2 focus:ring-text-default/30 disabled:opacity-60"
+        />
+        <button
+          type="submit"
+          disabled={loading || !draft.trim()}
+          className="px-4 py-2 text-[13px] font-medium bg-action-primary text-white rounded-md hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed transition"
+        >
+          보내기
+        </button>
+      </form>
+    </section>
+  );
+}

@@ -88,3 +88,15 @@ export const ROOMS_SEED: RoomBbox[] = [
 ];
 
 export const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+export type AskRequest = {
+  context_summary: string;
+  rooms: RoomScore[];
+  question: string;
+};
+
+export type AskResponse = {
+  answer: string;
+  fallback: boolean;
+  duration_ms: number;
+};

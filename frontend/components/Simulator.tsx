@@ -14,6 +14,7 @@ import type {
   SimulateResponse,
 } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
+import { AskPanel } from "./AskPanel";
 import { CustomModePanel } from "./CustomModePanel";
 import { ExplanationCard } from "./ExplanationCard";
 import { HouseMap } from "./HouseMap";
@@ -294,6 +295,10 @@ export function Simulator() {
             />
             <PriorityList rooms={state.response.rooms} />
             <ExplanationCard response={state.response} />
+            <AskPanel
+              key={state.response.scenario_id + state.response.duration_ms}
+              response={state.response}
+            />
           </>
         )}
       </div>

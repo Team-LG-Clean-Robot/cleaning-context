@@ -1,4 +1,6 @@
 import type {
+  AskRequest,
+  AskResponse,
   CustomRequest,
   EventMeta,
   ScenarioMeta,
@@ -62,6 +64,19 @@ export async function simulateCustom(
     signal,
   });
   return jsonOrThrow(r, "simulate");
+}
+
+export async function askQuestion(
+  req: AskRequest,
+  signal?: AbortSignal,
+): Promise<AskResponse> {
+  const r = await fetch(`${BASE}/api/ask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+    signal,
+  });
+  return jsonOrThrow(r, "ask");
 }
 
 /** 빠른 연속 요청 시 마지막 요청만 살리는 헬퍼. */
