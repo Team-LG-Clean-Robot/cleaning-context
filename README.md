@@ -9,9 +9,17 @@
 - **앱**: https://cleaning-context.vercel.app/
 - **API 헬스체크**: https://cleaning-context-backend.onrender.com/api/health
 
-## 한 줄로
+## 포지셔닝
 
-> "청소를 잘하는 로봇"이 아니라 **"왜 이렇게 청소했는지 설명하는 로봇"** — 단순 자동화에서 상황 이해·설명 가능한 Physical AI Agent로의 시장 포지션 이동을 제안.
+> **사용자 신뢰 격차(autonomy trust gap)를 해소하는, LG ThinQ에 그대로 얹을 수 있는 디바이스 측 explainable decision layer.**
+
+세 가지 사실 위에 선다.
+
+1. **신뢰 격차는 가설이 아니라 사실.** AI 자율 청소를 *원하면서도* "왜?"에 답하지 못해 결국 수동으로 회귀하는 사용자 세그먼트가 명확히 존재. 자율성의 병목은 청소 성능이 아니라 **설명 가능성**.
+2. **LG는 이미 데이터·하드웨어 보유.** ThinQ 플랫폼·CodeZero AI·각종 센서 — 빠진 건 그 데이터로부터 *결정·이유*를 만드는 layer뿐. 본 프로젝트는 그 layer의 5-Layer 명세·reference implementation.
+3. **중앙 허브 시대에도 살아남는다.** Matter/HomeKit/Google Home은 *제어 인터페이스*만 정의 — 결정·설명은 vendor 책임이고 디바이스 측에 남는다 (지연·프라이버시·도메인 지식·오프라인 fallback). 본 layer는 **지금 ThinQ, 미래 Home Agent 양쪽과 호환**.
+
+자세한 포지셔닝·반박 대응은 [PLANNING.md §3.1, §15](./PLANNING.md) 참조.
 
 ## 데모 시나리오 4종
 
