@@ -198,6 +198,11 @@ export function Simulator() {
       : state.customDraft.user_location;
 
   return (
+    <div className="space-y-6">
+    <AskPanel
+      key={state.response?.scenario_id ?? "general"}
+      response={state.response}
+    />
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       <div className="lg:col-span-3">
         <HouseMap
@@ -295,13 +300,10 @@ export function Simulator() {
             />
             <PriorityList rooms={state.response.rooms} />
             <ExplanationCard response={state.response} />
-            <AskPanel
-              key={state.response.scenario_id + state.response.duration_ms}
-              response={state.response}
-            />
           </>
         )}
       </div>
+    </div>
     </div>
   );
 }

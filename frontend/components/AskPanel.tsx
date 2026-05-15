@@ -5,15 +5,23 @@ import type { SimulateResponse } from "@/lib/types";
 
 type Turn = { question: string; answer: string; fallback: boolean };
 
-type Props = { response: SimulateResponse };
+type Props = { response: SimulateResponse | null };
 
-const SUGGESTIONS = [
+const GROUNDED_SUGGESTIONS = [
   "왜 거실이 우선이 아니야?",
   "이 시간에 안전한 청소 모드는?",
   "추가로 청소하면 좋은 공간 있어?",
 ];
 
+const GENERAL_SUGGESTIONS = [
+  "이 시뮬레이터는 어떻게 동작해?",
+  "Rule-based랑 LLM은 어떻게 나눠져 있어?",
+  "어떤 시나리오가 있어?",
+];
+
 export function AskPanel({ response }: Props) {
+  const grounded = response !== null;
+  const SUGGESTIONS = grounded ? GROUNDED_SUGGESTIONS : GENERAL_SUGGESTIONS;
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,8 +36,8 @@ export function AskPanel({ response }: Props) {
     setTurns((t) => [...t, { question, answer: "", fallback: false }]);
     try {
       const res = await askQuestion({
-        context_summary: response.context_summary,
-        rooms: response.rooms,
+        context_summary: response?.context_summary ?? "",
+        rooms: response?.rooms ?? [],
         question,
       });
       setTurns((t) => {
@@ -54,12 +62,14 @@ export function AskPanel({ response }: Props) {
       aria-label="AI 후속 질문"
       className="bg-white border border-border-default rounded-xl p-5 shadow-sm space-y-3"
     >
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-[16px] font-semibold text-text-default">
-          더 묻기
+          {grounded ? "이 결과에 대해 묻기" : "AI 어시스턴트"}
         </h2>
         <span className="text-[11px] text-gray-500">
-          이 결과에 대해 자유롭게 질문하세요
+          {grounded
+            ? "현재 시뮬레이션 결과를 근거로 답변합니다"
+            : "프로젝트·시나리오 전반에 대해 질문하세요"}
         </span>
       </div>
 
@@ -126,7 +136,11 @@ export function AskPanel({ response }: Props) {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={200}
-          placeholder="예: 왜 침실은 청소를 안 해?"
+          placeholder={
+            grounded
+              ? "예: 왜 침실은 청소를 안 해?"
+              : "예: Rule-based랑 LLM 어떻게 나눠져 있어?"
+          }
           disabled={loading}
           className="flex-1 px-3 py-2 text-[13px] bg-white border border-border-default rounded-md focus:outline-none focus:ring-2 focus:ring-text-default/30 disabled:opacity-60"
         />
