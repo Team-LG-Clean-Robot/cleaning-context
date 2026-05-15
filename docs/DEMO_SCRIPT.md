@@ -2,7 +2,7 @@
 
 > 발표자: 전유성 · 보조: 박주상 (질의응답) · 김준성·조현서 (옵저버)
 > 총 시간: 12분 (시연 9분 + 질의응답 여백 3분)
-> 라이브 URL: https://cleaning-context.vercel.app/
+> 라이브 URL: https://robot-cleaner.askewly.com/  (backup: https://cleaning-context.vercel.app/)
 > 백업: 라이브 실패 시 로컬 데모 (http://localhost:3001)
 
 ---
@@ -25,7 +25,7 @@
 >
 > 저희는 이 격차를 메우는 layer를 만들었습니다. 보여드리겠습니다."
 
-→ 화면 공유 시작, `https://cleaning-context.vercel.app/` 로딩.
+→ 화면 공유 시작, `https://robot-cleaner.askewly.com/` 로딩.
 
 ---
 

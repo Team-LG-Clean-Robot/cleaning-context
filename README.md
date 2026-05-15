@@ -6,7 +6,7 @@
 
 ## 🌐 라이브 데모
 
-- **앱**: https://cleaning-context.vercel.app/
+- **앱**: https://robot-cleaner.askewly.com/  (backup: https://cleaning-context.vercel.app/)
 - **API 헬스체크**: https://cleaning-context-backend.onrender.com/api/health
 
 ## 포지셔닝
