@@ -6,31 +6,38 @@ type Props = { rooms?: RoomScore[]; userLocation?: RoomId | null };
 
 type Furniture = { d: string; transform?: string };
 
-// 새 bbox 기준 가구 배치
+// 새 bbox 기준 가구 배치. 침실 베드 헤드보드·소파 쿠션·싱크홀 등 미세 디테일.
 const FURNITURE: Partial<Record<RoomId, Furniture[]>> = {
   living: [
     { d: "M 0 0 h 80 v 16 h -80 z", transform: "translate(140 130)" },
     { d: "M 0 0 h 80 v 4 h -80 z", transform: "translate(140 124)" },
+    { d: "M 18 8 v 8 M 40 8 v 8 M 62 8 v 8", transform: "translate(140 130)" },
     { d: "M 0 0 h 14 v 14 h -14 z", transform: "translate(232 122)" },
   ],
   bedroom: [
     { d: "M 0 0 h 70 v 50 h -70 z", transform: "translate(20 215)" },
+    { d: "M 0 -4 h 70 v 4 h -70 z", transform: "translate(20 215)" },
     { d: "M 0 0 h 28 v 10 h -28 z", transform: "translate(24 219)" },
     { d: "M 0 0 h 28 v 10 h -28 z", transform: "translate(58 219)" },
+    { d: "M 35 30 m -4 0 a 4 4 0 1 0 8 0 a 4 4 0 1 0 -8 0", transform: "translate(20 215)" },
   ],
   kitchen: [
     { d: "M 0 0 h 96 v 12 h -96 z", transform: "translate(302 16)" },
     { d: "M 0 0 v -6 h 10", transform: "translate(336 16)" },
+    { d: "M 70 6 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0", transform: "translate(302 16)" },
   ],
   bathroom: [
     {
       d: "M 6 0 h 78 a 6 6 0 0 1 6 6 v 38 a 6 6 0 0 1 -6 6 h -78 a 6 6 0 0 1 -6 -6 v -38 a 6 6 0 0 1 6 -6 z",
       transform: "translate(305 218)",
     },
+    { d: "M 12 8 h 66 v 4 h -66 z", transform: "translate(305 218)" },
   ],
   entrance: [
     { d: "M 0 0 a 6 4 0 1 0 12 0 a 6 4 0 1 0 -12 0", transform: "translate(20 140)" },
     { d: "M 0 0 a 6 4 0 1 0 12 0 a 6 4 0 1 0 -12 0", transform: "translate(44 140)" },
+    { d: "M -2 -2 l 16 0", transform: "translate(20 146)" },
+    { d: "M -2 -2 l 16 0", transform: "translate(44 146)" },
   ],
 };
 
@@ -52,18 +59,20 @@ function scoreTextColor(score: number, mode: Mode): string {
 function PersonIcon({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <circle cx={0} cy={-8} r={4} fill="#1A1A1A" />
+      <circle cx={0} cy={2} r={11} fill="white" stroke="#1A1A1A" strokeWidth={1.2} />
+      <circle cx={0} cy={-7} r={3.2} fill="#1A1A1A" />
       <path
-        d="M -6 0 q 6 -4 12 0 v 10 q -6 4 -12 0 z"
+        d="M -5 4 q 5 -3.5 10 0 v 6 q -5 3 -10 0 z"
         fill="#1A1A1A"
       />
       <text
         x={0}
-        y={22}
+        y={24}
         textAnchor="middle"
         style={{
-          font: "500 10px var(--font-sans)",
+          font: "600 9px var(--font-sans)",
           fill: "#1A1A1A",
+          letterSpacing: "0.04em",
         }}
       >
         사용자
@@ -138,7 +147,7 @@ export function HouseMap({ rooms, userLocation }: Props) {
       viewBox="0 0 420 280"
       role="img"
       aria-label={ariaLabel}
-      className="w-full h-auto border border-border-default rounded-xl bg-white shadow-sm"
+      className="w-full h-auto border border-border-default rounded-xl bg-white shadow-[0_4px_24px_-12px_rgba(0,0,0,0.25)]"
     >
       <defs>
         <pattern
@@ -149,6 +158,14 @@ export function HouseMap({ rooms, userLocation }: Props) {
         >
           <path d="M0 6 L6 0" stroke="#9ca3af" strokeWidth="1" />
         </pattern>
+        <filter id="room-shadow" x="-2%" y="-2%" width="104%" height="104%">
+          <feGaussianBlur stdDeviation="0.6" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.35" />
+          </feComponentTransfer>
+          <feComposite in2="SourceGraphic" operator="in" />
+          <feComposite in="SourceGraphic" operator="over" />
+        </filter>
       </defs>
 
       {/* Layer 1: 방 채우기 + 내벽 */}

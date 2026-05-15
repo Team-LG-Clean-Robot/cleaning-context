@@ -37,11 +37,11 @@ export function ScenarioPanel({
             onClick={() => onSelect(s.id)}
             disabled={loading}
             aria-pressed={active}
-            className={`p-4 rounded-xl border text-left transition
+            className={`p-4 rounded-xl border text-left transition duration-150 ease-out
               ${
                 active
                   ? "bg-action-primary text-white border-action-primary shadow-md"
-                  : "bg-white hover:bg-surface-base border-border-default"
+                  : "bg-white hover:bg-surface-base hover:-translate-y-0.5 hover:shadow-sm border-border-default"
               }
               ${loading ? "opacity-50 cursor-wait" : ""}
               focus:outline-none focus:ring-2 focus:ring-action-primary/40`}

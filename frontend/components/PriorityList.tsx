@@ -7,30 +7,38 @@ export function PriorityList({ rooms }: { rooms: RoomScore[] }) {
     <div className="bg-white border border-border-default rounded-xl p-4 shadow-sm">
       <h2 className="text-[16px] font-semibold mb-3">청소 우선순위</h2>
       <ul className="space-y-1.5">
-        {rooms.map((r) => {
+        {rooms.map((r, i) => {
           const badge = MODE_BADGE[r.mode];
+          const rank = r.mode === "excluded" ? "—" : String(i + 1);
           return (
             <li
               key={r.room_id}
-              className={`flex items-start justify-between p-2 rounded-md hover:bg-surface-base
+              className={`flex items-start justify-between gap-3 p-2 rounded-md hover:bg-surface-base transition
                 ${r.mode === "excluded" ? "opacity-70" : ""}`}
             >
-              <div className="min-w-0">
-                <span
-                  className={`text-[14px] font-medium ${
-                    r.mode === "excluded" ? "line-through text-text-muted" : "text-text-default"
-                  }`}
-                >
-                  {ROOM_LABEL[r.room_id]}
+              <div className="min-w-0 flex items-baseline gap-2.5">
+                <span className="inline-flex items-center justify-center w-5 h-5 text-[11px] font-semibold tabular-nums text-text-muted bg-surface-muted border border-border-default rounded-full shrink-0">
+                  {rank}
                 </span>
-                <span className="ml-2 text-[13px] text-gray-500 font-mono">
-                  {r.final}점
-                </span>
-                {r.exclusion_reason && r.mode === "excluded" && (
-                  <div className="text-[11px] text-gray-500 mt-0.5">
-                    {r.exclusion_reason}
+                <div className="min-w-0">
+                  <div className="flex items-baseline gap-2">
+                    <span
+                      className={`text-[14px] font-medium ${
+                        r.mode === "excluded" ? "line-through text-text-muted" : "text-text-default"
+                      }`}
+                    >
+                      {ROOM_LABEL[r.room_id]}
+                    </span>
+                    <span className="text-[13px] text-gray-500 font-mono tabular-nums">
+                      {r.final}점
+                    </span>
                   </div>
-                )}
+                  {r.exclusion_reason && r.mode === "excluded" && (
+                    <div className="text-[11px] text-gray-500 mt-0.5">
+                      {r.exclusion_reason}
+                    </div>
+                  )}
+                </div>
               </div>
               <span
                 className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md
