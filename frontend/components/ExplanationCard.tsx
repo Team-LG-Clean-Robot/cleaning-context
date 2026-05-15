@@ -17,7 +17,7 @@ export function ExplanationCard({ response }: { response: SimulateResponse }) {
           <h2 className="text-[16px] font-semibold">AI 설명</h2>
           {response.fallback && (
             <span className="text-[11px] font-medium px-2 py-0.5 rounded
-                             bg-orange-50 text-orange-700 border border-orange-700/30">
+                             bg-surface-muted text-text-muted border border-border-default">
               폴백 모드
             </span>
           )}

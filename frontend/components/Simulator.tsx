@@ -252,14 +252,14 @@ export function Simulator() {
         )}
 
         {state.error && (
-          <div className="p-3 bg-orange-50 border border-orange-700/30 rounded-lg text-orange-700 text-[13px]">
-            <div>{state.error}</div>
+          <div className="p-3 bg-surface-muted border-l-4 border-l-text-default border border-border-default rounded-md text-[13px] text-text-default">
+            <div className="font-medium">{state.error}</div>
             {state.mode === "preset" && state.selectedId && (
               <button
                 onClick={() =>
                   state.selectedId && handlePresetSelect(state.selectedId)
                 }
-                className="mt-1 underline text-[12px]"
+                className="mt-1 underline text-[12px] text-text-muted hover:text-text-default"
               >
                 재시도
               </button>
