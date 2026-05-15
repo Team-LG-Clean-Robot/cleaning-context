@@ -5,7 +5,7 @@
 
 ## 라이브 데모
 
-- **프론트**: https://cleaning-context.vercel.app/
+- **프론트**: https://robot-cleaner.askewly.com/  (backup: https://cleaning-context.vercel.app/)
 - **백엔드 헬스체크**: https://cleaning-context-backend.onrender.com/api/health
 
 ## 다가오는 마일스톤
@@ -52,7 +52,7 @@
 
 ### 배포
 - ✅ Render — `cleaning-context-backend.onrender.com`, render.yaml blueprint
-- ✅ Vercel — `cleaning-context.vercel.app`
+- ✅ Vercel — `robot-cleaner.askewly.com` (custom domain) + `cleaning-context.vercel.app` (backup)
 - ✅ Github push (main 브랜치)
 
 ---

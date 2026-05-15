@@ -38,7 +38,7 @@ git commit -m "seed cached responses for 4 scenarios"
 2. **Root Directory**: `team-project-lg/frontend`
 3. Framework: Next.js (자동 감지)
 4. 환경변수: `NEXT_PUBLIC_API_URL=https://<render-domain>`
-5. Deploy → URL 확보 (예: `https://cleaning-context.vercel.app`)
+5. Deploy → URL 확보 (예: `https://cleaning-context.vercel.app`, custom domain: `https://robot-cleaner.askewly.com`)
 6. Vercel URL을 Render `CORS_ORIGINS`에 추가 → Render 재배포
 
 ## 4. 발표 day-of 체크리스트

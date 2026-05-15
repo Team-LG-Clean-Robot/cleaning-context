@@ -5,3 +5,11 @@
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
+
+@layer base {
+  /* Korean word break — 어절 단위 줄바꿈으로 단어가 잘리지 않게 */
+  body {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+}

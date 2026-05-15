@@ -192,7 +192,7 @@ LG 로봇청소기를 비롯한 가정용 가전은 이미 자동화 수준에 �
 
 == 라이브 배포
 
-프론트엔드는 Vercel(#link("https://cleaning-context.vercel.app/")[`cleaning-context.vercel.app`]), 백엔드는 Render(#link("https://cleaning-context-backend.onrender.com/api/health")[`cleaning-context-backend.onrender.com/api/health`])에 배포되어 외부 접근 가능한 상태다. GitHub `main` 브랜치에 연동되어 push 즉시 재배포된다.
+프론트엔드는 Vercel(#link("https://robot-cleaner.askewly.com/")[`robot-cleaner.askewly.com`] · backup #link("https://cleaning-context.vercel.app/")[`cleaning-context.vercel.app`]), 백엔드는 Render(#link("https://cleaning-context-backend.onrender.com/api/health")[`cleaning-context-backend.onrender.com/api/health`])에 배포되어 외부 접근 가능한 상태다. GitHub `main` 브랜치에 연동되어 push 즉시 재배포된다.
 
 == 백엔드
 

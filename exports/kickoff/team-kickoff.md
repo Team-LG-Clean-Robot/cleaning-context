@@ -20,7 +20,7 @@
 
 로봇청소기가 **시간·날씨·이벤트** 같은 상황 정보를 종합해 어디를·언제·어떻게 청소할지 결정하고, 그 이유를 **자연어로 설명**하는 Physical AI Agent 시뮬레이터 (실제 로봇이 아닌 웹 화면에서 동작하는 의사결정 모형).
 
-- 라이브: https://cleaning-context.vercel.app/
+- 라이브: https://robot-cleaner.askewly.com/
 - 백엔드 (서버) 헬스: https://cleaning-context-backend.onrender.com/api/health
 
 ### 1.1 문제 정의
@@ -190,7 +190,7 @@ LLM이 점수표를 사람 말로 해석. 화면 오른쪽 `ExplanationCard` 에
 
 | 항목 | 링크 |
 |---|---|
-| 프론트 (사용자 화면) | https://cleaning-context.vercel.app/ |
+| 프론트 (사용자 화면) | https://robot-cleaner.askewly.com/ |
 | 백엔드 (서버) 헬스 | https://cleaning-context-backend.onrender.com/api/health |
 | 레포 (소스 코드 저장소) | https://github.com/lumatic2/ai-intensive-project |
 | 팀 현황 문서 | `team-project-lg/STATUS.md` |
@@ -293,7 +293,7 @@ cd team-project-lg/backend && pytest -v   # 24/24
 | 조직 (org) | **Team-LG-Clean-Robot** |
 | 메인 레포 | **https://github.com/Team-LG-Clean-Robot/cleaning-context** (공개) |
 | 기본 브랜치 | `main` |
-| 라이브 프론트 | https://cleaning-context.vercel.app/ (Vercel · `frontend/` 자동 배포) |
+| 라이브 프론트 | https://robot-cleaner.askewly.com/ (Vercel · `frontend/` 자동 배포) |
 | 라이브 백엔드 | https://cleaning-context-backend.onrender.com/api/health (Render · `backend/` 자동 배포) |
 
 > **상태.** Vercel·Render 가 이 레포의 `main` 푸시에 자동 반응하도록 연결 완료. 즉 main 에 commit 만 들어오면 1\~2분 안에 라이브에 반영된다.
