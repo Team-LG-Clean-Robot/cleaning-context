@@ -21,7 +21,7 @@ export function ScenarioPanel({
 }: Props) {
   if (scenarios.length === 0) {
     return (
-      <div className="text-[13px] text-ink-3">시나리오를 불러오는 중…</div>
+      <div className="text-[13px] text-gray-500">시나리오를 불러오는 중…</div>
     );
   }
   const eventLabel = new Map(events.map((e) => [e.id, e.name_ko]));
@@ -40,18 +40,18 @@ export function ScenarioPanel({
             className={`p-4 rounded-xl border text-left transition
               ${
                 active
-                  ? "bg-lg-red text-white border-lg-red shadow-md"
-                  : "bg-white hover:bg-paper border-line"
+                  ? "bg-action-primary text-white border-action-primary shadow-md"
+                  : "bg-white hover:bg-surface-base border-border-default"
               }
               ${loading ? "opacity-50 cursor-wait" : ""}
-              focus:outline-none focus:ring-2 focus:ring-lg-red/40`}
+              focus:outline-none focus:ring-2 focus:ring-action-primary/40`}
           >
             <div className="text-[16px] font-semibold leading-tight">
               {s.name_ko}
             </div>
             <div
               className={`text-[12px] mt-1.5 ${
-                active ? "text-white/80" : "text-ink-3"
+                active ? "text-white/80" : "text-gray-500"
               }`}
             >
               🕒 {s.current_time} · 😴 취침 {s.sleep_time}
@@ -66,7 +66,7 @@ export function ScenarioPanel({
                     ${
                       active
                         ? "bg-white/20 text-white border-white/30"
-                        : "bg-paper text-ink border-line-2"
+                        : "bg-surface-base text-text-default border-border-default"
                     }`}
                 >
                   {eventLabel.get(eid) ?? eid}
@@ -75,7 +75,7 @@ export function ScenarioPanel({
               {overflow > 0 && (
                 <span
                   className={`text-[11px] ${
-                    active ? "text-white/70" : "text-ink-3"
+                    active ? "text-white/70" : "text-gray-500"
                   }`}
                 >
                   +{overflow}

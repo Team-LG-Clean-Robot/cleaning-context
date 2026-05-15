@@ -19,13 +19,13 @@ const FURNITURE: Partial<Record<RoomId, Furniture[]>> = {
     { d: "M 0 0 h 28 v 10 h -28 z", transform: "translate(58 219)" },
   ],
   kitchen: [
-    { d: "M 0 0 h 100 v 18 h -100 z", transform: "translate(300 22)" },
-    { d: "M 0 0 v -8 h 12", transform: "translate(340 22)" },
+    { d: "M 0 0 h 96 v 12 h -96 z", transform: "translate(302 16)" },
+    { d: "M 0 0 v -6 h 10", transform: "translate(336 16)" },
   ],
   bathroom: [
     {
-      d: "M 6 0 h 88 a 6 6 0 0 1 6 6 v 48 a 6 6 0 0 1 -6 6 h -88 a 6 6 0 0 1 -6 -6 v -48 a 6 6 0 0 1 6 -6 z",
-      transform: "translate(300 180)",
+      d: "M 6 0 h 78 a 6 6 0 0 1 6 6 v 38 a 6 6 0 0 1 -6 6 h -78 a 6 6 0 0 1 -6 -6 v -38 a 6 6 0 0 1 6 -6 z",
+      transform: "translate(305 218)",
     },
   ],
   entrance: [
@@ -52,10 +52,10 @@ function scoreTextColor(score: number, mode: Mode): string {
 function PersonIcon({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <circle cx={0} cy={-8} r={4} fill="#A50034" />
+      <circle cx={0} cy={-8} r={4} fill="#1A1A1A" />
       <path
         d="M -6 0 q 6 -4 12 0 v 10 q -6 4 -12 0 z"
-        fill="#A50034"
+        fill="#1A1A1A"
       />
       <text
         x={0}
@@ -63,7 +63,7 @@ function PersonIcon({ x, y }: { x: number; y: number }) {
         textAnchor="middle"
         style={{
           font: "500 10px var(--font-sans)",
-          fill: "#A50034",
+          fill: "#1A1A1A",
         }}
       >
         사용자
@@ -94,16 +94,51 @@ function buildAriaLabel(rooms?: RoomScore[], userLocation?: RoomId | null): stri
   return `집 평면도. ${parts.join(", ")}.${userPart}`;
 }
 
+const LEGEND_STEPS = [96, 90, 84, 78, 72, 66];
+
+function HeatmapLegend() {
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-[11px] text-gray-500">
+      <span className="font-medium text-text-muted">청소 우선순위</span>
+      <div className="flex items-center gap-1.5">
+        <span>낮음</span>
+        <span className="flex" aria-hidden="true">
+          {LEGEND_STEPS.map((l) => (
+            <span
+              key={l}
+              className="block w-4 h-2.5 border-y border-l border-border-default last:border-r"
+              style={{ background: `oklch(${l}% 0 0)` }}
+            />
+          ))}
+        </span>
+        <span>높음</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <svg width={16} height={10} aria-hidden="true" className="border border-border-default">
+          <defs>
+            <pattern id="hatch-legend" patternUnits="userSpaceOnUse" width="4" height="4">
+              <path d="M0 4 L4 0" stroke="#9ca3af" strokeWidth="0.8" />
+            </pattern>
+          </defs>
+          <rect width={16} height={10} fill="url(#hatch-legend)" />
+        </svg>
+        <span>제외 (저소음 시간대 등)</span>
+      </div>
+    </div>
+  );
+}
+
 export function HouseMap({ rooms, userLocation }: Props) {
   const scoreMap = new Map(rooms?.map((r) => [r.room_id, r]) ?? []);
   const ariaLabel = buildAriaLabel(rooms, userLocation);
 
   return (
+    <div>
     <svg
       viewBox="0 0 420 280"
       role="img"
       aria-label={ariaLabel}
-      className="w-full h-auto border border-line rounded-xl bg-white shadow-sm"
+      className="w-full h-auto border border-border-default rounded-xl bg-white shadow-sm"
     >
       <defs>
         <pattern
@@ -220,5 +255,7 @@ export function HouseMap({ rooms, userLocation }: Props) {
           return <PersonIcon x={x} y={y} />;
         })()}
     </svg>
+    <HeatmapLegend />
+    </div>
   );
 }

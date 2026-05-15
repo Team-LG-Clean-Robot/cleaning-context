@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap"
         />
       </head>
-      <body className="bg-paper text-ink font-sans antialiased min-h-screen">
+      <body className="bg-surface-base text-text-default font-sans antialiased min-h-screen">
         {children}
       </body>
     </html>

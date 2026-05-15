@@ -54,13 +54,13 @@ export function CustomModePanel({
   };
 
   return (
-    <section className="bg-white border border-line rounded-xl p-5 shadow-sm space-y-4">
+    <section className="bg-white border border-border-default rounded-xl p-5 shadow-sm space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-[16px] font-semibold">상황 직접 입력</h2>
         <button
           type="button"
           onClick={() => onChange(PRESET_FILL)}
-          className="text-[12px] underline text-ink-2 hover:text-ink"
+          className="text-[12px] underline text-text-muted hover:text-text-default"
         >
           예시 복원
         </button>
@@ -68,7 +68,7 @@ export function CustomModePanel({
 
       <div className="grid grid-cols-2 gap-3">
         <label className="block">
-          <span className="text-[13px] font-medium text-ink-2">현재 시각</span>
+          <span className="text-[13px] font-medium text-text-muted">현재 시각</span>
           <input
             type="time"
             value={value.current_time}
@@ -78,19 +78,19 @@ export function CustomModePanel({
             className={`mt-1 w-full border rounded-lg px-3 py-2 text-[14px]
               ${
                 touched && errors.current_time
-                  ? "border-lg-red"
-                  : "border-line"
+                  ? "border-action-primary"
+                  : "border-border-default"
               }
-              focus:outline-none focus:ring-2 focus:ring-lg-red/30`}
+              focus:outline-none focus:ring-2 focus:ring-action-primary/30`}
           />
           {touched && errors.current_time && (
-            <p className="text-[11px] text-lg-red mt-1">
+            <p className="text-[11px] text-action-primary mt-1">
               {errors.current_time}
             </p>
           )}
         </label>
         <label className="block">
-          <span className="text-[13px] font-medium text-ink-2">취침 예정</span>
+          <span className="text-[13px] font-medium text-text-muted">취침 예정</span>
           <input
             type="time"
             value={value.sleep_time}
@@ -100,13 +100,13 @@ export function CustomModePanel({
             className={`mt-1 w-full border rounded-lg px-3 py-2 text-[14px]
               ${
                 touched && errors.sleep_time
-                  ? "border-lg-red"
-                  : "border-line"
+                  ? "border-action-primary"
+                  : "border-border-default"
               }
-              focus:outline-none focus:ring-2 focus:ring-lg-red/30`}
+              focus:outline-none focus:ring-2 focus:ring-action-primary/30`}
           />
           {touched && errors.sleep_time && (
-            <p className="text-[11px] text-lg-red mt-1">
+            <p className="text-[11px] text-action-primary mt-1">
               {errors.sleep_time}
             </p>
           )}
@@ -114,7 +114,7 @@ export function CustomModePanel({
       </div>
 
       <label className="block">
-        <span className="text-[13px] font-medium text-ink-2">사용자 위치</span>
+        <span className="text-[13px] font-medium text-text-muted">사용자 위치</span>
         <select
           value={value.user_location ?? ""}
           onChange={(e) =>
@@ -123,8 +123,8 @@ export function CustomModePanel({
               user_location: (e.target.value || null) as RoomId | null,
             })
           }
-          className="mt-1 w-full border border-line rounded-lg px-3 py-2 text-[14px] bg-white
-                     focus:outline-none focus:ring-2 focus:ring-lg-red/30"
+          className="mt-1 w-full border border-border-default rounded-lg px-3 py-2 text-[14px] bg-white
+                     focus:outline-none focus:ring-2 focus:ring-action-primary/30"
         >
           <option value="">사용자 없음 / 외출</option>
           {ROOM_IDS.map((id) => (
@@ -137,8 +137,8 @@ export function CustomModePanel({
 
       <div>
         <div className="flex items-baseline justify-between">
-          <span className="text-[13px] font-medium text-ink-2">이벤트</span>
-          <span className="text-[11px] text-ink-3">
+          <span className="text-[13px] font-medium text-text-muted">이벤트</span>
+          <span className="text-[11px] text-gray-500">
             {value.active_events.length} / 10 선택
           </span>
         </div>
@@ -154,8 +154,8 @@ export function CustomModePanel({
                 className={`px-3 py-1.5 rounded-md text-[13px] font-medium border transition
                   ${
                     selected
-                      ? "bg-lg-red text-white border-lg-red"
-                      : "bg-white text-ink border-line hover:bg-paper"
+                      ? "bg-action-primary text-white border-action-primary"
+                      : "bg-white text-text-default border-border-default hover:bg-surface-base"
                   }`}
               >
                 {e.name_ko}
@@ -164,7 +164,7 @@ export function CustomModePanel({
           })}
         </div>
         {touched && errors.events && (
-          <p className="text-[11px] text-lg-red mt-1">{errors.events}</p>
+          <p className="text-[11px] text-action-primary mt-1">{errors.events}</p>
         )}
       </div>
 
@@ -175,10 +175,10 @@ export function CustomModePanel({
         className={`w-full rounded-lg px-4 py-2.5 text-[14px] font-semibold transition
           ${
             loading
-              ? "bg-ink/40 cursor-wait text-white"
-              : "bg-ink text-white hover:bg-ink/90"
+              ? "bg-action-primary/40 cursor-wait text-white"
+              : "bg-action-primary text-white hover:bg-action-primary/90"
           }
-          focus:outline-none focus:ring-2 focus:ring-ink/40`}
+          focus:outline-none focus:ring-2 focus:ring-text-default/40`}
       >
         {loading ? "시뮬레이션 중…" : "시뮬레이션 실행"}
       </button>

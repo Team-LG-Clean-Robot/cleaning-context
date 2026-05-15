@@ -1,15 +1,7 @@
 @import "tailwindcss";
+@import "./theme.generated.css";
 
 @theme {
-  --color-paper: #FAF7F2;
-  --color-ink: #1A1A1A;
-  --color-ink-2: #4B4B4B;
-  --color-ink-3: #6B6B6B;
-  --color-line: #E5E0D6;
-  --color-line-2: #D4CCBC;
-  --color-lg-red: #A50034;
-  --color-gold: #8B6628;
-  --color-skeleton: #EDE8DE;
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }

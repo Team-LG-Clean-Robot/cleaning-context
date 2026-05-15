@@ -132,7 +132,7 @@ export function Simulator() {
         <div
           role="tablist"
           aria-label="입력 모드"
-          className="bg-paper border border-line rounded-lg p-1 flex gap-1 w-fit"
+          className="bg-surface-base border border-border-default rounded-lg p-1 flex gap-1 w-fit"
         >
           {(
             [
@@ -148,8 +148,8 @@ export function Simulator() {
               className={`px-4 py-2 text-[13px] font-medium rounded-md transition
                 ${
                   state.mode === t.id
-                    ? "bg-white shadow-sm text-ink"
-                    : "text-ink-3 hover:text-ink"
+                    ? "bg-white shadow-sm text-text-default"
+                    : "text-gray-500 hover:text-text-default"
                 }`}
             >
               {t.label}
@@ -194,11 +194,11 @@ export function Simulator() {
         {state.loading && <LoadingSkeleton />}
 
         {!state.response && !state.loading && !state.error && (
-          <div className="border-2 border-dashed border-line rounded-xl p-8 text-center text-ink-3">
+          <div className="border-2 border-dashed border-border-default rounded-xl p-8 text-center text-gray-500">
             <div className="text-2xl mb-2" aria-hidden>
               ←
             </div>
-            <p className="text-[13px] text-ink-2">
+            <p className="text-[13px] text-text-muted">
               {state.mode === "preset"
                 ? "좌측에서 시나리오를 선택하면 청소 우선순위와 AI 설명이 표시됩니다."
                 : "이벤트·시간·위치를 입력하고 '시뮬레이션 실행'을 누르세요."}

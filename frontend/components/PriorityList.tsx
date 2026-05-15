@@ -4,7 +4,7 @@ import { MODE_BADGE } from "@/lib/colors";
 
 export function PriorityList({ rooms }: { rooms: RoomScore[] }) {
   return (
-    <div className="bg-white border border-line rounded-xl p-4 shadow-sm">
+    <div className="bg-white border border-border-default rounded-xl p-4 shadow-sm">
       <h2 className="text-[16px] font-semibold mb-3">청소 우선순위</h2>
       <ul className="space-y-1.5">
         {rooms.map((r) => {
@@ -12,22 +12,22 @@ export function PriorityList({ rooms }: { rooms: RoomScore[] }) {
           return (
             <li
               key={r.room_id}
-              className={`flex items-start justify-between p-2 rounded-md hover:bg-paper
+              className={`flex items-start justify-between p-2 rounded-md hover:bg-surface-base
                 ${r.mode === "excluded" ? "opacity-70" : ""}`}
             >
               <div className="min-w-0">
                 <span
                   className={`text-[14px] font-medium ${
-                    r.mode === "excluded" ? "line-through text-ink-2" : "text-ink"
+                    r.mode === "excluded" ? "line-through text-text-muted" : "text-text-default"
                   }`}
                 >
                   {ROOM_LABEL[r.room_id]}
                 </span>
-                <span className="ml-2 text-[13px] text-ink-3 font-mono">
+                <span className="ml-2 text-[13px] text-gray-500 font-mono">
                   {r.final}점
                 </span>
                 {r.exclusion_reason && r.mode === "excluded" && (
-                  <div className="text-[11px] text-ink-3 mt-0.5">
+                  <div className="text-[11px] text-gray-500 mt-0.5">
                     {r.exclusion_reason}
                   </div>
                 )}

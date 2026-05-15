@@ -2,11 +2,10 @@ import type { Mode } from "./types";
 
 export function scoreToFill(score: number, mode: Mode): string {
   if (mode === "excluded") return "url(#hatch)";
-  if (score <= 0) return "#e5e7eb";
+  if (score <= 0) return "oklch(97% 0 0)";
   const clamped = Math.min(80, Math.max(0, score));
-  const hue = 60 - (clamped / 80) * 60;
-  const lightness = 88 - (clamped / 80) * 28;
-  return `hsl(${hue}, 85%, ${lightness}%)`;
+  const lightness = 96 - (clamped / 80) * 30;
+  return `oklch(${lightness}% 0 0)`;
 }
 
 export const MODE_BADGE: Record<

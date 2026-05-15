@@ -27,21 +27,21 @@ const ROLES = [
 ];
 
 export function MethodologyCard() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   return (
-    <section className="bg-white border border-line rounded-xl p-6 shadow-sm">
+    <section className="bg-white border border-border-default rounded-xl p-6 shadow-sm">
       <div className="flex items-start justify-between gap-4">
-        <p className="text-[14px] text-ink leading-relaxed max-w-[72ch]">
+        <p className="text-[14px] text-text-default leading-relaxed max-w-[72ch]">
           공간·행동·맥락을 점수로 환산하고{" "}
-          <span className="text-gold font-medium">(Rule-based)</span>, 그 이유를
+          <span className="text-accent-500 font-medium">(Rule-based)</span>, 그 이유를
           자연어로 설명합니다{" "}
-          <span className="text-gold font-medium">(LLM)</span>. 점수 계산과 설명
+          <span className="text-accent-500 font-medium">(LLM)</span>. 점수 계산과 설명
           생성이 분리되어 있어 "왜 이렇게 청소했는지" 100% 추적 가능합니다.
         </p>
         <button
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="shrink-0 bg-paper hover:bg-line/40 border border-line rounded-md px-3 py-1.5 text-[13px] font-medium transition"
+          className="shrink-0 bg-surface-base hover:bg-border-default/40 border border-border-default rounded-md px-3 py-1.5 text-[13px] font-medium transition"
         >
           {open ? "접기" : "어떻게 동작하나?"}
         </button>
@@ -76,14 +76,14 @@ export function MethodologyCard() {
                     width={160}
                     height={96}
                     rx={10}
-                    fill="#FAF7F2"
-                    stroke="#E5E0D6"
+                    fill="oklch(97% 0 0)"
+                    stroke="oklch(85% 0 0)"
                     strokeWidth={1.5}
                   />
                   <text
                     x={12}
                     y={22}
-                    fill="#8B6628"
+                    fill="oklch(50% 0 0)"
                     style={{
                       font: '600 11px var(--font-mono)',
                     }}
@@ -121,31 +121,31 @@ export function MethodologyCard() {
             })}
           </svg>
 
-          <div className="grid grid-cols-2 gap-0 border border-line rounded-lg overflow-hidden">
+          <div className="grid grid-cols-2 gap-0 border border-border-default rounded-lg overflow-hidden">
             {ROLES.map((r, i) => (
               <div
                 key={r.title}
-                className={`p-4 ${i === 0 ? "border-r border-line" : ""}`}
+                className={`p-4 ${i === 0 ? "border-r border-border-default" : ""}`}
               >
-                <div className="text-[11px] uppercase tracking-wider text-gold font-semibold mb-2">
+                <div className="text-[11px] uppercase tracking-wider text-accent-500 font-semibold mb-2">
                   {r.title}
                 </div>
                 <dl className="space-y-1.5 text-[12px]">
                   <div className="grid grid-cols-[64px_1fr] gap-2">
-                    <dt className="text-ink-3">역할</dt>
-                    <dd className="text-ink">{r.purpose}</dd>
+                    <dt className="text-gray-500">역할</dt>
+                    <dd className="text-text-default">{r.purpose}</dd>
                   </div>
                   <div className="grid grid-cols-[64px_1fr] gap-2">
-                    <dt className="text-ink-3">입력</dt>
-                    <dd className="text-ink">{r.inputs}</dd>
+                    <dt className="text-gray-500">입력</dt>
+                    <dd className="text-text-default">{r.inputs}</dd>
                   </div>
                   <div className="grid grid-cols-[64px_1fr] gap-2">
-                    <dt className="text-ink-3">출력</dt>
-                    <dd className="text-ink">{r.outputs}</dd>
+                    <dt className="text-gray-500">출력</dt>
+                    <dd className="text-text-default">{r.outputs}</dd>
                   </div>
                   <div className="grid grid-cols-[64px_1fr] gap-2">
-                    <dt className="text-ink-3">왜?</dt>
-                    <dd className="text-ink-2">{r.why}</dd>
+                    <dt className="text-gray-500">왜?</dt>
+                    <dd className="text-text-muted">{r.why}</dd>
                   </div>
                 </dl>
               </div>
