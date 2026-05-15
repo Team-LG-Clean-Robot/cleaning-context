@@ -315,12 +315,13 @@ cd team-project-lg/backend && pytest -v   # 24/24
   columns: (1fr, 2fr),
   align: (left, left),
   [*조직 (org)*], [*Team-LG-Clean-Robot*],
-  [*대시보드*], [#link("https://github.com/orgs/Team-LG-Clean-Robot/dashboard")[`github.com/orgs/Team-LG-Clean-Robot/dashboard`]],
-  [*메인 레포*], [`cleaning-context` (이전 작업 중)],
-  [*현재 원격 (이전 완료 전까지)*], [#link("https://github.com/lumatic2/ai-intensive-project")[`github.com/lumatic2/ai-intensive-project`]],
+  [*메인 레포*], [#link("https://github.com/Team-LG-Clean-Robot/cleaning-context")[`github.com/Team-LG-Clean-Robot/cleaning-context`] (공개)],
+  [*기본 브랜치*], [`main`],
+  [*라이브 프론트*], [#link("https://cleaning-context.vercel.app/")[`cleaning-context.vercel.app`] (Vercel · `frontend/` 자동 배포)],
+  [*라이브 백엔드*], [#link("https://cleaning-context-backend.onrender.com/api/health")[`/api/health`] (Render · `backend/` 자동 배포)],
 )
 
-#callout[*참고.* Vercel·Render 배포 연결이 Team-LG-Clean-Robot 조직 레포로 이전 중. 이전 완료 전까지 코드는 `lumatic2/ai-intensive-project` 에서 작업, 문서·자료는 새 조직 레포에 업로드해도 됨.]
+#callout[*상태.* Vercel·Render 가 이 레포의 `main` 푸시에 자동 반응하도록 연결 완료. 즉 main 에 commit 만 들어오면 1\~2분 안에 라이브에 반영된다.]
 
 === 가입 절차 (저녁 미팅에서)
 
@@ -336,9 +337,9 @@ cd team-project-lg/backend && pytest -v   # 24/24
   columns: (1fr, 2fr),
   align: (left, left),
   [*하고 싶은 일*], [*어디서*],
-  [시장조사 PDF·이미지·노트 업로드], [레포 `team-project-lg/docs/research/` 에 웹 UI 로 Add file → Upload],
+  [시장조사 PDF·이미지·노트 업로드], [레포 `docs/research/` 에 웹 UI 로 Add file → Upload],
   [진행 상황 메모·질문], [레포 *Issues* 탭에 New issue],
-  [PPT 초안·발표 노트 공유], [`team-project-lg/exports/ppt/` 에 업로드],
+  [PPT 초안·발표 노트 공유], [`exports/ppt/` 에 업로드],
   [다른 사람 작업물 보기], [*Pull requests* 탭],
 )
 
