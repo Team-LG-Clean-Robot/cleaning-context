@@ -30,3 +30,11 @@ def load_scenarios() -> dict[str, Scenario]:
 @lru_cache
 def load_rules() -> dict:
     return json.loads((DATA_DIR / "scoring_rules.json").read_text(encoding="utf-8"))
+
+
+@lru_cache
+def load_inference_engine():
+    """v2 — IoT sensor → event 추론 엔진. docs/IOT_DOMAIN.md 참조."""
+    from app.services.sensor_inference import SensorInferenceEngine
+
+    return SensorInferenceEngine(DATA_DIR / "sensor_inference_rules.json")

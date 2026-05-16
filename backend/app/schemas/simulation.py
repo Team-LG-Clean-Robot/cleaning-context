@@ -58,6 +58,15 @@ class CustomContext(BaseModel):
 class SimulateRequest(BaseModel):
     scenario_id: str | None = None
     custom: CustomContext | None = None
+    # v2 — IoT 멀티센서 readings (멘토 피드백 2026-05-16, docs/IOT_DOMAIN.md)
+    # 제공 시 백엔드가 추론 → active_events 자동 채움. custom과 병용 가능 (시간·user_location override).
+    sensor_readings: list["SensorReading"] | None = None
+
+
+# 순환 import 회피용 forward declaration
+from app.schemas.sensor import SensorReading  # noqa: E402
+
+SimulateRequest.model_rebuild()
 
 
 class SimulateResponse(BaseModel):

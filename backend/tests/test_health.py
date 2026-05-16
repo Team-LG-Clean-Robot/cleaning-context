@@ -11,6 +11,11 @@ def test_health():
     body = res.json()
     assert body["status"] == "ok"
     assert body["rooms_loaded"] == 5
-    assert body["events_loaded"] == 7  # rain, user_returned, cooking_done, guest_arriving_2h, pre_sleep_2h, pre_sleep_30min, guest_visit_recent
+    # v2: 기존 7개 + IoT 추론 신규 5개 (cooking_active, tv_watching, recent_shower, user_left, meal_prep)
+    assert body["events_loaded"] == 12
     assert body["scenarios_loaded"] == 4
     assert isinstance(body["llm_available"], bool)
+    # v2 신규 필드
+    assert isinstance(body["cold_start"], bool)
+    assert body["inference_rules_loaded"] == 13
+    assert body["ml_classifier_loaded"] is False

@@ -1,9 +1,16 @@
 import time
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException
 
-from app.data_loader import load_events, load_rooms, load_rules, load_scenarios
-from app.schemas.simulation import SimulateRequest, SimulateResponse
+from app.data_loader import (
+    load_events,
+    load_inference_engine,
+    load_rooms,
+    load_rules,
+    load_scenarios,
+)
+from app.schemas.simulation import CustomContext, SimulateRequest, SimulateResponse
 from app.services import cache, llm_explainer
 from app.services.context_builder import (
     ScoringContext,
@@ -47,10 +54,13 @@ def _run(
 
 @router.post("/simulate", response_model=SimulateResponse)
 def simulate(req: SimulateRequest) -> SimulateResponse:
-    if req.scenario_id is None and req.custom is None:
-        raise HTTPException(400, "either scenario_id or custom is required")
-    if req.scenario_id is not None and req.custom is not None:
-        raise HTTPException(400, "cannot provide both scenario_id and custom")
+    mode_count = sum(x is not None for x in (req.scenario_id, req.custom, req.sensor_readings))
+    if mode_count == 0:
+        raise HTTPException(
+            400, "one of scenario_id / custom / sensor_readings is required"
+        )
+    if req.scenario_id is not None and (req.custom is not None or req.sensor_readings is not None):
+        raise HTTPException(400, "scenario_id cannot be combined with custom or sensor_readings")
 
     t0 = time.perf_counter()
     events = load_events()
@@ -66,13 +76,59 @@ def simulate(req: SimulateRequest) -> SimulateResponse:
         )
         return _run(ctx, t0, summary, cache.cache_key(req.scenario_id))
 
-    custom = req.custom
+    # v2 — sensor_readings 경로: inference → custom으로 합쳐 기존 scoring 호출
+    if req.sensor_readings is not None:
+        custom = _custom_from_sensors(req)
+    else:
+        custom = req.custom
+
     unknown = [eid for eid in custom.active_events if eid not in events]
     if unknown:
         raise HTTPException(400, f"unknown event id(s): {unknown}")
     ctx = build_custom_context(custom, events)
+    label = "IoT 센서 추론" if req.sensor_readings is not None else "직접 입력"
     summary = (
-        f"직접 입력 · 시각 {custom.current_time}"
+        f"{label} · 시각 {custom.current_time}"
         f" · 취침예정 {custom.sleep_time}"
     )
     return _run(ctx, t0, summary, cache_key=None)
+
+
+def _custom_from_sensors(req: SimulateRequest) -> CustomContext:
+    """sensor_readings → infer-events → CustomContext 빌드.
+
+    req.custom이 함께 제공되면 시간·user_location·sleep_time을 override로 사용.
+    """
+    engine = load_inference_engine()
+    override = req.custom
+
+    now = datetime.now()
+    current_time = override.current_time if override else f"{now.hour:02d}:{now.minute:02d}"
+    sleep_time = override.sleep_time if override else "23:00"
+    weekday = now.weekday()  # 월=0 ... 일=6
+
+    inferred = engine.evaluate(
+        readings=req.sensor_readings,
+        current_time=current_time,
+        weekday=weekday,
+        sleep_time=sleep_time,
+    )
+    sensor_event_ids = list(dict.fromkeys(e.event_id for e in inferred))
+
+    # custom.active_events가 있으면 합집합
+    explicit_events = list(override.active_events) if override else []
+    merged_events = list(dict.fromkeys(explicit_events + sensor_event_ids))
+
+    # user_location: override 우선, 없으면 motion_sensor 힌트
+    user_location = override.user_location if override and override.user_location else None
+    if user_location is None:
+        user_location = engine.user_location_hint(req.sensor_readings)
+
+    gap_rooms = list(override.gap_rooms) if override else []
+    return CustomContext(
+        current_time=current_time,
+        sleep_time=sleep_time,
+        user_location=user_location,
+        active_events=merged_events,
+        gap_rooms=gap_rooms,
+    )

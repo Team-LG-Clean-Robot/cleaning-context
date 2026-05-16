@@ -5,8 +5,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.data_loader import load_events, load_rooms, load_rules, load_scenarios
-from app.routers import ask, events, health, scenarios, simulate
+from app.data_loader import (
+    load_events,
+    load_inference_engine,
+    load_rooms,
+    load_rules,
+    load_scenarios,
+)
+from app.routers import ask, events, health, infer, scenarios, simulate
 
 
 def _seed_cache_from_disk() -> None:
@@ -28,6 +34,7 @@ async def lifespan(app: FastAPI):
     load_events()
     load_scenarios()
     load_rules()
+    load_inference_engine()
     _seed_cache_from_disk()
     yield
 
@@ -47,3 +54,4 @@ app.include_router(scenarios.router, prefix="/api")
 app.include_router(simulate.router, prefix="/api")
 app.include_router(events.router, prefix="/api")
 app.include_router(ask.router, prefix="/api")
+app.include_router(infer.router, prefix="/api")
