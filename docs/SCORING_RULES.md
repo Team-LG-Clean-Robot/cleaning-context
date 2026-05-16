@@ -2,6 +2,8 @@
 
 > TECHNICAL_PLAN.md §4 시나리오 4종에 등장한 가중치를 일반화된 룰 테이블로 정리한다.
 > 코드는 이 문서를 JSON으로 옮긴 `backend/app/data/scoring_rules.json`을 그대로 읽어 적용 (하드코딩 금지).
+>
+> **상위 layer (Sensor → Behavioral)**: IoT 센서 raw 시그널이 어떻게 active_events로 변환되는지는 [IOT_DOMAIN.md](./IOT_DOMAIN.md) 참조. 본 문서의 scoring은 Behavioral Layer 출력(events)을 입력으로 받음 — IoT 도입 후에도 본 규칙은 변함없이 유효.
 
 ## 1. 공식
 

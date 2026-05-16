@@ -1,0 +1,98 @@
+[
+  {
+    "id": "door_lock",
+    "name_ko": "현관 도어락",
+    "room_id": "entrance",
+    "schema": {"state": "locked|unlocked", "side": "in|out", "ts": "iso8601"},
+    "vendors": ["삼성SDS", "아이레보", "게이트맨"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "induction",
+    "name_ko": "인덕션",
+    "room_id": "kitchen",
+    "schema": {"state": "on|off", "power_level": "0-9", "ts": "iso8601"},
+    "vendors": ["LG", "삼성", "쿠첸"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "microwave",
+    "name_ko": "전자레인지",
+    "room_id": "kitchen",
+    "schema": {"state": "on|off", "mode": "str", "ts": "iso8601"},
+    "vendors": ["LG", "삼성"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "refrigerator",
+    "name_ko": "냉장고",
+    "room_id": "kitchen",
+    "schema": {"open_count_last_1h": "int", "last_open_ts": "iso8601"},
+    "vendors": ["LG ThinQ"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "air_conditioner",
+    "name_ko": "에어컨",
+    "room_id": "*",
+    "schema": {"state": "on|off", "mode": "str", "target_temp": "int", "room_id": "str", "ts": "iso8601"},
+    "vendors": ["LG", "삼성"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "tv",
+    "name_ko": "TV",
+    "room_id": "living",
+    "schema": {"state": "on|off", "channel": "str?", "volume": "int?", "ts": "iso8601"},
+    "vendors": ["LG", "삼성"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "bed_sensor",
+    "name_ko": "침대 압력 센서",
+    "room_id": "bedroom",
+    "schema": {"occupied": "bool", "motion_level": "0-10", "ts": "iso8601"},
+    "vendors": ["자이리", "withings", "샤오미"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "motion_sensor",
+    "name_ko": "모션 센서",
+    "room_id": "*",
+    "schema": {"room_id": "str", "last_motion_ts": "iso8601"},
+    "vendors": ["Aqara", "Philips Hue", "SmartThings"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "humidity_bath",
+    "name_ko": "욕실 습도 센서",
+    "room_id": "bathroom",
+    "schema": {"rh": "0-100", "ts": "iso8601"},
+    "vendors": ["Aqara", "SwitchBot"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "smart_speaker",
+    "name_ko": "스마트 스피커",
+    "room_id": "*",
+    "schema": {"room_id": "str", "wake_word_ts": "iso8601", "voice_command": "str?"},
+    "vendors": ["LG ThinQ", "Google Home", "Apple HomePod"],
+    "privacy_class": "edge_only"
+  },
+  {
+    "id": "weather_api",
+    "name_ko": "날씨 API",
+    "room_id": "external",
+    "schema": {"condition": "clear|rain|snow|cloud", "intensity": "0-10", "last_1h_rain_mm": "float", "ts": "iso8601"},
+    "vendors": ["기상청", "OpenWeather"],
+    "privacy_class": "cloud_ok"
+  },
+  {
+    "id": "calendar",
+    "name_ko": "캘린더",
+    "room_id": "external",
+    "schema": {"upcoming_events": "list[{title, start_ts, attendees?}]"},
+    "vendors": ["Google Calendar", "Apple Calendar"],
+    "privacy_class": "user_opt_in"
+  }
+]

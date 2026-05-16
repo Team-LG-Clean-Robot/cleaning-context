@@ -58,5 +58,45 @@
       {"room_id": "living", "delta": 5},
       {"room_id": "bathroom", "delta": 5}
     ]
+  },
+  {
+    "id": "cooking_active",
+    "name_ko": "요리 진행 중",
+    "effects": [
+      {"room_id": "kitchen", "delta": -25},
+      {"room_id": "living", "delta": 5}
+    ]
+  },
+  {
+    "id": "tv_watching",
+    "name_ko": "TV 시청 중",
+    "effects": [
+      {"room_id": "living", "delta": -15}
+    ]
+  },
+  {
+    "id": "recent_shower",
+    "name_ko": "샤워 직후",
+    "effects": [
+      {"room_id": "bathroom", "delta": 20}
+    ]
+  },
+  {
+    "id": "user_left",
+    "name_ko": "사용자 외출 중",
+    "effects": [
+      {"room_id": "entrance", "delta": 5},
+      {"room_id": "living", "delta": 5},
+      {"room_id": "kitchen", "delta": 5},
+      {"room_id": "bedroom", "delta": 5},
+      {"room_id": "bathroom", "delta": 5}
+    ]
+  },
+  {
+    "id": "meal_prep",
+    "name_ko": "식사 준비 정황",
+    "effects": [
+      {"room_id": "kitchen", "delta": 10}
+    ]
   }
 ]

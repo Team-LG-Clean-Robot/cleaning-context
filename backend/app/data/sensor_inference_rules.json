@@ -1,0 +1,94 @@
+[
+  {
+    "id": "R-RETURN-1",
+    "description": "도어락이 바깥에서 열린 직후 → 사용자 귀가",
+    "trigger": {"sensor": "door_lock", "match": {"state": "unlocked", "side": "out"}, "within_min": 5},
+    "emit_event": "user_returned",
+    "confidence": "high"
+  },
+  {
+    "id": "R-LEFT-1",
+    "description": "도어락이 바깥에서 잠긴 직후 → 사용자 외출",
+    "trigger": {"sensor": "door_lock", "match": {"state": "locked", "side": "out"}, "within_min": 5},
+    "emit_event": "user_left",
+    "confidence": "high"
+  },
+  {
+    "id": "R-COOK-ACTIVE-1",
+    "description": "인덕션이 5분 이상 켜져 있음 → 요리 진행 중",
+    "trigger": {"sensor": "induction", "match": {"state": "on"}, "duration_min_gte": 5},
+    "emit_event": "cooking_active",
+    "confidence": "high"
+  },
+  {
+    "id": "R-COOK-ACTIVE-2",
+    "description": "전자레인지 2분+ 가동 → 보조 요리 신호",
+    "trigger": {"sensor": "microwave", "match": {"state": "on"}, "duration_min_gte": 2},
+    "emit_event": "cooking_active",
+    "confidence": "medium"
+  },
+  {
+    "id": "R-COOK-DONE-1",
+    "description": "인덕션 ON → OFF 전환 (직전 30분 ON 이력) → 요리 완료",
+    "trigger": {"sensor": "induction", "match": {"state": "off"}, "transition_from": "on", "prev_on_within_min": 30},
+    "emit_event": "cooking_done",
+    "confidence": "high"
+  },
+  {
+    "id": "R-FRIDGE-MEAL-1",
+    "description": "냉장고 1시간 내 4회 이상 개폐 → 식사 준비",
+    "trigger": {"sensor": "refrigerator", "match": {"open_count_last_1h_gte": 4}},
+    "emit_event": "meal_prep",
+    "confidence": "medium"
+  },
+  {
+    "id": "R-SLEEP-30M-1",
+    "description": "취침 시간 30분 이내 + 침대 점유 → 곧 취침",
+    "trigger": {"sensor": "bed_sensor", "match": {"occupied": true}, "context": {"time_to_sleep_min_lte": 30}},
+    "emit_event": "pre_sleep_30min",
+    "confidence": "high"
+  },
+  {
+    "id": "R-SLEEP-2H-1",
+    "description": "취침 2시간 이내 + 침실 활동 신호",
+    "trigger": {"any_of": [{"sensor": "bed_sensor", "match": {"occupied": true}}, {"sensor": "motion_sensor", "match": {"room_id": "bedroom"}, "within_min": 10}], "context": {"time_to_sleep_min_lte": 120}},
+    "emit_event": "pre_sleep_2h",
+    "confidence": "medium"
+  },
+  {
+    "id": "R-TV-WATCH-1",
+    "description": "TV 30분+ 재생 → 거실 점유",
+    "trigger": {"sensor": "tv", "match": {"state": "on"}, "duration_min_gte": 30},
+    "emit_event": "tv_watching",
+    "confidence": "high"
+  },
+  {
+    "id": "R-SHOWER-1",
+    "description": "욕실 습도 80% 이상 + 직전 10분간 +20%p 급증",
+    "trigger": {"sensor": "humidity_bath", "match": {"rh_gte": 80, "rh_delta_last_10min_gte": 20}},
+    "emit_event": "recent_shower",
+    "confidence": "high"
+  },
+  {
+    "id": "R-RAIN-1",
+    "description": "날씨 API rain 또는 최근 1시간 강우",
+    "trigger": {"any_of": [{"sensor": "weather_api", "match": {"condition": "rain"}}, {"sensor": "weather_api", "match": {"last_1h_rain_mm_gt": 0}}]},
+    "emit_event": "rain",
+    "confidence": "deterministic"
+  },
+  {
+    "id": "R-GUEST-1",
+    "description": "캘린더에 손님 태그된 일정이 2시간 이내",
+    "trigger": {"sensor": "calendar", "match": {"upcoming_event_tag": "guest", "within_min_lte": 120}},
+    "emit_event": "guest_arriving_2h",
+    "confidence": "deterministic"
+  },
+  {
+    "id": "R-USER-LOC-1",
+    "description": "특정 방 모션 센서가 3분 이내 트리거 → 사용자 위치 추정",
+    "trigger": {"sensor": "motion_sensor", "match": {"any_room": true}, "within_min": 3},
+    "emit_event": "_user_location_hint",
+    "confidence": "medium",
+    "note": "이 emit은 event vocab이 아닌 user_location field에 반영"
+  }
+]

@@ -60,7 +60,7 @@ LG 로봇청소기를 비롯한 가정용 가전은 이미 자동화 수준에 �
 세 가지 사실 위에 선다.
 
 1. **문제는 가설이 아니라 관측된 사실이다.** AI 자율 청소를 *원하면서도* 예측 불가능성에 불만이라 결국 수동 모드로 회귀하는 사용자 세그먼트가 명확히 존재한다 (§9 C 세그먼트). 자율성의 병목은 청소 성능이 아니라 **"왜?"에 답하지 못하는 신뢰 격차**다.
-2. **LG는 데이터·하드웨어를 이미 갖고 있다.** ThinQ 플랫폼·CodeZero AI 라인업·각종 센서·이벤트 데이터까지 — 빠진 건 그 데이터로부터 *결정·이유*를 만들어 사용자에게 설명하는 layer뿐이다. 본 프로젝트는 그 layer를 5-Layer 구조로 명세화한 reference implementation이다.
+2. **LG는 데이터·하드웨어를 이미 갖고 있다.** ThinQ 플랫폼·CodeZero AI 라인업·각종 센서·이벤트 데이터까지 — 빠진 건 그 데이터로부터 *결정·이유*를 만들어 사용자에게 설명하는 layer뿐이다. 본 프로젝트는 그 layer를 6-Layer 구조 (Sensor → Behavioral → Spatial → Context → Decision → Explainable)로 명세화한 reference implementation이다.
 3. **중앙 허브 시대에도 살아남는다.** Matter·HomeKit·Google Home 같은 표준은 *제어 인터페이스*만 정의한다. 디바이스가 어떤 의사결정을 어떻게 *설명*하는지는 vendor 책임이고, 중앙 허브가 와도 그 explainable API는 디바이스 측에 남는다 (지연·프라이버시·도메인 지식·오프라인 fallback 때문). 따라서 본 layer는 **지금 ThinQ에 붙이는 데 의미가 있고, 미래 Home Agent와도 호환되는** 위치에 있다.
 
 > **반박 받기.** "그건 LG가 직접 하면 되지 않나?" — 본 프로젝트가 LG 본체를 대체한다는 주장이 아니라, ThinQ 옆에 붙는 *도메인 특화 결정·설명 layer 의 제안*. 멘토링 트랙의 정합한 결과물 형태다.
@@ -69,19 +69,38 @@ LG 로봇청소기를 비롯한 가정용 가전은 이미 자동화 수준에 �
 
 사용자의 생활 패턴·공간 정보·외부 상황 데이터를 분석해 로봇청소기가 **언제·어디를·어떻게** 청소할지 판단하고, 그 이유를 자연어로 설명하는 AI 기반 Physical Home Agent 시뮬레이터.
 
-### 3.3 시스템 5-Layer 구조
+### 3.3 시스템 6-Layer 구조 (멘토 피드백 2026-05-16 반영)
 
-1. **Spatial Layer (공간 이해)** — 집 구조 2D 맵 + 공간별 속성 (오염도, 사용 빈도, 청소 민감도, 소음 민감도, 최근 청소 시각)
-2. **Behavioral Layer (사용자 행동)** — 이벤트 정의 (귀가·요리·취침·운동 후·손님 방문 등) + 이벤트가 공간별 오염도·우선순위에 미치는 영향 매핑
-3. **Context Layer (상황 추론)** — 시간·이벤트·공간 상태·날씨·청소 기록을 LLM이 자연어 컨텍스트로 재구성
-4. **Decision Layer (의사결정)** — Rule-based scoring으로 공간별 priority score 계산 → 청소 순서·제외 공간·청소 모드 결정
-5. **Explainable AI Layer (설명 UX)** — LLM이 의사결정 이유를 자연어로 생성 ("왜 이 공간을 먼저?", "왜 이 공간을 제외?")
+> 기존 5-Layer에 **Sensor Layer**를 맨 앞에 추가. 세부 설계는 [docs/IOT_DOMAIN.md](./docs/IOT_DOMAIN.md).
+
+1. **Sensor Layer (IoT 시그널 입력)** — 도어락·인덕션·냉장고·에어컨·TV·침대 압력·모션·욕실 습도·스마트 스피커 등 집 안의 실 IoT 센서 + 외부 데이터(날씨 API, 캘린더). raw readings는 **디바이스 안에서만** 처리하고 클라우드로 보내지 않음 (개인정보 분리)
+2. **Behavioral Layer (사용자 행동)** — Sensor → Event 추론. 13개 추론 규칙(Rule-based) + ML 분류기(UCI ADL 학습)로 raw 시그널을 high-level 이벤트(귀가·요리·취침·외출·TV 시청 등)로 변환. 사용자 명시 입력도 같은 vocab으로 합류
+3. **Spatial Layer (공간 이해)** — 집 구조 2D 맵 + 공간별 속성 (오염도, 사용 빈도, 청소 민감도, 소음 민감도, 최근 청소 시각)
+4. **Context Layer (상황 추론)** — 시간·이벤트·공간 상태·날씨·청소 기록을 LLM이 자연어 컨텍스트로 재구성
+5. **Decision Layer (의사결정)** — Rule-based scoring으로 공간별 priority score 계산 → 청소 순서·제외 공간·청소 모드 결정
+6. **Explainable AI Layer (설명 UX)** — LLM이 의사결정 이유를 자연어로 생성 ("왜 이 공간을 먼저?", "왜 이 공간을 제외?")
+
+```
+[IoT 디바이스 — 도어락·인덕션·냉장고·…]
+              ↓ raw readings (edge only)
+    [1. Sensor Layer]
+              ↓ inference (Rule + ML)
+    [2. Behavioral Layer] ← 사용자 명시 입력도 합류
+              ↓
+    [3. Spatial Layer (공간 속성 결합)]
+              ↓
+    [4. Context Layer (시간·날씨·청소 이력 종합)]
+              ↓
+    [5. Decision Layer (Rule-based scoring)]
+              ↓ priorities
+    [6. Explainable Layer (LLM 자연어 해석)]
+```
 
 ### 3.4 데이터 기반 보강
 
-가중치·이벤트 매핑은 임의 설정이 아닌, **공개 스마트홈/IoT 데이터셋** (UCI Activities of Daily Living, Kaggle Smart Home Dataset 등)에서 추출한 시간대별 공간 사용 패턴으로 보정한다. 또한 **사용자 이벤트 분류 ML 모델**(scikit-learn 기반)을 학습해, 직접 이벤트를 입력하지 않아도 시간·요일·이전 이벤트 시퀀스로부터 현재 상황을 추정할 수 있게 한다.
+가중치·이벤트 매핑은 임의 설정이 아닌, **공개 스마트홈/IoT 데이터셋** (UCI Activities of Daily Living, Kaggle Smart Home Dataset 등)에서 추출한 시간대별 공간 사용 패턴으로 보정한다. 또한 **Sensor → Event 추론 ML 분류기**(scikit-learn 기반)를 학습해, 직접 이벤트를 입력하지 않아도 멀티 IoT 센서 시그널 + 시간·요일로부터 현재 상황을 추정할 수 있게 한다.
 
-> **왜 이게 중요한가.** 행사 핵심 키워드인 **"데이터 활용"**과 **"AI 실무 역량"**에 답하는 부분. Rule-based + LLM에 더해 **실 데이터 분석 + ML 모델 학습**까지 포함하면, 멘토·심사자가 묻는 "실제로 어떤 AI/데이터 작업을 했나요?"에 구체적 답이 가능하다.
+> **왜 이게 중요한가.** 행사 핵심 키워드인 **"데이터 활용"**과 **"AI 실무 역량"**에 답하는 부분. Rule-based + LLM에 더해 **멀티센서 데이터 분석 + ML 모델 학습**까지 포함하면, 멘토·심사자가 묻는 "실제로 어떤 AI/데이터 작업을 했나요?"에 구체적 답이 가능하다. **LLM zero-shot으로는 raw 센서 시그널을 매번 클라우드로 보내야 하므로 프라이버시·비용 모두 ML 분류기가 우월** (멘토 피드백 반영).
 
 ### 3.5 AI vs Rule-based — 역할 분리
 
@@ -309,7 +328,7 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 | 1 | Hook | "어, 얘 왜 저 방은 안 치우지?" — AI 자율 모드를 켰다가 꺼버린 경험에서 출발 |
 | 2 | 문제 (B) | **신뢰 격차** — 사용자는 AI 자율성을 *원하면서도* "왜?"에 답하지 못해 결국 수동으로 회귀한다. 자율성의 병목은 청소 성능이 아니라 설명 가능성이다 |
 | 3 | 포지셔닝 (A) | "스탠드얼론 청소 AI"가 아니라, **ThinQ에 그대로 얹는 explainable decision layer**. LG는 데이터·하드웨어를 갖고 있고, 빠진 건 결정·이유를 만드는 layer뿐이다 |
-| 4 | 솔루션 구조 | 5-Layer (Spatial·Behavioral·Context·Decision·Explainable) + Rule-based vs LLM 역할 분리 — 점수 계산은 결정론적, 설명만 LLM |
+| 4 | 솔루션 구조 | 6-Layer (Sensor·Behavioral·Spatial·Context·Decision·Explainable) + Rule-based vs LLM 역할 분리 — 점수 계산은 결정론적, 설명만 LLM |
 | 5 | 데모 (라이브) | 4개 시나리오 실시간 시연 — 같은 공간이 상황에 따라 우선순위가 어떻게 바뀌는지. 발표의 80%를 결정하는 슬라이드 |
 | 6 | 데이터·ML | 공개 IoT 데이터셋 분석 (시간대별 공간 사용 패턴) + ML 이벤트 분류기 정확도·confusion matrix + 우선순위 변화 heatmap *(§7.3에 따라 2주차 작업 예정)* |
 | 7 | 확장성 (C) | Matter·HomeKit은 *제어 인터페이스*만 정의 — 결정·설명은 vendor 책임. 본 layer는 중앙 허브가 와도 디바이스 측에 남는 explainable API → **지금 ThinQ, 미래 Home Agent 양쪽과 호환** |
