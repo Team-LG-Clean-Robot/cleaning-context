@@ -30,7 +30,7 @@ archive/
 # 내부용 (공개 X) — 팀 내부 메모, AI 지시문
 CLAUDE.md
 CLAUDE.local.md
-ROADMAP.md
+# ROADMAP.md 는 글로벌 CLAUDE.md 규칙상 루트 필수 파일 → 추적함 (2026-05-16)
 
 # 빌드 산출물
 .playwright-mcp/
