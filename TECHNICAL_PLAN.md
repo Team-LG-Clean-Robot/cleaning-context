@@ -1,10 +1,14 @@
-# 프로젝트 기획서
+# 기술 기획서 (Technical Plan)
 
 **과제명**: 생활 맥락을 이해하는 로봇청소기 — 가정용 Physical AI Agent 시뮬레이터
 **팀명**: 럭키 금성
-**작성일**: 2026.05.14
+**최초 작성**: 2026.05.14 · **분리**: 2026.05.16 (멘토 피드백에 따라 사업성·기술 트랙 분리)
 **소속**: 성균관대 RISE 사업단 · AI Intensive Project · LG전자 가전 멘토링 트랙
 **구성원**: 전유성 (팀장) · 김준성 · 박주상 · 조현서
+
+> **본 문서는 기술 트랙입니다.** 시장·페르소나·수익모델·STP·SWOT·재무 추정은 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md) (가상 회사 "무빙홈" 시나리오) 참조.
+>
+> 분리 배경: 멘토 피드백(2026-05-16) — "사업계획서가 기술에 치우쳤다. 사업성/기술 두 트랙으로 쪼개고, 사업성은 가상 회사로 데이터를 채워봐라."
 
 ---
 
@@ -221,51 +225,12 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 
 ---
 
-## 8. 시장 분석
-
-| 지표 | 값 | 출처 |
-|---|---|---|
-| 글로벌 시장 (2024) | 75~96억$ | Virtue Market Research (75억$, 2024)¹ · Strategic Market Research (96억$, 2024)² |
-| 글로벌 시장 (2030) | 162~217억$ | Virtue (162억$)¹ · Strategic (195억$)² · The Business Research Company (217억$)³ |
-| CAGR (2024~2030) | 12.4 ~ 14.3% | Strategic (12.4%)² · Virtue (13.7%)¹ · TBRC (14.3%)³ · Grand View Research⁴ |
-
-> 보수적으로 본 값은 약 **80억$ → 195억$, CAGR ~13%** 수준. 본 사업계획서에서는 멘토링·발표 자료에 보수 추정치를 사용한다.
->
-> ¹ [Virtue Market Research — Robotic Vacuum Cleaner Market 2025–2030](https://virtuemarketresearch.com/report/robotic-vacuum-cleaner-market)
-> ² [Strategic Market Research — Robotic Vacuum Cleaner Market $19.5B by 2030](https://www.strategicmarketresearch.com/market-report/robotic-vacuum-cleaner-market)
-> ³ [The Business Research Company — Robotic Vacuum Cleaners Global Market Report 2026](https://www.thebusinessresearchcompany.com/report/robotic-vacuum-cleaners-global-market-report)
-> ⁴ [Grand View Research — Robotic Vacuum Cleaner Market Size & Share Report, 2030](https://www.grandviewresearch.com/industry-analysis/robotic-vacuum-cleaner-market)
-
-| 항목 | 내용 |
-|---|---|
-| **트렌드 배경** | Physical AI (NVIDIA Project GR00T, Tesla Optimus, Figure 02). Agentic AI (사용자 명령 없이 스스로 계획·실행). Smart Home OS (개별 제어 → 통합 가정 에이전트) |
-| **기술 배경** | LLM 추론·설명 능력이 실시간 응답 가능 수준 (GPT-4o, Claude Opus, Gemini). 클라우드 API로 가전 + LLM 결합이 현실적 비용. Rule-based + LLM 하이브리드 아키텍처 검증됨 |
-| **사회 배경** | 1인 가구·맞벌이·반려동물 가구 증가 → 자율형 가전 수요 증가. 사용자가 AI 자율 행동을 신뢰 못 해 "수동 모드" 회귀 경향. "AI가 왜?" 설명 요구 증가 |
-| **시장 기회** | 모든 경쟁사가 **청소 성능·하드웨어 사양**에서 경쟁 중. **AI 의사결정의 설명 가능성**은 미개척 영역. LG가 선점 시 차세대 가전 UX 표준을 주도할 수 있는 영역 |
+> **§8 시장 분석 · §9 STP · §10 SWOT 는 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md) 로 이전됨** (2026-05-16 분리 작업).
+> BUSINESS_PLAN.md §4 (TAM/SAM/SOM + 글로벌 시장 + STP + SWOT), §5 (경쟁 분석) 참조.
 
 ---
 
-## 9. STP 전략
-
-| 항목 | 내용 |
-|---|---|
-| **Segmentation** | A: 정해진 시간 자동 청소형 (기존 사용자 다수) / B: 상황별 수동 호출형 (불만족 사용자) / C: AI 자율 청소를 원하지만 신뢰 못 함 (잠재 타겟) |
-| **Targeting** | 1차 타겟은 **C 세그먼트** — AI 자율성을 원하지만 예측 불가능성에 불만인 사용자. 30~40대 맞벌이 / 1인 가구 / 반려동물·영유아 가구. AI 가전에 호의적이나 "왜?"에 대한 답을 원함 |
-| **Positioning** | "청소를 잘하는 로봇"이 아니라 **"왜 이렇게 청소했는지 설명하는 로봇"**. "단순 자동화"에서 **"상황 이해·설명 가능한 Physical AI Agent"**로 시장 포지션 이동 |
-
----
-
-## 10. SWOT 분석
-
-|  | **Strength** | **Weakness** |
-|---|---|---|
-| 내부 | • Rule-based + LLM 하이브리드 아키텍처로 의사결정의 설명 가능성 확보<br>• Explainable AI를 가전 도메인에 적용한 차별화된 접근<br>• Mock data 기반 시뮬레이션으로 실 데이터 부재를 우회하면서도 작동 데모 구현 | • 실 로봇청소기 데이터 접근 불가 → Mock data 의존<br>• 3주의 짧은 개발 기간<br>• 실제 SLAM·하드웨어 제어는 범위 외 |
-|  | **Opportunity** | **Threat** |
-| 외부 | • Physical AI·Agentic AI·Explainable AI 트렌드 정점<br>• LG·삼성 모두 차세대 AI 가전 UX 모색 중<br>• 멘토 도메인과 직접 연결, 발표 임팩트 확보 | • "컨셉 PPT"로 끝나면 차별성 약화 → 작동 데모 필수<br>• 범위 과확장 시 3주 안에 미완성<br>• 경쟁 팀 중 유사 주제 출현 가능성 |
-
----
-
-## 11. 개발 일정
+## 8. 개발 일정
 
 본 일정은 2026.05.13~30 (총 3주) 기준으로 계획되었으며, 멘토링 피드백·진척 상황에 따라 조정될 수 있다. 진척 표기: ✅ 완료 · 🔄 진행 중 · ⬜ 대기.
 
@@ -295,7 +260,7 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 
 ---
 
-## 12. 팀 구성
+## 9. 팀 구성
 
 | 이름 | 전공 | 역할 |
 |---|---|---|
@@ -306,7 +271,7 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 
 ---
 
-## 13. 성공 기준 (KPI)
+## 10. 성공 기준 (KPI)
 
 | 카테고리 | 지표 | 목표 |
 |---|---|---|
@@ -321,7 +286,7 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 
 ---
 
-## 14. 리스크 관리
+## 11. 리스크 관리 (기술)
 
 | 리스크 | 영향 | 대응 |
 |---|---|---|
@@ -333,7 +298,7 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 
 ---
 
-## 15. 발표 전략 (8-Slide 흐름)
+## 12. 발표 전략 (8-Slide 흐름)
 
 발표는 **기술 자랑**이 아니라 **서사**다. 다음 8슬라이드 흐름으로 구성한다.
 
@@ -356,7 +321,7 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 
 ---
 
-## 16. 핵심 메시지
+## 13. 핵심 메시지
 
 > **Main.** "우리는 로봇청소기를 단순 청소 기계가 아니라, 생활 맥락을 이해하는 가정용 AI Agent의 시작점으로 보았다."
 

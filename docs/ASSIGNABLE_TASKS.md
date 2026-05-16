@@ -88,4 +88,4 @@
 - [ ] 각 항목마다 **마감일** 명시 (e.g., A1 → 5/20 수)
 - [ ] **commit 단위**로 push 약속 (PR 안 만들어도 commit-then-push OK)
 - [ ] 진행 어려우면 카톡 즉시 — 막힌 채로 마감일 가지 말 것
-- [ ] 산출물은 `docs/` 하위 또는 PLANNING.md 직접 수정 (대형 자료는 `assets/`)
+- [ ] 산출물은 `docs/` 하위 또는 TECHNICAL_PLAN.md 직접 수정 (대형 자료는 `assets/`)

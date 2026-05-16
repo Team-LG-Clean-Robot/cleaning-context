@@ -30,7 +30,7 @@
                                 └──────────────────────────────┘
 ```
 
-PLANNING.md §3.2 5-Layer 매핑:
+TECHNICAL_PLAN.md §3.2 5-Layer 매핑:
 - Spatial Layer → `data/rooms.json`
 - Behavioral Layer → `data/events.json`
 - Context Layer → `services/context_builder.py`
@@ -41,7 +41,7 @@ PLANNING.md §3.2 5-Layer 매핑:
 
 ```
 team-project-lg/
-├── PLANNING.md
+├── TECHNICAL_PLAN.md
 ├── docs/
 │   ├── TECH_STACK.md
 │   ├── PRD.md
@@ -102,7 +102,7 @@ team-project-lg/
 class Room(BaseModel):
     id: str                     # "entrance", "living", "kitchen", "bedroom", "bathroom"
     name_ko: str
-    base_score: int             # rest 상태 우선순위 (PLANNING.md 표의 "기본")
+    base_score: int             # rest 상태 우선순위 (TECHNICAL_PLAN.md 표의 "기본")
     noise_sensitivity: int      # 0-10
     last_cleaned_hours: float
     bbox: dict                  # {x, y, w, h} — 프론트 SVG 좌표
@@ -201,7 +201,7 @@ def generate_explanation(
     return response.choices[0].message.content
 ```
 
-**프롬프트 원칙 (PLANNING.md §3.4 LLM의 역할 한정):**
+**프롬프트 원칙 (TECHNICAL_PLAN.md §3.4 LLM의 역할 한정):**
 - 점수 계산 X. 점수표를 컨텍스트로 받아 자연어로 설명만.
 - "왜 이 공간을 먼저?", "왜 이 공간을 제외?" 두 질문에 답하는 구조 강제.
 - 출력 길이 200-300자.
@@ -224,7 +224,7 @@ CORS_ORIGINS=http://localhost:3000
 
 | 레이어 | 도구 | 범위 |
 |---|---|---|
-| Scoring engine | pytest | PLANNING.md §4 시나리오 4종 점수표 reproducibility (golden test) |
+| Scoring engine | pytest | TECHNICAL_PLAN.md §4 시나리오 4종 점수표 reproducibility (golden test) |
 | API | pytest + httpx TestClient | `/simulate` 4 시나리오 200 응답, 응답 schema 검증 |
 | LLM explainer | mock + 1회 실호출 smoke | timeout·fallback 동작 |
 | Frontend | (생략, 발표 데모 우선) | |

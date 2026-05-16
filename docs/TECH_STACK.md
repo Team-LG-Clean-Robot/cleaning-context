@@ -1,6 +1,6 @@
 # Tech Stack
 
-> 본 프로젝트는 PLANNING.md §3.4의 Rule-based + LLM 하이브리드 아키텍처를 구현한다.
+> 본 프로젝트는 TECHNICAL_PLAN.md §3.4의 Rule-based + LLM 하이브리드 아키텍처를 구현한다.
 > 의사결정의 결정론적 부분(scoring)은 Python으로, 시각화·인터랙션은 Next.js로 분리.
 
 ## Backend
@@ -36,7 +36,7 @@
 | Provider | OpenAI | day01에서 Timely GPT bridge 사용 검증 |
 | Model | `gpt-4o-mini` | 비용·속도 균형. 설명 생성에 충분 |
 | 호출 모드 | non-streaming | 시나리오당 1회, 응답 캐싱 |
-| 캐시 | 디스크 JSON (`backend/cache/scenarios/*.json`) | 발표 안정성 — PLANNING.md §12 리스크 대응 |
+| 캐시 | 디스크 JSON (`backend/cache/scenarios/*.json`) | 발표 안정성 — TECHNICAL_PLAN.md §12 리스크 대응 |
 
 ## 개발 환경
 

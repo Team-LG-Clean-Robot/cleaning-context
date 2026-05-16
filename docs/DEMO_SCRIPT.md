@@ -12,7 +12,7 @@
 - [ ] Render warm-up — `curl https://cleaning-context-backend.onrender.com/api/health` 1회 호출 (cold start ~30초 해소)
 - [ ] Vercel 라이브 페이지 1회 reload 확인
 - [ ] 로컬 백엔드(`uvicorn ... --port 8123`) + 프론트(`pnpm dev`) 둘 다 띄워두기 (백업)
-- [ ] PLANNING.md §3.1·§15 한 번 더 읽기 — 반박 대응 3종 머릿속에
+- [ ] TECHNICAL_PLAN.md §3.1·§15 한 번 더 읽기 — 반박 대응 3종 머릿속에
 - [ ] 노트북 화면 공유 미리 테스트, 글꼴 크기 조정
 
 ---
@@ -128,7 +128,7 @@
 ## 라이브 실패 시 fallback
 
 - 시나리오 응답이 5초 넘게 안 오면 → 로컬 서버(http://localhost:3001)로 즉시 전환
-- 그것도 실패하면 → 백업 영상 (3주차 P2-11에서 녹화 예정 — 멘토 미팅까지는 아직 없음, 정 안 되면 PLANNING.md §4의 데모 시나리오 표를 띄워 말로 설명)
+- 그것도 실패하면 → 백업 영상 (3주차 P2-11에서 녹화 예정 — 멘토 미팅까지는 아직 없음, 정 안 되면 TECHNICAL_PLAN.md §4의 데모 시나리오 표를 띄워 말로 설명)
 
 ## Q&A 반박 대응 — PLANNING §15 인용
 

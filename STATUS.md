@@ -23,7 +23,7 @@
 
 ### 사업·기획
 - ✅ 주제 픽스 — "생활 맥락을 이해하는 로봇청소기 시뮬레이터"
-- ✅ `PLANNING.md` 14섹션 사업계획서 v2 + 시장 출처 4건 (Virtue / Strategic Market Research / TBRC / Grand View)
+- ✅ `TECHNICAL_PLAN.md` 14섹션 사업계획서 v2 + 시장 출처 4건 (Virtue / Strategic Market Research / TBRC / Grand View)
 - ✅ 설계 문서 5종 — `docs/{TECH_STACK,PRD,TRD,SCORING_RULES,MOCK_DATA_SCHEMA}.md`
 - ✅ Typst 기반 사업계획서 PDF (`exports/planning-v2/`)
 

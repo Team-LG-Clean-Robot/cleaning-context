@@ -1,6 +1,6 @@
 # Scoring Rules — Decision Layer 명세
 
-> PLANNING.md §4 시나리오 4종에 등장한 가중치를 일반화된 룰 테이블로 정리한다.
+> TECHNICAL_PLAN.md §4 시나리오 4종에 등장한 가중치를 일반화된 룰 테이블로 정리한다.
 > 코드는 이 문서를 JSON으로 옮긴 `backend/app/data/scoring_rules.json`을 그대로 읽어 적용 (하드코딩 금지).
 
 ## 1. 공식
@@ -24,7 +24,7 @@ final_score(room) = base_score(room)
 | 침실 (bedroom) | 15 | 9 |
 | 욕실 (bathroom) | 10 | 3 |
 
-> **근거.** PLANNING.md §4 시나리오 표에서 "기본" 컬럼 직접 인용. 욕실은 PLANNING 표에 없어 보수적으로 추가 (낮은 base).
+> **근거.** TECHNICAL_PLAN.md §4 시나리오 표에서 "기본" 컬럼 직접 인용. 욕실은 PLANNING 표에 없어 보수적으로 추가 (낮은 base).
 
 ## 3. Event effects (이벤트 → 공간별 점수 가산)
 
@@ -37,7 +37,7 @@ final_score(room) = base_score(room)
 | `pre_sleep_30min` | 취침 30분 이내 | -5 | -15 | -5 | -30 | -5 |
 | `cleanup_gap_2d` | 마지막 청소 2일+ 경과 | +10 | +15 | +10 | +5 | +5 |
 
-> **근거.** PLANNING.md §4 시나리오 1~4 표의 가중치를 이벤트 단위로 분리. 표에 없는 셀은 0.
+> **근거.** TECHNICAL_PLAN.md §4 시나리오 1~4 표의 가중치를 이벤트 단위로 분리. 표에 없는 셀은 0.
 
 ## 4. Time / occupancy modifier
 
@@ -58,7 +58,7 @@ final_score(room) = base_score(room)
 
 ## 6. 시나리오별 검증 (golden test 입력)
 
-이 표가 단위 테스트 fixture가 된다. 결과가 PLANNING.md §4 표와 일치해야 함.
+이 표가 단위 테스트 fixture가 된다. 결과가 TECHNICAL_PLAN.md §4 표와 일치해야 함.
 
 ### 시나리오 1. 비 오는 날 귀가 (20:30, 비, 귀가, 취침 23:00, 현관 청소 2일 경과)
 
@@ -101,7 +101,7 @@ final_score(room) = base_score(room)
 - 침실: 15 - 30 - 10 = -25? PLANNING은 -35. occupancy -20까지 더하면 -45. PLANNING 표는 occupancy 컬럼이 없고 "취침 -30, 소음 -20" 두 컬럼으로 -35.
   → **PLANNING이 단순화된 표시이고 실제 룰은 별도 정의가 가능.** 본 문서는 룰을 자체 일관성으로 두고, 시나리오 3의 침실 final = `-25 (excluded)`로 정의. PLANNING의 `-35`는 발표 자료 시각화용 reference value.
 
-→ **결정.** 시나리오 표는 "느낌"이고, 룰 테이블이 ground truth. 두 값이 일치하지 않을 수 있음을 PLANNING.md에 각주로 추가하는 것은 다음 문서 보강 작업.
+→ **결정.** 시나리오 표는 "느낌"이고, 룰 테이블이 ground truth. 두 값이 일치하지 않을 수 있음을 TECHNICAL_PLAN.md에 각주로 추가하는 것은 다음 문서 보강 작업.
 
 - 거실: 25 - 15(pre_sleep -15) - 0(noise<7) = 10? PLANNING -10(노이즈) 추가 → 0.
   → 룰 보강: `pre_sleep_30min` 거실 -15는 위 표에 이미 있음. noise add는 ≥7만. 거실 noise=5 → noise add 미적용. → 거실 final = 25 - 15 = 10. PLANNING은 0(excluded). 차이 허용.
@@ -148,6 +148,6 @@ final_score(room) = base_score(room)
 
 ## 8. 추가 작업 필요
 
-- 시나리오 3의 PLANNING vs 룰 차이를 PLANNING.md에 각주로 표기 (또는 룰을 PLANNING에 맞춰 재조정)
+- 시나리오 3의 PLANNING vs 룰 차이를 TECHNICAL_PLAN.md에 각주로 표기 (또는 룰을 PLANNING에 맞춰 재조정)
 - 욕실의 base_score·이벤트 효과는 가설값. 멘토링 후 보강
 - ML 이벤트 분류기가 활성화되면, classifier 출력을 active_events에 자동 주입하는 경로 정의

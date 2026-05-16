@@ -195,7 +195,7 @@ LLM이 점수표를 사람 말로 해석. 화면 오른쪽 `ExplanationCard` 에
 | 레포 (소스 코드 저장소) | https://github.com/lumatic2/ai-intensive-project |
 | 팀 현황 문서 | `team-project-lg/STATUS.md` |
 | 공개 README | `team-project-lg/README.md` |
-| 사업계획서 | `team-project-lg/PLANNING.md` (16섹션) |
+| 사업계획서 | `team-project-lg/TECHNICAL_PLAN.md` (16섹션) |
 
 ### 6.2 로컬 실행
 

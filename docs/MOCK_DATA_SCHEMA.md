@@ -1,7 +1,7 @@
 # Mock Data Schema
 
 > 백엔드 startup 시 로드되는 정적 JSON 파일 4개의 스키마와 seed 값.
-> 실데이터 부재를 우회하기 위한 MVP 자산 (PLANNING.md §8 SWOT — Mock data 의존 명시).
+> 실데이터 부재를 우회하기 위한 MVP 자산 (TECHNICAL_PLAN.md §8 SWOT — Mock data 의존 명시).
 
 ## 파일 목록
 

@@ -19,7 +19,7 @@
 2. **LG는 이미 데이터·하드웨어 보유.** ThinQ 플랫폼·CodeZero AI·각종 센서 — 빠진 건 그 데이터로부터 *결정·이유*를 만드는 layer뿐. 본 프로젝트는 그 layer의 5-Layer 명세·reference implementation.
 3. **중앙 허브 시대에도 살아남는다.** Matter/HomeKit/Google Home은 *제어 인터페이스*만 정의 — 결정·설명은 vendor 책임이고 디바이스 측에 남는다 (지연·프라이버시·도메인 지식·오프라인 fallback). 본 layer는 **지금 ThinQ, 미래 Home Agent 양쪽과 호환**.
 
-자세한 포지셔닝·반박 대응은 [PLANNING.md §3.1, §15](./PLANNING.md) 참조.
+자세한 포지셔닝·기술 구현은 [TECHNICAL_PLAN.md §3, §12](./TECHNICAL_PLAN.md). 사업성·시장·페르소나·재무 추정은 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md) (가상 회사 "무빙홈" 시나리오).
 
 ## 데모 시나리오 4종
 
@@ -57,7 +57,8 @@
 
 ```
 team-project-lg/
-├── PLANNING.md              # 사업계획서 14섹션
+├── BUSINESS_PLAN.md         # 사업성 트랙 — 가상 회사 "무빙홈" 시장/페르소나/재무
+├── TECHNICAL_PLAN.md        # 기술 트랙 — 5-Layer 아키텍처/시나리오/일정/KPI
 ├── STATUS.md                # 팀 내부 현황·액션 (gitignored 아님 — 팀 공유용)
 ├── DEPLOY.md                # 배포 매뉴얼
 ├── backend/

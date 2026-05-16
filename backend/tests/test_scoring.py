@@ -2,7 +2,7 @@
 Golden tests for scoring engine.
 
 기대값은 SCORING_RULES.md §6 기준. 시나리오 3(pre_sleep)의 침실 점수는
-PLANNING.md(-35) vs 룰(-25) 차이가 있으며, 본 테스트는 룰을 ground truth로 본다.
+TECHNICAL_PLAN.md(-35) vs 룰(-25) 차이가 있으며, 본 테스트는 룰을 ground truth로 본다.
 """
 
 import pytest
