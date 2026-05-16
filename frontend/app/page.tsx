@@ -1,5 +1,6 @@
 import { MethodologyCard } from "@/components/MethodologyCard";
 import { Simulator } from "@/components/Simulator";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Page() {
   return (
@@ -11,9 +12,9 @@ export default function Page() {
           aria-hidden
           className="w-20 h-16 object-contain shrink-0 select-none"
         />
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-4 flex-1">
           <div className="w-1 h-7 bg-action-primary mt-1.5" aria-hidden />
-          <div>
+          <div className="flex-1">
             <h1 className="text-[28px] font-bold leading-tight">
               생활 맥락 로봇청소기 시뮬레이터
             </h1>
@@ -26,6 +27,7 @@ export default function Page() {
             </p>
           </div>
         </div>
+        <ThemeToggle />
       </header>
       <MethodologyCard />
       <Simulator />
