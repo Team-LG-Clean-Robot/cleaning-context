@@ -1,0 +1,64 @@
+name: robotic
+description: "로보틱 — LG 가전 리모콘 앱의 로봇청소기 탭 (Explainable Physical AI Reference)"
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # HTTP
+  dio: ^5.4.3
+
+  # JSON / sealed classes
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Routing
+  go_router: ^14.2.0
+
+  # Local storage (theme preference)
+  shared_preferences: ^2.3.0
+
+  # SVG / images
+  flutter_svg: ^2.0.10
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.11
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/PretendardVariable.ttf
+          weight: 400
+        - asset: assets/fonts/PretendardVariable.ttf
+          weight: 600
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Medium.ttf
+  assets:
+    - assets/images/
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 24
