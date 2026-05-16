@@ -45,12 +45,12 @@ class _ColdStartRetryInterceptor extends Interceptor {
       err.requestOptions.extra['retried'] = true;
       await Future<void>.delayed(const Duration(seconds: 4));
       try {
-        final res = await Dio(err.requestOptions.copyWith(baseUrl: '')..baseUrl = kBaseUrl)
-            .fetch<dynamic>(err.requestOptions);
+        final retryDio = Dio(BaseOptions(baseUrl: kBaseUrl));
+        final res = await retryDio.fetch<dynamic>(err.requestOptions);
         handler.resolve(res);
         return;
       } catch (_) {
-        // fall through to next interceptor
+        // fall through
       }
     }
     handler.next(err);

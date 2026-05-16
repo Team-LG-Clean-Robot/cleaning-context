@@ -32,7 +32,7 @@ class MapScreen extends ConsumerWidget {
               builder: (context, constraints) {
                 return GestureDetector(
                   onTapDown: (d) {
-                    final room = HouseMapPainter.hitTest(d.localPosition, constraints.biggest);
+                    final room = HouseMapPainter.hitRoom(d.localPosition, constraints.biggest);
                     if (room != null) {
                       final score = rooms.firstWhere(
                         (r) => r.roomId == room,

@@ -35,8 +35,8 @@ class HouseMapPainter extends CustomPainter {
   static double _fit(Size widget) =>
       math.min(widget.width / viewBoxSize.width, widget.height / viewBoxSize.height);
 
-  /// (탭한 local 좌표, widget size) → 어느 방인지.
-  static String? hitTest(Offset localPos, Size widgetSize) {
+  /// (탭한 local 좌표, widget size) → 어느 방인지. (CustomPainter.hitTest 와 이름 충돌 회피)
+  static String? hitRoom(Offset localPos, Size widgetSize) {
     final scale = _fit(widgetSize);
     final dx = (localPos.dx - (widgetSize.width - viewBoxSize.width * scale) / 2) / scale;
     final dy = (localPos.dy - (widgetSize.height - viewBoxSize.height * scale) / 2) / scale;
@@ -81,7 +81,9 @@ class HouseMapPainter extends CustomPainter {
       ..strokeWidth = 2
       ..color = scheme.outline;
     canvas.drawRect(Offset.zero & viewBoxSize, wall);
-    _bboxes.values.forEach((b) => canvas.drawRect(b, wall));
+    for (final b in _bboxes.values) {
+      canvas.drawRect(b, wall);
+    }
 
     // 3. 문 — surface로 덮어 벽 끊기
     for (final d in _doors) {
