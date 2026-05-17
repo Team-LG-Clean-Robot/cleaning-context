@@ -165,9 +165,20 @@ LLM 호출 키: `backend/.env`의 `TIMELY_API_KEY` (출력 금지).
 
 ---
 
-## 8. 외부 참조
+## 8. 팀 협업 도구
+
+| 채널 | 용도 |
+|---|---|
+| **Slack** | 대화·실시간 소통 (질문·hand-off 알림·blocker) |
+| **Notion** | 파일 공유 (정리된 문서·자료·산출물 링크) |
+| **GitHub** (`Team-LG-Clean-Robot/cleaning-context`) | 코드·문서·PR (모든 작업물의 source of truth) |
+
+원칙: **코드·문서 = GitHub PR**, **참고 자료·정리본 = Notion**, **빠른 대화 = Slack**. 같은 정보 두 곳에 두지 말 것.
+
+---
+
+## 9. 외부 참조
 
 - **라이브 웹**: https://robot-cleaner.askewly.com/  (backup: https://cleaning-context.vercel.app/)
 - **백엔드 헬스**: https://cleaning-context-backend.onrender.com/api/health
-- **GitHub**: `Team-LG-Clean-Robot/cleaning-context` (org)
 - **멘토 트랙**: 성균관대 RISE 사업단 · LG전자 가전 멘토링
