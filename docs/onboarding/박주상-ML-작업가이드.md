@@ -1,4 +1,4 @@
-# 박주상 — 작업 가이드 (ML 분류기 · LLM 프롬프트)
+# 박주상 — 작업 가이드 (ML Engineer)
 
 > 작성: 2026-05-17 (피벗 반영본) · 팀장 전유성 → 박주상. 막히면 카톡.
 
@@ -10,35 +10,50 @@
 
 피벗 (5/16 멘토 1차):
 - 사용자 명시 이벤트 7개 → **12 IoT 센서 + 13 추론 규칙** Sensor Layer 추가
-- **너의 ML 모델 입출력이 바뀜**: (raw 센서 readings) → (event labels). UCI ADL 학습 패턴과 자연스럽게 일치.
+- **너의 ML 모델 입출력**: (raw 센서 readings) → (event labels). 공개 활동 인식 데이터셋 학습 패턴과 자연스럽게 일치
 
-전체 그림: `README.md` → `docs/IOT_DOMAIN.md` (네가 가장 자주 볼 문서) → `TECHNICAL_PLAN.md §3`.
+전체 그림 → `README.md` → `docs/IOT_DOMAIN.md` (네가 가장 자주 볼 문서) → `TECHNICAL_PLAN.md §3`.
 
 ---
 
-## 너의 역할 — 두 축
+## ML이 우리 프로젝트에서 어디 들어가는가
 
-| 영역 | 무엇을 | 산출물 위치 |
-|---|---|---|
-| **A. ML 이벤트 분류기** | 공개 데이터셋 → 학습 → `event_classifier.joblib` → `/api/infer-events`에 통합 (rule fallback 유지) | `backend/models/` · `backend/scripts/train_classifier.py` |
-| **B. LLM 프롬프트** | 한국어 톤·길이·상황별 출력 검토 + 6 시나리오 캐시 재시드 | `backend/app/services/llm.py` · `backend/scripts/seed_cache.py` |
+```
+[IoT 센서 raw]                    ← 12개 센서 시계열
+   ↓
+[ML 분류기 (네가 만듦)]            ← 공개 활동 데이터셋으로 학습
+   ↓
+[Event 라벨 + confidence]
+   ↓ (실패 시 rule fallback)
+[Rule scoring]                     ← 결정론적, ML 안 닿음
+   ↓
+[LLM 설명]                         ← 자연어, ML 안 닿음
+```
 
-**본 프로젝트의 데이터·AI 실무 역량 증명 파트**. 발표에서 정확도·confusion matrix 직접 발표.
+너의 ML은 **Sensor → Event 추론**만 담당. scoring·LLM 설명에는 절대 안 닿음 (그 둘은 결정론·캐시 보호 영역).
 
-## 이번 주 (W2: 5/20~26) 할 일
+**왜 ML이 rule만으로 안 되는가**: 12 센서 × 시간 패턴 조합 폭발, 미묘한 시계열(냉장고만 자주 여닫는데 인덕션 안 켜짐 = 음식 준비 중), 새 가구 환경 적응 — 룰로 다 짜기 어려움.
 
-| # | 항목 | 산출물 | 예상 KPI |
-|---|---|---|---|
-| 1 | UCI ADL Ordonez 데이터셋 다운로드 + 우리 12 센서 매핑 노트 | `backend/scripts/dataset_mapping.md` + raw 데이터 `backend/data_raw/` (gitignored) | 매핑 표 12행 |
-| 2 | 전처리 파이프라인 — 시간 binning, 공간 occupancy → 이벤트 라벨 | `backend/scripts/preprocess.py` | train/test split 산출 |
-| 3 | 모델 학습·평가 (DecisionTree → RandomForest → GB) | `backend/models/event_classifier.joblib` + `backend/reports/metrics.json` | **정확도 ≥75%, 5-fold CV ≥70%** |
-| 4 | `/api/infer-events` 통합 (전유성 협업) — ML 1st, rule fallback | endpoint 응답에 `source: "ml" \| "rule"` 필드 | rule 결과와 일치율 ≥60% |
-| 5 | (여유 있으면) LLM 프롬프트 톤 검토 + 6 시나리오 캐시 재시드 | `cached_responses/*.json` 6개 | — |
+## 너의 직무 — ML Engineer
+
+**한 줄**: Sensor → Event 추론을 ML로 만들어 정확도 KPI 달성하고 발표에서 본인이 직접 설명.
+
+- **소유**: 학습 데이터 발굴·다운로드·매핑 · 전처리 파이프라인 · 모델 학습·평가 · 메트릭 리포트 · `/api/infer-events` ML 통합 (전유성 협업) · LLM 프롬프트 톤 튜닝 · 캐시 재시드
+- **소유 X**: 시뮬·시연용 데이터 (김준성 영역, 별개) / 사업·시장 / 프론트·배포
+- **학습용 데이터는 본인 책임**: 김준성이 만드는 시뮬 데이터와 분리. UCI ADL Ordonez 등 공개 활동 인식 데이터셋 본인이 발굴·다운로드·우리 12 센서에 매핑
+- **성공 지표**: **정확도 ≥75% / 5-fold CV ≥70%** + 발표에서 confusion matrix·feature importance 직접 설명
+
+## Plan B — 정직한 보고가 최우선
+
+KPI 못 맞춰도 괜찮다. **숨기지 말고 5/24까지 팀장에게 보고**. 그러면 발표는 "rule + LLM" 중심으로 가고, ML은 "공개 데이터셋을 우리 12 센서로 매핑하는 과정에서 학부 프로젝트 데이터 양 한계로 KPI 미달" 정직하게 프레이밍. **억지로 숫자 만들지 말 것** — 가짜 정확도는 멘토에게 들킴.
+
+## 작업 방식 — 본인이 발굴
+
+구체 task는 본인이 결정. 한 주 PR 2~3개 목표. 큰 작업은 쪼개기 (데이터셋 매핑 PR / 학습 스크립트 PR / 메트릭 리포트 PR …).
 
 ## 막히면
 
-- IoT 센서·이벤트 정의: `docs/IOT_DOMAIN.md` 가 단일 출처
-- 데이터셋 후보 비교 필요하면 → **조현서**에게 요청 (Gemini CLI로 후보 3개 비교 리포트 받기)
+- IoT 센서·이벤트 정의: `docs/IOT_DOMAIN.md` 단일 출처
 - `/api/infer-events` 인터페이스 변경하고 싶으면 → 전유성과 먼저 합의 (모바일·웹 양쪽 영향)
-- 학습 환경: `backend/.venv` 안에서 (`pip install scikit-learn pandas` 등 — `pyproject.toml`에 추가)
-- 정확도 75% 못 넘으면: **임의로 KPI 낮추지 말 것**. feature engineering · 다른 데이터셋 후보로 회귀. 안 되면 토론
+- 학습 환경: `backend/.venv` 안에서 (`scikit-learn`·`pandas` 등 `pyproject.toml`에 추가)
+- 데이터셋 후보 비교 deep-dive 필요하면 **조현서**에게 부탁 (시장·논문 리서치 담당)

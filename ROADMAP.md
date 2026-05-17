@@ -26,24 +26,18 @@
 - [x] Flutter 앱 "로보틱" — 5-tab BottomNav + Riverpod + HouseMapPainter + IoT Sensors 화면. 47 파일
 - [x] Flutter Web 실행 (localhost:8770)
 
-**W2 sprint 배정 (2026-05-17 갱신)** — 각 팀원 가이드: [`docs/onboarding/`](./docs/onboarding/)
+**W2 직무 (2026-05-17 갱신)** — 각자 직무에 맞는 일을 본인이 발굴해 PR. 한 주 PR 2~3개 목표. 가이드: [`docs/onboarding/`](./docs/onboarding/).
 
-| 담당 | 항목 | 산출물 |
+| 담당 | 직무 | W2 성공 지표 |
 |---|---|---|
-| 전유성 | Android SDK + APK 빌드 | GitHub Release APK |
-| 전유성 | `/api/infer-events`에 박주상 ML 통합 (rule fallback 유지) | 응답 `source: ml\|rule` |
-| 전유성 | IoT 신규 시나리오 2개 (`morning_quick_clean`, `cooking_in_progress`) | `scenarios.json` + 캐시 + golden test |
-| 전유성 | 멘토 2차 일정 + 자료 갱신 | `team-kickoff.pdf` v3.3 |
-| 전유성 | 앱 아이콘 (`flutter_launcher_icons`) | `mobile/assets/icon/` |
-| 김준성 | `BUSINESS_PLAN §5` 경쟁사 표 보강 (LG·삼성·로보락 사양·가격) | BUSINESS_PLAN 갱신 |
-| 김준성 | Mock IoT 센서 dataset CSV v2 (24h × 7일 × 12 센서) | `backend/app/data/mock_sensor_dataset.csv` |
-| 김준성 | W3 PPT 8슬라이드 outline | `exports/presentation/outline.md` |
-| 박주상 | UCI ADL Ordonez 다운로드 + 12 센서 매핑 | `backend/scripts/dataset_mapping.md` |
-| 박주상 | 전처리 + 모델 학습·평가 (KPI 75% / CV 70%) | `event_classifier.joblib` + `reports/metrics.json` |
-| 박주상 | LLM 프롬프트 톤 검토 + 6 시나리오 캐시 재시드 | `cached_responses/*.json` |
-| 조현서 | IoT 데이터셋 후보 3개 비교 리포트 (Gemini CLI) | `docs/research/datasets_compare.md` |
-| 조현서 | 한국 사용자 정성 리뷰 50건 수집 | `docs/research/user_voice.md` |
-| 조현서 | 멘토·심사위원 예상 Q&A 10종 | `docs/DEMO_SCRIPT.md §Q&A` |
+| 전유성 | **Tech Lead / Full-Stack** | 5/30 라이브 데모 100% 작동 + 멘토 2차 일정 fixed + 발표 스토리 |
+| 김준성 | **Data Curator** | 시뮬·시연 데이터 부족으로 막힘 0건 + BUSINESS_PLAN §페르소나·데이터 출처 보강 |
+| 박주상 | **ML Engineer** | 정확도 ≥75% / 5-fold CV ≥70% (학습 데이터 본인 발굴) · 미달 시 5/24까지 정직 보고 → Plan B (rule + LLM 중심 발표) |
+| 조현서 | **Market Research Analyst** | BUSINESS_PLAN §시장·경쟁·재무·전략·STP·SWOT 보강 + 멘토·심사위원 예상 Q&A 10종 |
+
+**BUSINESS_PLAN 영역 분할** — 김준성=`§페르소나·데이터 출처` / 조현서=`§시장·경쟁사·재무·전략·STP·SWOT`. 같은 섹션 동시 PR 금지.
+
+**ML Plan B** — 박주상 KPI 미달 시 발표는 "rule + LLM" 중심으로 가고 ML은 "학부 데이터 양 한계" 정직하게 프레이밍. 박주상에게 압박 X.
 
 ### 📅 3주차 (5/27~30) — 발표 준비
 - [ ] 최종 발표 PPT 8슬라이드
