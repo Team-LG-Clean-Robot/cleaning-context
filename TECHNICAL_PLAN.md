@@ -214,7 +214,7 @@ Next.js 15 App Router · TypeScript strict · Tailwind v4 환경에서 7개 핵�
 
 ### 6.4 문서·자산
 
-본 사업계획서와 함께 설계 문서 5종(`docs/{TECH_STACK,PRD,TRD,SCORING_RULES,MOCK_DATA_SCHEMA}.md`)을 보유하며, 5개 방·7개 이벤트·4개 시나리오·스코어링 룰이 JSON 시드로 정리돼 있다. 팀 운영 자료로는 STATUS.md(액션 아이템)와 킥오프 PDF(`exports/kickoff/team-kickoff.pdf`)가 별도 관리된다.
+본 사업계획서와 함께 설계 문서 5종(`docs/{PRD,TRD,IOT_DOMAIN,SCORING_RULES,MOCK_DATA_SCHEMA}.md` — 기술 스택은 TRD §0에 통합)을 보유하며, 5개 방·7개 이벤트·4개 시나리오·스코어링 룰이 JSON 시드로 정리돼 있다. 팀 운영 자료로는 ROADMAP.md(마일스톤·sprint 배정)·docs/onboarding/(4인 작업 가이드)·킥오프 PDF(`exports/kickoff/team-kickoff.pdf`)가 별도 관리된다.
 
 ---
 

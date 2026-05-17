@@ -26,12 +26,24 @@
 - [x] Flutter 앱 "로보틱" — 5-tab BottomNav + Riverpod + HouseMapPainter + IoT Sensors 화면. 47 파일
 - [x] Flutter Web 실행 (localhost:8770)
 
-**진행 중**:
-- [ ] Android SDK 설치 + APK 빌드 → 멘토 폰 설치 가능 산출물
-- [ ] ML Sensor → Event 분류기 학습 (UCI ADL Ordonez, KPI 75%) — 박주상 트랙
-- [ ] IoT 신규 시나리오 2개 (`morning_quick_clean`, `cooking_in_progress`)
-- [ ] README.md / ROADMAP.md / PRD / TRD / DEMO_SCRIPT 문서 sync
-- [ ] 앱 아이콘 (사용자 ChatGPT 이미지 → flutter_launcher_icons)
+**W2 sprint 배정 (2026-05-17 갱신)** — 각 팀원 가이드: [`docs/onboarding/`](./docs/onboarding/)
+
+| 담당 | 항목 | 산출물 |
+|---|---|---|
+| 전유성 | Android SDK + APK 빌드 | GitHub Release APK |
+| 전유성 | `/api/infer-events`에 박주상 ML 통합 (rule fallback 유지) | 응답 `source: ml\|rule` |
+| 전유성 | IoT 신규 시나리오 2개 (`morning_quick_clean`, `cooking_in_progress`) | `scenarios.json` + 캐시 + golden test |
+| 전유성 | 멘토 2차 일정 + 자료 갱신 | `team-kickoff.pdf` v3.3 |
+| 전유성 | 앱 아이콘 (`flutter_launcher_icons`) | `mobile/assets/icon/` |
+| 김준성 | `BUSINESS_PLAN §5` 경쟁사 표 보강 (LG·삼성·로보락 사양·가격) | BUSINESS_PLAN 갱신 |
+| 김준성 | Mock IoT 센서 dataset CSV v2 (24h × 7일 × 12 센서) | `backend/app/data/mock_sensor_dataset.csv` |
+| 김준성 | W3 PPT 8슬라이드 outline | `exports/presentation/outline.md` |
+| 박주상 | UCI ADL Ordonez 다운로드 + 12 센서 매핑 | `backend/scripts/dataset_mapping.md` |
+| 박주상 | 전처리 + 모델 학습·평가 (KPI 75% / CV 70%) | `event_classifier.joblib` + `reports/metrics.json` |
+| 박주상 | LLM 프롬프트 톤 검토 + 6 시나리오 캐시 재시드 | `cached_responses/*.json` |
+| 조현서 | IoT 데이터셋 후보 3개 비교 리포트 (Gemini CLI) | `docs/research/datasets_compare.md` |
+| 조현서 | 한국 사용자 정성 리뷰 50건 수집 | `docs/research/user_voice.md` |
+| 조현서 | 멘토·심사위원 예상 Q&A 10종 | `docs/DEMO_SCRIPT.md §Q&A` |
 
 ### 📅 3주차 (5/27~30) — 발표 준비
 - [ ] 최종 발표 PPT 8슬라이드

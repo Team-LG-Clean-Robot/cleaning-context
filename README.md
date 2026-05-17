@@ -1,127 +1,116 @@
-# 생활 맥락 로봇청소기 시뮬레이터
+# 생활 맥락 로봇청소기
 
-> LG전자 가전 멘토링 트랙 · 팀 럭키 금성 · 성균관대 AI Intensive Project
+> LG전자 가전 멘토링 트랙 · 팀 럭키 금성 · 성균관대 AI Intensive Project (2026-05)
 
-로봇청소기가 **시간·날씨·이벤트** 같은 상황 정보를 종합해 어디를·언제·어떻게 청소할지 결정하고, 그 이유를 **자연어로 설명**하는 Physical AI Agent 시뮬레이터.
+**IoT 멀티센서로 생활 맥락을 추론**하고, 로봇청소기가 어디를·언제·어떻게 청소할지 결정하고 그 이유를 **자연어로 설명**하는 시뮬레이터. 웹 + 모바일 두 클라이언트가 동일 백엔드를 공유.
 
-## 🌐 라이브 데모
+## 라이브
 
-- **앱**: https://robot-cleaner.askewly.com/  (backup: https://cleaning-context.vercel.app/)
+- **웹**: https://robot-cleaner.askewly.com/  (backup: https://cleaning-context.vercel.app/)
 - **API 헬스체크**: https://cleaning-context-backend.onrender.com/api/health
+- **모바일 (Flutter)**: APK 배포 예정 (`mobile/`)
 
 ## 포지셔닝
 
 > **사용자 신뢰 격차(autonomy trust gap)를 해소하는, LG ThinQ에 그대로 얹을 수 있는 디바이스 측 explainable decision layer.**
 
-세 가지 사실 위에 선다.
+1. **신뢰 격차는 가설이 아니라 사실.** AI 자율 청소를 원하면서도 "왜?"에 답하지 못해 결국 수동으로 회귀하는 사용자 세그먼트가 명확히 존재.
+2. **LG는 이미 데이터·하드웨어 보유.** ThinQ 플랫폼·CodeZero AI·각종 센서 — 빠진 건 그 데이터로부터 *결정·이유*를 만드는 layer뿐.
+3. **중앙 허브 시대에도 살아남는다.** Matter/HomeKit/Google Home은 *제어 인터페이스*만 정의 — 결정·설명은 vendor 책임이고 디바이스 측에 남는다.
 
-1. **신뢰 격차는 가설이 아니라 사실.** AI 자율 청소를 *원하면서도* "왜?"에 답하지 못해 결국 수동으로 회귀하는 사용자 세그먼트가 명확히 존재. 자율성의 병목은 청소 성능이 아니라 **설명 가능성**.
-2. **LG는 이미 데이터·하드웨어 보유.** ThinQ 플랫폼·CodeZero AI·각종 센서 — 빠진 건 그 데이터로부터 *결정·이유*를 만드는 layer뿐. 본 프로젝트는 그 layer의 5-Layer 명세·reference implementation.
-3. **중앙 허브 시대에도 살아남는다.** Matter/HomeKit/Google Home은 *제어 인터페이스*만 정의 — 결정·설명은 vendor 책임이고 디바이스 측에 남는다 (지연·프라이버시·도메인 지식·오프라인 fallback). 본 layer는 **지금 ThinQ, 미래 Home Agent 양쪽과 호환**.
+자세한 기술·시장은 [TECHNICAL_PLAN.md](./TECHNICAL_PLAN.md) / [BUSINESS_PLAN.md](./BUSINESS_PLAN.md) (가상 회사 "무빙홈" 시나리오) 참조.
 
-자세한 포지셔닝·기술 구현은 [TECHNICAL_PLAN.md §3, §12](./TECHNICAL_PLAN.md). 사업성·시장·페르소나·재무 추정은 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md) (가상 회사 "무빙홈" 시나리오).
+## 시스템 (6-Layer)
+
+```
+[IoT 센서 — 도어락/인덕션/냉장고/에어컨/CO₂/…]
+   ↓  Sensor Layer  (raw readings)
+[Rule + ML 추론]
+   ↓  Event Layer   (cooking_done, user_returned, pre_sleep_30min…)
+[Rule-based Scoring]   ← 결정론적, 재현 가능
+   ↓  Decision Layer
+[LLM Explanation]      ← 자연어로 이유 생성
+```
+
+- **Spatial** — 5개 공간 + 속성(오염도·사용 빈도·소음 민감도)
+- **Behavioral** — 사용자 행동·이벤트
+- **Sensor** *(신규, 2주차)* — 12 IoT 센서 + 13 추론 규칙. raw=디바이스, 결과=클라우드 분리 (Privacy on Edge)
+- **Context · Decision · Explainable** — 위 다이어그램
+
+Rule-based + LLM 분리: 점수 계산은 결정론적(재현성·디버깅), LLM은 점수표 해석만.
 
 ## 데모 시나리오 4종
 
 | 시나리오 | 입력 | 핵심 의사결정 |
 |---|---|---|
-| 비 오는 날 귀가 | 20:30 · 비 · 사용자 귀가 · 취침 2h 전 | 현관 우선 + 침실 제외 (취침 페널티) |
-| 요리 직후 | 19:20 · 요리 완료 · 거실에 사용자 머무름 | 주방 즉시 + 거실 지연 |
+| 비 오는 날 귀가 | 20:30 · 비 · 사용자 귀가 · 취침 2h 전 | 현관 우선 + 침실 제외 |
+| 요리 직후 | 19:20 · 요리 완료 · 거실에 사용자 | 주방 즉시 + 거실 지연 |
 | 취침 직전 | 22:50 · 취침 30분 전 · 침실에 사용자 | 침실·거실 제외 + 현관·주방 저소음 |
-| 손님 방문 예정 | 17:00 · 2시간 후 방문 · 거실·현관 청소 공백 | 거실·현관 우선 + 침실 후순위 |
+| 손님 방문 예정 | 17:00 · 2시간 후 방문 | 거실·현관 우선 |
 
-추가로 **"직접 입력" 모드** — 시간·취침예정·사용자 위치·이벤트 7개 중 다중 선택해서 임의 상황 만들기.
-
-## 시스템 5-Layer
-
-1. **Spatial Layer** — 5개 공간 + 속성(오염도·사용 빈도·소음 민감도)
-2. **Behavioral Layer** — 7개 이벤트(비/귀가/요리/취침/손님 …)와 공간별 영향
-3. **Context Layer** — 시간·이벤트·공간 상태 종합 컨텍스트
-4. **Decision Layer** — Rule-based scoring → 공간별 priority score
-5. **Explainable Layer** — LLM이 점수표를 자연어로 해석
-
-> **Rule-based + LLM 분리.** 점수 계산은 결정론적 알고리즘(재현성·디버깅 가능). LLM 은 점수표를 자연어로 해석만 — 점수 계산에 관여하지 않음.
+추가로 **직접 입력 모드** + **IoT 센서 추론 모드** (`POST /api/infer-events`).
 
 ## 기술 스택
 
 | 영역 | 스택 |
 |---|---|
-| 백엔드 | Python 3.12 · FastAPI · Pydantic v2 |
+| 백엔드 | Python 3.12 · FastAPI · Pydantic v2 · pytest 50 |
 | LLM | OpenAI SDK via Timely GPT bridge · gpt-4o-mini |
-| 프론트 | Next.js 15 · TypeScript · Tailwind v4 · React 19 |
-| 디자인 | Pretendard · JetBrains Mono · CSS variables (`@theme`) |
-| 배포 | Render (백엔드) · Vercel (프론트) |
-| 테스트 | pytest 24 케이스 (golden score + LLM cache + custom mode) |
+| 웹 프론트 | Next.js 15 · TypeScript · Tailwind v4 |
+| 모바일 | Flutter 3 · Riverpod · Dio · go_router |
+| ML (2주차) | scikit-learn (DecisionTree → RF → GB) |
+| 배포 | Render (백엔드) · Vercel (웹) · GitHub Release (APK 예정) |
 
 ## 디렉토리
 
 ```
-team-project-lg/
-├── BUSINESS_PLAN.md         # 사업성 트랙 — 가상 회사 "무빙홈" 시장/페르소나/재무
-├── TECHNICAL_PLAN.md        # 기술 트랙 — 5-Layer 아키텍처/시나리오/일정/KPI
-├── STATUS.md                # 팀 내부 현황·액션 (gitignored 아님 — 팀 공유용)
-├── DEPLOY.md                # 배포 매뉴얼
-├── backend/
-│   ├── app/                 # FastAPI 앱 (routers/schemas/services/data)
-│   ├── tests/               # pytest 24 케이스
-│   └── scripts/seed_cache.py
-├── frontend/
-│   ├── app/                 # Next.js App Router (layout, page, globals.css, icon)
-│   ├── components/          # HouseMap, Simulator, MethodologyCard, ScenarioPanel, CustomModePanel, PriorityList, ExplanationCard, LoadingSkeleton
-│   └── lib/                 # types, api, colors
-├── docs/                    # 설계 문서 5종 (PRD·TRD·SCORING_RULES·MOCK_DATA_SCHEMA·TECH_STACK)
-└── exports/                 # 사업계획서 PDF·hwp 자동 채우기 스크립트
+backend/    # FastAPI — routers/schemas/services/data/tests
+frontend/   # Next.js 웹 앱
+mobile/     # Flutter 모바일 앱
+docs/       # PRD · TRD · IOT_DOMAIN · SCORING_RULES · onboarding/
+exports/    # Typst PDF (kickoff, planning-v2)
+BUSINESS_PLAN.md / TECHNICAL_PLAN.md / ROADMAP.md
 ```
 
 ## 로컬 실행
 
-### 백엔드
 ```bash
-cd team-project-lg/backend
-python -m venv .venv
-.venv/Scripts/activate          # Windows. macOS/Linux: source .venv/bin/activate
-pip install -e .
-cp .env.example .env             # TIMELY_API_KEY 채움
+# 백엔드
+cd backend && python -m venv .venv && .venv/Scripts/activate
+pip install -e . && cp .env.example .env  # TIMELY_API_KEY 채움
 uvicorn app.main:app --port 8123 --reload
-```
 
-헬스체크: http://localhost:8123/api/health
-
-### 프론트
-```bash
-cd team-project-lg/frontend
-pnpm install
+# 웹 프론트
+cd frontend && pnpm install
 NEXT_PUBLIC_API_URL=http://localhost:8123 pnpm dev
-```
 
-http://localhost:3000 접속.
+# 모바일 (웹 미리보기)
+cd mobile && flutter run -d chrome --web-port 8770
 
-### 테스트
-```bash
-cd team-project-lg/backend && pytest -v       # 24 케이스
-cd team-project-lg/frontend && pnpm typecheck # tsc --noEmit
+# 테스트
+cd backend && pytest -v      # 50 케이스
+cd frontend && pnpm typecheck
+cd mobile && flutter analyze && flutter test
 ```
 
 ## 팀
 
 | 이름 | 전공 | 역할 |
 |---|---|---|
-| **전유성** (팀장) | 글로벌경영 | 총괄·일정·백엔드·LLM 통합·발표 스토리·멘토 커뮤니케이션 |
-| **김준성** | 글로벌경영 | 시장·경쟁 제품 조사·공개 IoT 데이터셋 분석·PPT 시장성 파트 발표 |
-| **박주상** | 인공지능 | ML 이벤트 분류 모델(scikit-learn)·LLM 프롬프트 엔지니어링·분류기 성능 발표 |
+| **전유성** (팀장) | 글로벌경영 | 총괄·백엔드·LLM·배포·발표 스토리 |
+| **김준성** | 글로벌경영 | 데이터·시장·발표 PPT 리드 |
+| **박주상** | 인공지능 | ML 이벤트 분류 모델·LLM 프롬프트 |
+| **조현서** | 글로벌경영 | (5/15 킥오프 결과 반영 예정) |
 
 ## 일정
 
-총 4주 (2026-05-04 ~ 2026-05-30).
+총 3주 (2026-05-13 ~ 2026-05-30). 자세한 진척·KPI·블로커는 [ROADMAP.md](./ROADMAP.md).
 
 | 주차 | 기간 | 핵심 |
 |---|---|---|
-| 1주 | 5/4~5/10 | 사업계획서·설계 문서 |
-| 2주 | 5/11~5/17 | MVP 백엔드+프론트+배포 ← **현재** |
-| 3주 | 5/18~5/24 | ML 이벤트 분류기 + UI 폴리싱 |
-| 4주 | 5/25~5/30 | 발표 PPT·리허설·**5/30 최종 발표** |
-
-자세한 진척은 [STATUS.md](./STATUS.md) 참조.
+| W1 | 5/13~19 | MVP 백·프론트·배포·사업계획서 v1 ✅ |
+| W2 | 5/20~26 | 멘토 피벗 반영 + 모바일 + ML ← **현재** |
+| W3 | 5/27~30 | 발표 PPT·리허설·**5/30 최종 발표** |
 
 ## 라이선스
 

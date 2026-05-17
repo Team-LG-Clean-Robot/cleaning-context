@@ -27,9 +27,9 @@ tmp/
 outputs/
 archive/
 
-# 내부용 (공개 X) — 팀 내부 메모, AI 지시문
-CLAUDE.md
+# 팀 내부 메모 (팀장 세션 컨텍스트)
 CLAUDE.local.md
+# CLAUDE.md 는 팀 공유 AI 진입점 → 추적함 (2026-05-17, private 팀 레포라 노출 위험 없음)
 # ROADMAP.md 는 글로벌 CLAUDE.md 규칙상 루트 필수 파일 → 추적함 (2026-05-16)
 
 # 빌드 산출물

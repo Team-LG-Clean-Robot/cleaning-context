@@ -29,4 +29,4 @@ pytest -v
 - `app/routers/` — health, scenarios, simulate
 - `app/data/*.json` — 공간/이벤트/시나리오/룰 시드
 
-설계 문서: `../docs/{TECH_STACK,PRD,TRD,SCORING_RULES,MOCK_DATA_SCHEMA}.md`
+설계 문서: `../docs/{PRD,TRD,IOT_DOMAIN,SCORING_RULES,MOCK_DATA_SCHEMA}.md` (TRD §0에 기술 스택 포함)

@@ -3,6 +3,64 @@
 > [PRD.md](./PRD.md)의 요구사항을 코드 구조·API·데이터 모델로 변환한다.
 > Scoring 룰의 구체 수치는 [SCORING_RULES.md](./SCORING_RULES.md), 데이터 형태는 [MOCK_DATA_SCHEMA.md](./MOCK_DATA_SCHEMA.md).
 
+## 0. 기술 스택
+
+> 의사결정의 결정론적 부분(scoring)은 Python으로, 시각화·인터랙션은 Next.js + Flutter로 분리.
+
+### Backend
+
+| 항목 | 선택 | 비고 |
+|---|---|---|
+| 언어 | Python 3.12 | type hints + pydantic v2 |
+| 웹 프레임워크 | FastAPI | async, OpenAPI 자동 생성 |
+| 데이터 검증 | Pydantic v2 | 요청/응답 스키마 |
+| ML | scikit-learn | 이벤트 분류기 (DecisionTree → RandomForest → GB) |
+| 데이터 처리 | pandas, numpy | 공개 IoT 데이터셋 분석 |
+| LLM SDK | openai (≥1.x) via Timely GPT bridge | `gpt-4o-mini` |
+| 환경변수 | python-dotenv | `.env` |
+| 테스트 | pytest | 50 케이스 (scoring golden + sensor inference + endpoints) |
+| 패키지 관리 | pip + venv |  |
+
+### Web Frontend
+
+| 항목 | 선택 | 비고 |
+|---|---|---|
+| 프레임워크 | Next.js 15 (App Router) | React 19 |
+| 언어 | TypeScript | strict mode, `any` 금지 |
+| 스타일 | Tailwind CSS v4 | `@theme` semantic 토큰만 |
+| 상태 | React useState/useReducer | 전역 store 불필요 |
+| API 클라이언트 | fetch + 작은 wrapper |  |
+| 시각화 | inline SVG + Tailwind | 차트 라이브러리 금지 |
+| 패키지 관리 | pnpm |  |
+
+### Mobile
+
+| 항목 | 선택 | 비고 |
+|---|---|---|
+| 프레임워크 | Flutter 3 | Android 우선, web 미리보기 가능 |
+| 상태 | Riverpod |  |
+| HTTP | Dio | `mobile/lib/api/dio_client.dart` |
+| 라우팅 | go_router | 5-tab BottomNav |
+| 디자인 토큰 | `mobile/lib/theme/tokens.dart` | 웹 토큰과 1:1 |
+
+### 배포
+
+| 항목 | 선택 |
+|---|---|
+| Frontend | Vercel (`main` push 자동) |
+| Backend | Render (`main` push 자동) |
+| Mobile | GitHub Release APK (수동) |
+| 폴백 | 디스크 캐시된 4 시나리오 응답 — LLM 장애 시 즉시 응답 |
+
+### 비채택
+
+- **Streamlit** — 2D heatmap·인터랙션 한계로 데모 임팩트 부족
+- **데이터베이스** — in-memory + JSON 파일로 충분
+- **인증** — 데모 불필요
+- **WebSocket** — REST 충분
+
+---
+
 ## 1. 시스템 구성
 
 ```
@@ -43,7 +101,6 @@ TECHNICAL_PLAN.md §3.2 5-Layer 매핑:
 team-project-lg/
 ├── TECHNICAL_PLAN.md
 ├── docs/
-│   ├── TECH_STACK.md
 │   ├── PRD.md
 │   ├── TRD.md
 │   ├── SCORING_RULES.md
