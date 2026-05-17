@@ -26,16 +26,22 @@
 - [x] Flutter 앱 "로보틱" — 5-tab BottomNav + Riverpod + HouseMapPainter + IoT Sensors 화면. 47 파일
 - [x] Flutter Web 실행 (localhost:8770)
 
-**W2 직무 (2026-05-17 갱신)** — 각자 직무에 맞는 일을 본인이 발굴해 PR. 한 주 PR 2~3개 목표. 가이드: [`docs/onboarding/`](./docs/onboarding/).
+**산출물 ownership (2026-05-17 갱신)** — 5/30 발표일에 무엇이 산출돼야 하나 → 각 산출물을 한 명이 책임. 가이드: [`docs/onboarding/`](./docs/onboarding/).
 
-| 담당 | 직무 | W2 성공 지표 |
-|---|---|---|
-| 전유성 | **Tech Lead / Full-Stack** | 5/30 라이브 데모 100% 작동 + 멘토 2차 일정 fixed + 발표 스토리 |
-| 김준성 | **Data Curator** | 시뮬·시연 데이터 부족으로 막힘 0건 + BUSINESS_PLAN §페르소나·데이터 출처 보강 |
-| 박주상 | **ML Engineer** | 정확도 ≥75% / 5-fold CV ≥70% (학습 데이터 본인 발굴) · 미달 시 5/24까지 정직 보고 → Plan B (rule + LLM 중심 발표) |
-| 조현서 | **Market Research Analyst** | BUSINESS_PLAN §시장·경쟁·재무·전략·STP·SWOT 보강 + 멘토·심사위원 예상 Q&A 10종 |
+| # | 산출물 | Owner | W2 성공 지표 |
+|---|---|---|---|
+| 1 | **라이브 데모** (웹 + 모바일 APK + IoT 시뮬) | 전유성 | 5/30 100% 작동 + 멘토 2차 일정 fixed |
+| 2 | **사업계획서 제출본** (`BUSINESS_PLAN.md` → hwp) | **김준성** | 전 섹션 통합 작성 + 부수로 시뮬용 mock data·아파트 도면 납품 |
+| 3 | **ML 분류 결과** (정확도·confusion matrix) | 박주상 | 정확도 ≥75% / 5-fold CV ≥70% (학습 데이터 본인 발굴) · 미달 시 5/24까지 정직 보고 → Plan B (rule + LLM 중심 발표) |
+| 4 | **외부 증거 + 멘토 Q&A** | 조현서 | `docs/research/*.md` 자료 수집·hand-off + Q&A 10종 |
+| (5) | 발표 PPT 8슬라이드 | TBD | W3 결정 |
 
-**BUSINESS_PLAN 영역 분할** — 김준성=`§페르소나·데이터 출처` / 조현서=`§시장·경쟁사·재무·전략·STP·SWOT`. 같은 섹션 동시 PR 금지.
+**Hand-off 구조**:
+- 조현서 (raw 자료) → 김준성 (BUSINESS_PLAN 본문 통합) → 전유성 (머지)
+- 김준성 (mock data·도면) → 전유성 (코드 통합)
+- 박주상 (학습 모델) → 전유성 (`/api/infer-events` 통합)
+
+**작업 방식** — 각자 직무에 맞는 일을 본인이 발굴해 PR. 한 주 PR 2~3개 목표.
 
 **ML Plan B** — 박주상 KPI 미달 시 발표는 "rule + LLM" 중심으로 가고 ML은 "학부 데이터 양 한계" 정직하게 프레이밍. 박주상에게 압박 X.
 

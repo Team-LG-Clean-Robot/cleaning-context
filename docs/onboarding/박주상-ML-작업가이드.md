@@ -56,4 +56,4 @@ KPI 못 맞춰도 괜찮다. **숨기지 말고 5/24까지 팀장에게 보고**
 - IoT 센서·이벤트 정의: `docs/IOT_DOMAIN.md` 단일 출처
 - `/api/infer-events` 인터페이스 변경하고 싶으면 → 전유성과 먼저 합의 (모바일·웹 양쪽 영향)
 - 학습 환경: `backend/.venv` 안에서 (`scikit-learn`·`pandas` 등 `pyproject.toml`에 추가)
-- 데이터셋 후보 비교 deep-dive 필요하면 **조현서**에게 부탁 (시장·논문 리서치 담당)
+- 데이터셋 후보 비교 deep-dive 필요하면 → 본인이 직접 (조현서는 시장·사업계획서 자료 담당이라 ML 데이터셋은 너의 영역)
