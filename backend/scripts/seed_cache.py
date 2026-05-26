@@ -1,5 +1,5 @@
 """
-4 시나리오를 백엔드에 호출해 응답을 cached_responses/에 저장.
+시나리오를 백엔드에 호출해 응답을 cached_responses/에 저장.
 
 사용법:
   1. uvicorn app.main:app --port 8000 (or whatever port)
@@ -17,7 +17,14 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 SEED_DIR = ROOT / "app" / "data" / "cached_responses"
-SCENARIOS = ["rainy_return", "post_cooking", "pre_sleep", "guest_incoming"]
+SCENARIOS = [
+    "rainy_return",
+    "post_cooking",
+    "pre_sleep",
+    "guest_incoming",
+    "morning_quick_clean",
+    "cooking_in_progress",
+]
 
 
 def main() -> int:

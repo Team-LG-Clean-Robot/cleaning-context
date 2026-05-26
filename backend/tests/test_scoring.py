@@ -37,6 +37,20 @@ EXPECTED_SCORES: dict[str, dict[str, tuple[int, str]]] = {
         "bedroom": (5, "normal"),
         "bathroom": (20, "normal"),
     },
+    "morning_quick_clean": {
+        "entrance": (35, "normal"),
+        "living": (30, "normal"),
+        "kitchen": (25, "normal"),
+        "bedroom": (20, "normal"),
+        "bathroom": (15, "normal"),
+    },
+    "cooking_in_progress": {
+        "entrance": (30, "normal"),
+        "living": (30, "normal"),
+        "kitchen": (-25, "excluded"),
+        "bedroom": (15, "normal"),
+        "bathroom": (10, "normal"),
+    },
 }
 
 # pre_sleep는 점수가 룰 기반 derived → 모드만 검증
@@ -111,6 +125,13 @@ def test_scenarios_list():
     res = client.get("/api/scenarios")
     assert res.status_code == 200
     body = res.json()
-    assert len(body) == 4
+    assert len(body) == 6
     ids = {s["id"] for s in body}
-    assert ids == {"rainy_return", "post_cooking", "pre_sleep", "guest_incoming"}
+    assert ids == {
+        "rainy_return",
+        "post_cooking",
+        "pre_sleep",
+        "guest_incoming",
+        "morning_quick_clean",
+        "cooking_in_progress",
+    }

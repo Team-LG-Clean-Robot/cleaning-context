@@ -38,5 +38,25 @@
     "user_location": null,
     "active_events": ["guest_arriving_2h"],
     "gap_rooms": []
+  },
+  {
+    "id": "morning_quick_clean",
+    "name_ko": "아침 외출 직후 빠른 청소",
+    "description": "사용자가 07:00 외출 직후, 모든 방 청소 가능",
+    "current_time": "07:00",
+    "sleep_time": "23:00",
+    "user_location": null,
+    "active_events": ["user_left"],
+    "gap_rooms": []
+  },
+  {
+    "id": "cooking_in_progress",
+    "name_ko": "요리 중",
+    "description": "19:00 인덕션 사용 중, 주방 회피하고 거실·침실 청소",
+    "current_time": "19:00",
+    "sleep_time": "23:00",
+    "user_location": "kitchen",
+    "active_events": ["cooking_active"],
+    "gap_rooms": []
   }
 ]

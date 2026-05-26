@@ -1,6 +1,7 @@
 # ROADMAP — 생활 맥락 로봇청소기 시뮬레이터
 
-> **현재 위치**: 2주차 진입 (5/16 멘토 1차 미팅 후 대규모 피벗 반영)
+> **마지막 업데이트**: 2026-05-17
+> **현재 위치**: 2주차 진입 — 직무 분배(산출물 ownership) + 문서 정리 완료, hand-off 흐름 가동 직전
 > **최종 발표**: 2026-05-30 (금)
 > 사업성 트랙은 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md), 기술 트랙은 [TECHNICAL_PLAN.md](./TECHNICAL_PLAN.md), 모바일·IoT 도메인은 [docs/IOT_DOMAIN.md](./docs/IOT_DOMAIN.md) 참조.
 

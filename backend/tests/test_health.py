@@ -13,7 +13,7 @@ def test_health():
     assert body["rooms_loaded"] == 5
     # v2: 기존 7개 + IoT 추론 신규 5개 (cooking_active, tv_watching, recent_shower, user_left, meal_prep)
     assert body["events_loaded"] == 12
-    assert body["scenarios_loaded"] == 4
+    assert body["scenarios_loaded"] == 6
     assert isinstance(body["llm_available"], bool)
     # v2 신규 필드
     assert isinstance(body["cold_start"], bool)

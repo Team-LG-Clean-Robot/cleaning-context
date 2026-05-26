@@ -1,0 +1,103 @@
+{
+  "scenario_id": "morning_quick_clean",
+  "context_summary": "아침 외출 직후 빠른 청소 · 시각 07:00 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "entrance",
+      "base": 30,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 30
+        },
+        {
+          "source": "user_left",
+          "label_ko": "사용자 외출 중",
+          "delta": 5
+        }
+      ],
+      "final": 35,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "living",
+      "base": 25,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 25
+        },
+        {
+          "source": "user_left",
+          "label_ko": "사용자 외출 중",
+          "delta": 5
+        }
+      ],
+      "final": 30,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "kitchen",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        },
+        {
+          "source": "user_left",
+          "label_ko": "사용자 외출 중",
+          "delta": 5
+        }
+      ],
+      "final": 25,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 15,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 15
+        },
+        {
+          "source": "user_left",
+          "label_ko": "사용자 외출 중",
+          "delta": 5
+        }
+      ],
+      "final": 20,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bathroom",
+      "base": 10,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 10
+        },
+        {
+          "source": "user_left",
+          "label_ko": "사용자 외출 중",
+          "delta": 5
+        }
+      ],
+      "final": 15,
+      "mode": "normal",
+      "exclusion_reason": null
+    }
+  ],
+  "explanation": "먼저 현관과 거실을 청소하는 이유는 이 공간들이 오염 가능성이 높고, 사용자가 외출 중이기 때문입니다. 특히 현관은 외부에서 들어온 먼지나 오염물질이 쌓일 수 있는 장소로, 청소를 통해 쾌적한 환경을 유지하는 것이 중요합니다. 거실 또한 사용자가 자주 머무는 공간으로, 외출 중에 쌓인 먼지를 제거함으로써 쾌적함을 더할 수 있습니다. 반면, 침실과 욕실은 상대적으로 청소 우선순위가 낮습니다. 침실은 사용자가 주로 휴식을 취하는 공간으로, 취침 시간이 가까워지기 때문에 저소음 모드로 처리하여 방해를 최소화하고, 욕실은 사용 빈도가 낮아 오염 가능성이 적어 청소를 지연시키는 것이 적절합니다. 이러한 방식으로 청소를 진행함으로써 효율적이고 쾌적한 환경을 조성할 수 있습니다.",
+  "fallback": false
+}
