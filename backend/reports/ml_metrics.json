@@ -1,0 +1,119 @@
+{
+  "dataset": "CASAS hh106",
+  "total_segments": 1420,
+  "feature_count": 21,
+  "class_count": 8,
+  "labels": [
+    "cooking_active",
+    "cooking_done",
+    "entertain_guests",
+    "pre_sleep",
+    "recent_shower",
+    "tv_watching",
+    "user_left",
+    "user_returned"
+  ],
+  "model_comparison": {
+    "DecisionTree": {
+      "cv_mean": 0.7824,
+      "cv_std": 0.0191
+    },
+    "RandomForest": {
+      "cv_mean": 0.8514,
+      "cv_std": 0.022
+    },
+    "GradientBoosting": {
+      "cv_mean": 0.8394,
+      "cv_std": 0.0158
+    }
+  },
+  "best_model": "RandomForest",
+  "best_cv_accuracy": 0.8514,
+  "train_accuracy": 0.9951,
+  "rule_based_accuracy": 0.5512,
+  "per_class": {
+    "cooking_active": {
+      "precision": 0.994,
+      "recall": 1.0,
+      "f1": 0.997
+    },
+    "cooking_done": {
+      "precision": 1.0,
+      "recall": 0.985,
+      "f1": 0.992
+    },
+    "entertain_guests": {
+      "precision": 1.0,
+      "recall": 0.923,
+      "f1": 0.96
+    },
+    "pre_sleep": {
+      "precision": 1.0,
+      "recall": 0.992,
+      "f1": 0.996
+    },
+    "recent_shower": {
+      "precision": 0.989,
+      "recall": 1.0,
+      "f1": 0.995
+    },
+    "tv_watching": {
+      "precision": 0.99,
+      "recall": 1.0,
+      "f1": 0.995
+    },
+    "user_left": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "user_returned": {
+      "precision": 0.995,
+      "recall": 0.995,
+      "f1": 0.995
+    }
+  },
+  "top_features": [
+    {
+      "name": "bathroom_ratio",
+      "importance": 0.0858
+    },
+    {
+      "name": "bathroom_count",
+      "importance": 0.0822
+    },
+    {
+      "name": "kitchen_ratio",
+      "importance": 0.0771
+    },
+    {
+      "name": "entrance_ratio",
+      "importance": 0.0767
+    },
+    {
+      "name": "entrance_count",
+      "importance": 0.069
+    },
+    {
+      "name": "duration_sec",
+      "importance": 0.0688
+    },
+    {
+      "name": "total_events",
+      "importance": 0.0657
+    },
+    {
+      "name": "living_ratio",
+      "importance": 0.0653
+    },
+    {
+      "name": "living_count",
+      "importance": 0.0613
+    },
+    {
+      "name": "bedroom_ratio",
+      "importance": 0.0514
+    }
+  ],
+  "analysis_date": "2026-05-26 16:11"
+}
