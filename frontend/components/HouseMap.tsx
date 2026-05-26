@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ROOMS_SEED, ROOM_LABEL, type Mode, type RoomId, type RoomScore } from "@/lib/types";
-import { scoreToFill } from "@/lib/colors";
+import { ROOMS_SEED, ROOM_LABEL, type Mode, type RoomBbox, type RoomId, type RoomScore } from "@/lib/types";
 
 type Props = {
   rooms?: RoomScore[];
@@ -9,150 +8,18 @@ type Props = {
   onRoomClick?: (roomId: RoomId) => void;
 };
 
-// ── 가구 (레퍼런스 도면 참고, 건축 도면 스타일) ─────────────
-
-function Furniture() {
-  const s = "oklch(65% 0 0)";
-  const w = 0.8;
-  return (
-    <g stroke={s} strokeWidth={w} fill="none" strokeLinejoin="round" style={{ pointerEvents: "none" }}>
-      {/* ── 침실 ── */}
-      {/* 침대 (더블) */}
-      <rect x={40} y={60} width={80} height={110} rx={2} />
-      <line x1={40} y1={115} x2={120} y2={115} />
-      <rect x={48} y={120} width={28} height={14} rx={4} />
-      <rect x={84} y={120} width={28} height={14} rx={4} />
-      <rect x={38} y={138} width={84} height={5} rx={1} fill="oklch(88% 0 0)" />
-      {/* 옷장 */}
-      <rect x={160} y={30} width={42} height={90} rx={1} />
-      <line x1={181} y1={30} x2={181} y2={120} />
-      {/* 협탁 */}
-      <rect x={128} y={120} width={22} height={22} rx={1} />
-
-      {/* ── 주방 ── */}
-      {/* 상부 카운터 */}
-      <rect x={234} y={20} width={336} height={20} rx={1} fill="oklch(92% 0 0)" stroke={s} />
-      {/* 싱크 */}
-      <rect x={460} y={24} width={32} height={13} rx={5} />
-      <circle cx={476} cy={30} r={3} />
-      {/* 인덕션 */}
-      <rect x={370} y={25} width={26} height={12} rx={1} />
-      <circle cx={378} cy={31} r={3} />
-      <circle cx={390} cy={31} r={3} />
-      {/* 냉장고 */}
-      <rect x={530} y={20} width={42} height={52} rx={2} fill="oklch(90% 0 0)" stroke={s} />
-      <line x1={551} y1={20} x2={551} y2={72} strokeDasharray="2 2" />
-      {/* 식탁 + 의자 6개 */}
-      <rect x={320} y={80} width={90} height={60} rx={4} />
-      <rect x={332} y={70} width={18} height={10} rx={4} />
-      <rect x={380} y={70} width={18} height={10} rx={4} />
-      <rect x={332} y={140} width={18} height={10} rx={4} />
-      <rect x={380} y={140} width={18} height={10} rx={4} />
-      <rect x={308} y={92} width={10} height={18} rx={4} />
-      <rect x={308} y={118} width={10} height={18} rx={4} />
-
-      {/* ── 현관 ── */}
-      {/* 신발장 */}
-      <rect x={28} y={222} width={80} height={18} rx={1} />
-      <line x1={48} y1={222} x2={48} y2={240} />
-      <line x1={68} y1={222} x2={68} y2={240} />
-      <line x1={88} y1={222} x2={88} y2={240} />
-      {/* 신발 */}
-      <ellipse cx={42} cy={268} rx={8} ry={4} />
-      <ellipse cx={66} cy={270} rx={8} ry={4} />
-
-      {/* ── 거실 ── */}
-      {/* L자 소파 */}
-      <rect x={170} y={310} width={140} height={52} rx={4} />
-      <rect x={158} y={310} width={12} height={52} rx={2} fill="oklch(90% 0 0)" stroke={s} />
-      <rect x={170} y={362} width={50} height={12} rx={2} fill="oklch(90% 0 0)" stroke={s} />
-      {/* 쿠션 */}
-      <rect x={178} y={318} width={36} height={36} rx={5} strokeDasharray="2 2" />
-      <rect x={220} y={318} width={36} height={36} rx={5} strokeDasharray="2 2" />
-      <rect x={262} y={318} width={36} height={36} rx={5} strokeDasharray="2 2" />
-      {/* TV */}
-      <rect x={220} y={214} width={90} height={6} rx={1} fill="oklch(40% 0 0)" />
-      <rect x={235} y={222} width={60} height={16} rx={1} />
-      {/* 커피테이블 */}
-      <rect x={210} y={280} width={68} height={22} rx={8} />
-      {/* 러그 (점선) */}
-      <rect x={190} y={270} width={108} height={36} rx={10} strokeDasharray="4 3" stroke="oklch(75% 0 0)" />
-      {/* 스탠드 */}
-      <circle cx={370} cy={230} r={6} />
-      <line x1={370} y1={236} x2={370} y2={252} />
-
-      {/* ── 욕실 ── */}
-      {/* 욕조 */}
-      <rect x={424} y={306} width={130} height={60} rx={14} />
-      <rect x={434} y={316} width={110} height={40} rx={10} strokeDasharray="2 2" />
-      {/* 수도꼭지 */}
-      <circle cx={489} cy={306} r={3} fill="oklch(75% 0 0)" />
-      {/* 세면대 */}
-      <rect x={424} y={224} width={44} height={34} rx={12} />
-      <circle cx={446} cy={240} r={6} />
-      {/* 거울 */}
-      <rect x={430} y={214} width={32} height={4} rx={1} fill="oklch(85% 0 0)" />
-      {/* 변기 */}
-      <ellipse cx={520} cy={248} rx={16} ry={20} />
-      <rect x={507} y={226} width={26} height={12} rx={5} />
-    </g>
-  );
+function roomCenter(room: RoomBbox): { x: number; y: number } {
+  if (room.center) return room.center;
+  return { x: room.bbox.x + room.bbox.w / 2, y: room.bbox.y + room.bbox.h / 2 };
 }
-
-// ── 벽 + 문 ─────────────────────────────────────────────────
-
-function Walls() {
-  return (
-    <g style={{ pointerEvents: "none" }}>
-      {/* 외벽 */}
-      <rect x={12} y={12} width={576} height={396} fill="none" stroke="oklch(25% 0 0)" strokeWidth={5} rx={2} />
-
-      {/* 내벽 */}
-      <g stroke="oklch(25% 0 0)" strokeWidth={4}>
-        {/* 수평 — 상하 분할 */}
-        <line x1={12} y1={206} x2={588} y2={206} />
-        {/* 수직 — 침실 | 주방 */}
-        <line x1={218} y1={12} x2={218} y2={206} />
-        {/* 수직 — 현관 | 거실 */}
-        <line x1={138} y1={206} x2={138} y2={408} />
-        {/* 수직 — 거실 | 욕실 */}
-        <line x1={402} y1={206} x2={402} y2={408} />
-      </g>
-
-      {/* 문 (벽 끊기) */}
-      <g fill="white" stroke="none">
-        <rect x={216} y={90} width={6} height={40} />
-        <rect x={100} y={204} width={36} height={6} />
-        <rect x={270} y={204} width={40} height={6} />
-        <rect x={400} y={300} width={6} height={40} />
-        <rect x={136} y={310} width={6} height={40} />
-      </g>
-
-      {/* 문 아크 (건축 도면 스타일) */}
-      <g fill="none" stroke="oklch(55% 0 0)" strokeWidth={0.6} strokeDasharray="2 2">
-        <path d="M 222 90 Q 248 90 248 116" />
-        <path d="M 100 204 Q 100 178 126 178" />
-        <path d="M 310 204 Q 310 180 288 180" />
-        <path d="M 402 340 Q 426 340 426 320" />
-        <path d="M 138 310 Q 162 310 162 332" />
-      </g>
-
-      {/* 현관문 (하단 좌측) */}
-      <line x1={16} y1={370} x2={16} y2={408} stroke="oklch(25% 0 0)" strokeWidth={5} />
-      <path d="M 16 370 Q 16 336 50 336" fill="none" stroke="oklch(55% 0 0)" strokeWidth={0.6} strokeDasharray="2 2" />
-    </g>
-  );
-}
-
-// ── 아이콘 ───────────────────────────────────────────────────
 
 function PersonIcon({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x}, ${y})`} style={{ pointerEvents: "none" }}>
-      <circle cx={0} cy={0} r={13} fill="white" stroke="oklch(25% 0 0)" strokeWidth={1.2} />
-      <circle cx={0} cy={-5} r={3.5} fill="oklch(25% 0 0)" />
-      <path d="M -5 1 q 5 -3 10 0 v 5 q -5 3 -10 0 z" fill="oklch(25% 0 0)" />
-      <text x={0} y={24} textAnchor="middle" style={{ font: "600 9px var(--font-sans)", fill: "oklch(25% 0 0)" }}>사용자</text>
+      <circle cx={0} cy={0} r={13} fill="white" stroke="#1a1a1a" strokeWidth={1.2} />
+      <circle cx={0} cy={-5} r={3.5} fill="#1a1a1a" />
+      <path d="M -5 1 q 5 -3 10 0 v 5 q -5 3 -10 0 z" fill="#1a1a1a" />
+      <text x={0} y={24} textAnchor="middle" style={{ font: "600 9px var(--font-sans)", fill: "#1a1a1a" }}>사용자</text>
     </g>
   );
 }
@@ -177,8 +44,6 @@ function RobotIcon({ x, y }: { x: number; y: number }) {
   );
 }
 
-// ── 점수 카운트업 ────────────────────────────────────────────
-
 function useCountUp(target: number, duration = 400): number {
   const [val, setVal] = useState(target);
   const prevRef = useRef(target);
@@ -199,17 +64,21 @@ function useCountUp(target: number, duration = 400): number {
   return val;
 }
 
-function scoreTextColor(score: number, mode: Mode): string {
-  if (mode === "excluded") return "#999";
-  if (score >= 50) return "#1a1a1a";
-  return "#444";
+function buildAriaLabel(rooms?: RoomScore[], userLocation?: RoomId | null): string {
+  if (!rooms?.length) {
+    return `아파트 평면도. ${ROOMS_SEED.map((r) => `${r.name_ko} ${r.base_score}점`).join(", ")}.`;
+  }
+  const parts = rooms.map((r) => {
+    const m = r.mode === "excluded" ? " 제외" : r.mode === "quiet" ? " 저소음" : "";
+    return `${ROOM_LABEL[r.room_id]} ${r.final}점${m}`;
+  });
+  return `아파트 평면도. ${parts.join(", ")}.${userLocation ? ` 사용자 ${ROOM_LABEL[userLocation]}.` : ""}`;
 }
-
-// ── 범례 ─────────────────────────────────────────────────────
 
 const LEGEND_STEPS = [96, 90, 84, 78, 72, 66];
 
-function HeatmapLegend() {
+function HeatmapLegend({ visible }: { visible: boolean }) {
+  if (!visible) return null;
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-[11px] text-gray-500">
       <span className="font-medium text-text-muted">청소 우선순위</span>
@@ -233,37 +102,76 @@ function HeatmapLegend() {
   );
 }
 
-// ── Aria ─────────────────────────────────────────────────────
-
-function buildAriaLabel(rooms?: RoomScore[], userLocation?: RoomId | null): string {
-  if (!rooms?.length) {
-    return `아파트 평면도. ${ROOMS_SEED.map((r) => `${r.name_ko} ${r.base_score}점`).join(", ")}.`;
+function RoomShape({
+  room,
+  fill,
+  stroke,
+  strokeWidth,
+  style,
+  onMouseEnter,
+  onMouseLeave,
+  onClick,
+}: {
+  room: RoomBbox;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  style: React.CSSProperties;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  onClick: () => void;
+}) {
+  if (room.polygon) {
+    return (
+      <polygon
+        points={room.polygon}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        strokeLinejoin="round"
+        style={style}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onClick={onClick}
+      />
+    );
   }
-  const parts = rooms.map((r) => {
-    const m = r.mode === "excluded" ? " 제외" : r.mode === "quiet" ? " 저소음" : "";
-    return `${ROOM_LABEL[r.room_id]} ${r.final}점${m}`;
-  });
-  return `아파트 평면도. ${parts.join(", ")}.${userLocation ? ` 사용자 ${ROOM_LABEL[userLocation]}.` : ""}`;
+  return (
+    <rect
+      x={room.bbox.x}
+      y={room.bbox.y}
+      width={room.bbox.w}
+      height={room.bbox.h}
+      fill={fill}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      rx={1}
+      style={style}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onClick={onClick}
+    />
+  );
 }
-
-// ── 메인 ─────────────────────────────────────────────────────
 
 export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
   const scoreMap = new Map(rooms?.map((r) => [r.room_id, r]) ?? []);
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const topRoom = rooms?.filter((r) => r.mode !== "excluded").sort((a, b) => b.final - a.final)[0];
   const robotSeed = topRoom ? ROOMS_SEED.find((r) => r.id === topRoom.room_id) : null;
-  const robotX = robotSeed ? robotSeed.bbox.x + robotSeed.bbox.w / 2 : -100;
-  const robotY = robotSeed ? robotSeed.bbox.y + robotSeed.bbox.h / 2 + 10 : -100;
+  const robotPos = robotSeed ? roomCenter(robotSeed) : null;
+  const robotX = robotPos ? robotPos.x : -100;
+  const robotY = robotPos ? robotPos.y + 10 : -100;
 
   return (
-    <div>
+    <div className="relative">
       <svg
-        viewBox="0 0 600 420"
+        viewBox="0 0 600 400"
         role="img"
         aria-label={buildAriaLabel(rooms, userLocation)}
-        className="w-full h-auto rounded-xl border border-border-default bg-white shadow-[0_4px_24px_-12px_rgba(0,0,0,0.2)] overflow-hidden"
+        className="w-full h-auto rounded-xl border border-border-default shadow-[0_4px_24px_-12px_rgba(0,0,0,0.2)] overflow-hidden"
       >
         <defs>
           <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6">
@@ -271,21 +179,34 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
           </pattern>
         </defs>
 
-        {/* Layer 1: 방 히트맵 */}
+        {/* 도면 이미지 배경 */}
+        <image href="/floorplan-bg.png" x={0} y={0} width={600} height={400} preserveAspectRatio="xMidYMid slice" />
+
+        {/* 히트맵 오버레이 (클릭 영역은 항상, 색상은 토글) */}
         {ROOMS_SEED.map((room) => {
           const s = scoreMap.get(room.id);
           const score = s?.final ?? room.base_score;
           const mode = (s?.mode ?? "normal") as Mode;
           const isHovered = hoveredRoom === room.id;
+
+          let fill: string;
+          if (!showOverlay) {
+            fill = "transparent";
+          } else if (mode === "excluded") {
+            fill = "url(#hatch)";
+          } else {
+            const t = Math.min(Math.max(score, 0), 80) / 80;
+            fill = `rgba(20, 50, 100, ${0.08 + t * 0.3})`;
+          }
+
           return (
-            <rect
+            <RoomShape
               key={room.id}
-              x={room.bbox.x} y={room.bbox.y}
-              width={room.bbox.w} height={room.bbox.h}
-              fill={scoreToFill(score, mode)}
-              stroke={isHovered ? "oklch(40% 0.12 250)" : "none"}
-              strokeWidth={isHovered ? 2 : 0}
-              style={{ transition: "fill 0.6s ease", cursor: onRoomClick ? "pointer" : "default" }}
+              room={room}
+              fill={fill}
+              stroke={showOverlay && isHovered ? "oklch(40% 0.15 250)" : "transparent"}
+              strokeWidth={isHovered && showOverlay ? 2.5 : 0}
+              style={{ transition: "fill 0.6s ease, stroke 0.2s ease", cursor: onRoomClick ? "pointer" : "default" }}
               onMouseEnter={() => setHoveredRoom(room.id)}
               onMouseLeave={() => setHoveredRoom(null)}
               onClick={() => onRoomClick?.(room.id)}
@@ -293,48 +214,66 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
           );
         })}
 
-        {/* Layer 2: 가구 */}
-        <Furniture />
-
-        {/* Layer 3: 벽 + 문 */}
-        <Walls />
-
-        {/* Layer 4: 라벨 + 점수 */}
-        {ROOMS_SEED.map((room) => {
+        {/* 라벨 + 점수 (토글) */}
+        {showOverlay && ROOMS_SEED.map((room) => {
           const s = scoreMap.get(room.id);
           const score = s?.final ?? room.base_score;
-          const mode = (s?.mode ?? "normal") as Mode;
-          const cx = room.bbox.x + room.bbox.w / 2;
-          const cy = room.bbox.y + room.bbox.h / 2;
-          const txtColor = scoreTextColor(score, mode);
+          const c = roomCenter(room);
+
           return (
             <g key={`lbl-${room.id}`} style={{ pointerEvents: "none" }}>
-              <text x={cx} y={cy - 4} textAnchor="middle" style={{ font: "500 14px var(--font-sans)", fill: txtColor }}>
+              <rect x={c.x - 28} y={c.y - 14} width={56} height={30} rx={5} fill="rgba(255,255,255,0.75)" stroke="rgba(0,0,0,0.06)" strokeWidth={0.5} />
+              <text x={c.x} y={c.y - 1} textAnchor="middle" style={{ font: "500 11px var(--font-sans)", fill: "#333" }}>
                 {room.name_ko}
               </text>
-              <text x={cx} y={cy + 14} textAnchor="middle" style={{ font: "700 13px var(--font-mono)", fill: txtColor }}>
-                {rooms ? <AnimatedScoreText score={score} mode={mode} /> : score}
+              <text x={c.x} y={c.y + 13} textAnchor="middle" style={{ font: "700 13px var(--font-mono)", fill: "#111" }}>
+                {rooms ? <AnimatedScoreText score={score} /> : score}
               </text>
             </g>
           );
         })}
 
-        {/* Layer 5: 사용자 */}
+        {/* 사용자 */}
         {userLocation && (() => {
           const room = ROOMS_SEED.find((r) => r.id === userLocation);
           if (!room) return null;
-          return <PersonIcon x={room.bbox.x + room.bbox.w - 24} y={room.bbox.y + 26} />;
+          const c = roomCenter(room);
+          return <PersonIcon x={c.x + 30} y={c.y - 20} />;
         })()}
 
-        {/* Layer 6: 로봇 청소기 */}
+        {/* 로봇 청소기 (항상 표시) */}
         {rooms && rooms.length > 0 && <RobotIcon x={robotX} y={robotY} />}
       </svg>
-      <HeatmapLegend />
+
+      {/* 히트맵 토글 버튼 */}
+      <button
+        type="button"
+        onClick={() => setShowOverlay((v) => !v)}
+        className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-white/80 backdrop-blur-sm border border-border-default px-2.5 py-1.5 text-[11px] font-medium text-gray-600 shadow-sm hover:bg-white/95 transition-colors"
+      >
+        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          {showOverlay ? (
+            <>
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx={12} cy={12} r={3} />
+            </>
+          ) : (
+            <>
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <line x1={1} y1={1} x2={23} y2={23} />
+            </>
+          )}
+        </svg>
+        {showOverlay ? "히트맵 숨기기" : "히트맵 보기"}
+      </button>
+
+      <HeatmapLegend visible={showOverlay} />
     </div>
   );
 }
 
-function AnimatedScoreText({ score, mode }: { score: number; mode: Mode }) {
+function AnimatedScoreText({ score }: { score: number }) {
   const display = useCountUp(score);
   return <>{display}</>;
 }
