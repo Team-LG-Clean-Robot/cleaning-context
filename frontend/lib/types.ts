@@ -78,13 +78,13 @@ export type RoomBbox = {
   bbox: { x: number; y: number; w: number; h: number };
 };
 
-// 백엔드 미연결 fallback. 외벽 420×280을 5개 방이 빈틈 없이 채움.
+// 건축 도면 기반 레이아웃. viewBox 560×400.
 export const ROOMS_SEED: RoomBbox[] = [
-  { id: "entrance", name_ko: "현관", base_score: 30, bbox: { x: 0, y: 0, w: 80, h: 180 } },
-  { id: "living", name_ko: "거실", base_score: 25, bbox: { x: 80, y: 0, w: 200, h: 180 } },
-  { id: "kitchen", name_ko: "주방", base_score: 20, bbox: { x: 280, y: 0, w: 140, h: 100 } },
-  { id: "bedroom", name_ko: "침실", base_score: 15, bbox: { x: 0, y: 180, w: 280, h: 100 } },
-  { id: "bathroom", name_ko: "욕실", base_score: 10, bbox: { x: 280, y: 100, w: 140, h: 180 } },
+  { id: "bedroom",  name_ko: "침실", base_score: 15, bbox: { x: 16, y: 16, w: 176, h: 168 } },
+  { id: "kitchen",  name_ko: "주방", base_score: 20, bbox: { x: 196, y: 16, w: 348, h: 168 } },
+  { id: "entrance", name_ko: "현관", base_score: 30, bbox: { x: 16, y: 188, w: 96, h: 196 } },
+  { id: "living",   name_ko: "거실", base_score: 25, bbox: { x: 116, y: 188, w: 280, h: 196 } },
+  { id: "bathroom", name_ko: "욕실", base_score: 10, bbox: { x: 400, y: 188, w: 144, h: 196 } },
 ];
 
 export const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
