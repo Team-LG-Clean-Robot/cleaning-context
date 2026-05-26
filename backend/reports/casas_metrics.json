@@ -1,0 +1,177 @@
+{
+  "dataset": "CASAS hh106 (Zenodo, CC BY 4.0)",
+  "source": "https://zenodo.org/records/15708568",
+  "description": "Washington State Univ. — 단일 거주자 스마트홈, 8개 방, 36개 활동 라벨",
+  "total_records": 202546,
+  "activity_segments": 1484,
+  "overall_accuracy": 0.5512,
+  "mapped_rules": [
+    "R-RETURN-1 (OutsideDoor → user_returned)",
+    "R-LEFT-1 (OutsideDoor → user_left)",
+    "R-COOK-ACTIVE-1 (Kitchen 60%+ → cooking_active)",
+    "R-COOK-DONE-1 (Kitchen→Living 전환 → cooking_done)",
+    "R-SLEEP-30M-1 (Bedroom + 야간 → pre_sleep)",
+    "R-SHOWER-1 (Bathroom 50%+ → recent_shower)",
+    "R-TV-WATCH-1 (LivingRoom 70%+ → tv_watching)",
+    "R-GUEST-1 (OutsideDoor + LivingRoom → entertain_guests)"
+  ],
+  "unmapped_rules": [
+    "R-RAIN-1 (weather API — 센서 없음)",
+    "R-FRIDGE-MEAL-1 (냉장고 개폐 — 센서 없음)",
+    "R-COOK-ACTIVE-2 (전자레인지 — 센서 없음)",
+    "R-SLEEP-2H-1 (bed_sensor — 센서 없음)",
+    "R-USER-LOC-1 (위치 힌트 — 직접 평가 대상 아님)"
+  ],
+  "per_class_metrics": {
+    "cooking_active": {
+      "precision": 0.642,
+      "recall": 0.939,
+      "f1": 0.762,
+      "support": 164
+    },
+    "cooking_done": {
+      "precision": 0.568,
+      "recall": 0.617,
+      "f1": 0.592,
+      "support": 269
+    },
+    "entertain_guests": {
+      "precision": 0.056,
+      "recall": 0.143,
+      "f1": 0.08,
+      "support": 14
+    },
+    "pre_sleep": {
+      "precision": 0.865,
+      "recall": 0.616,
+      "f1": 0.72,
+      "support": 125
+    },
+    "recent_shower": {
+      "precision": 0.634,
+      "recall": 0.137,
+      "f1": 0.226,
+      "support": 379
+    },
+    "tv_watching": {
+      "precision": 0.379,
+      "recall": 0.842,
+      "f1": 0.523,
+      "support": 101
+    },
+    "user_left": {
+      "precision": 0.93,
+      "recall": 0.93,
+      "f1": 0.93,
+      "support": 215
+    },
+    "user_returned": {
+      "precision": 0.837,
+      "recall": 0.378,
+      "f1": 0.521,
+      "support": 217
+    }
+  },
+  "confusion_matrix": {
+    "cooking_active": {
+      "cooking_active": 154,
+      "cooking_done": 8,
+      "entertain_guests": 0,
+      "pre_sleep": 0,
+      "recent_shower": 0,
+      "tv_watching": 1,
+      "unknown": 1,
+      "user_left": 0,
+      "user_returned": 0
+    },
+    "cooking_done": {
+      "cooking_active": 67,
+      "cooking_done": 166,
+      "entertain_guests": 1,
+      "pre_sleep": 1,
+      "recent_shower": 0,
+      "tv_watching": 18,
+      "unknown": 10,
+      "user_left": 2,
+      "user_returned": 4
+    },
+    "entertain_guests": {
+      "cooking_active": 0,
+      "cooking_done": 7,
+      "entertain_guests": 2,
+      "pre_sleep": 0,
+      "recent_shower": 0,
+      "tv_watching": 4,
+      "unknown": 0,
+      "user_left": 0,
+      "user_returned": 1
+    },
+    "pre_sleep": {
+      "cooking_active": 0,
+      "cooking_done": 4,
+      "entertain_guests": 0,
+      "pre_sleep": 77,
+      "recent_shower": 26,
+      "tv_watching": 0,
+      "unknown": 18,
+      "user_left": 0,
+      "user_returned": 0
+    },
+    "recent_shower": {
+      "cooking_active": 8,
+      "cooking_done": 62,
+      "entertain_guests": 14,
+      "pre_sleep": 9,
+      "recent_shower": 52,
+      "tv_watching": 65,
+      "unknown": 163,
+      "user_left": 5,
+      "user_returned": 1
+    },
+    "tv_watching": {
+      "cooking_active": 0,
+      "cooking_done": 10,
+      "entertain_guests": 1,
+      "pre_sleep": 0,
+      "recent_shower": 0,
+      "tv_watching": 85,
+      "unknown": 5,
+      "user_left": 0,
+      "user_returned": 0
+    },
+    "unknown": {
+      "cooking_active": 0,
+      "cooking_done": 0,
+      "entertain_guests": 0,
+      "pre_sleep": 0,
+      "recent_shower": 0,
+      "tv_watching": 0,
+      "unknown": 0,
+      "user_left": 0,
+      "user_returned": 0
+    },
+    "user_left": {
+      "cooking_active": 0,
+      "cooking_done": 1,
+      "entertain_guests": 0,
+      "pre_sleep": 0,
+      "recent_shower": 4,
+      "tv_watching": 0,
+      "unknown": 0,
+      "user_left": 200,
+      "user_returned": 10
+    },
+    "user_returned": {
+      "cooking_active": 11,
+      "cooking_done": 34,
+      "entertain_guests": 18,
+      "pre_sleep": 2,
+      "recent_shower": 0,
+      "tv_watching": 51,
+      "unknown": 11,
+      "user_left": 8,
+      "user_returned": 82
+    }
+  },
+  "analysis_date": "2026-05-26 15:25"
+}

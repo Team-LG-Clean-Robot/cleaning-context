@@ -22,6 +22,9 @@ frontend/node_modules/
 # 백엔드 캐시 (런타임 생성)
 backend/cache/
 
+# 데이터셋 (대용량, git 추적 X)
+backend/data/
+
 # 임시 / 출력
 tmp/
 outputs/
