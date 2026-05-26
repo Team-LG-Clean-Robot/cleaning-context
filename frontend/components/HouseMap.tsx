@@ -193,17 +193,22 @@ function PersonIcon({ x, y }: { x: number; y: number }) {
 }
 
 function RobotIcon({ x, y }: { x: number; y: number }) {
+  const size = 36;
   return (
     <g style={{ transform: `translate(${x}px, ${y}px)` }} className="transition-transform duration-1000 ease-in-out">
-      <circle cx={0} cy={0} r={14} fill="oklch(45% 0 0)" opacity={0.1}>
-        <animate attributeName="r" values="14;19;14" dur="2s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values="0.1;0.04;0.1" dur="2s" repeatCount="indefinite" />
+      <circle cx={0} cy={0} r={22} fill="oklch(45% 0 0)" opacity={0.08}>
+        <animate attributeName="r" values="22;28;22" dur="2s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.08;0.03;0.08" dur="2s" repeatCount="indefinite" />
       </circle>
-      <circle cx={0} cy={0} r={11} fill="oklch(25% 0 0)" stroke="white" strokeWidth={1.5} />
-      <circle cx={-3.5} cy={-2} r={1.8} fill="white" />
-      <circle cx={3.5} cy={-2} r={1.8} fill="white" />
-      <path d="M -4 3.5 q 4 3 8 0" stroke="white" strokeWidth={1} fill="none" strokeLinecap="round" />
-      <text x={0} y={23} textAnchor="middle" style={{ font: "600 8px var(--font-sans)", fill: "oklch(25% 0 0)" }}>
+      <image
+        href="/robot-vacuum-map.png"
+        x={-size / 2}
+        y={-size / 2}
+        width={size}
+        height={size}
+        style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.3))" }}
+      />
+      <text x={0} y={size / 2 + 12} textAnchor="middle" style={{ font: "600 8px var(--font-sans)", fill: "oklch(25% 0 0)" }}>
         청소기
       </text>
     </g>
