@@ -78,13 +78,13 @@ export type RoomBbox = {
   bbox: { x: number; y: number; w: number; h: number };
 };
 
-// 건축 도면 이미지 기반 레이아웃. viewBox 600×400. 이미지 벽선에 맞춤.
+// SVG 직접 렌더링 기반 레이아웃. viewBox 600×420. 5개 방.
 export const ROOMS_SEED: RoomBbox[] = [
-  { id: "bedroom",  name_ko: "침실", base_score: 15, bbox: { x: 84, y: 46, w: 122, h: 146 } },
-  { id: "kitchen",  name_ko: "주방", base_score: 20, bbox: { x: 214, y: 46, w: 310, h: 146 } },
-  { id: "entrance", name_ko: "현관", base_score: 30, bbox: { x: 78, y: 200, w: 82, h: 155 } },
-  { id: "living",   name_ko: "거실", base_score: 25, bbox: { x: 168, y: 200, w: 236, h: 155 } },
-  { id: "bathroom", name_ko: "욕실", base_score: 10, bbox: { x: 412, y: 200, w: 114, h: 155 } },
+  { id: "bedroom",  name_ko: "침실", base_score: 15, bbox: { x: 16, y: 16, w: 200, h: 188 } },
+  { id: "kitchen",  name_ko: "주방", base_score: 20, bbox: { x: 220, y: 16, w: 364, h: 188 } },
+  { id: "entrance", name_ko: "현관", base_score: 30, bbox: { x: 16, y: 208, w: 120, h: 196 } },
+  { id: "living",   name_ko: "거실", base_score: 25, bbox: { x: 140, y: 208, w: 260, h: 196 } },
+  { id: "bathroom", name_ko: "욕실", base_score: 10, bbox: { x: 404, y: 208, w: 180, h: 196 } },
 ];
 
 export const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
