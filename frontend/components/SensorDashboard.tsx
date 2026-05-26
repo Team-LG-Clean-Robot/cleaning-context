@@ -12,6 +12,7 @@ import {
   PointElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { SensorIcon } from "./SensorIcon";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
 
@@ -118,7 +119,7 @@ export function SensorDashboard({ scenarioId }: Props) {
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[16px]" aria-hidden>{s.icon}</span>
+                <SensorIcon sensorId={s.id} className={`w-5 h-5 ${s.active ? "text-text-default" : "text-gray-400"}`} />
                 <LedDot active={s.active} />
               </div>
               <div className="text-[11px] font-medium text-text-default truncate">
