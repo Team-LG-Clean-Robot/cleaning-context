@@ -1,0 +1,121 @@
+{
+  "scenario_id": "cooking_in_progress",
+  "context_summary": "요리 중 · 시각 19:00 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "living",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        },
+        {
+          "source": "cooking_active",
+          "label_ko": "요리 진행 중",
+          "delta": 15
+        }
+      ],
+      "final": 35,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "entrance",
+      "base": 22,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 22
+        },
+        {
+          "source": "cooking_active",
+          "label_ko": "요리 진행 중",
+          "delta": 5
+        }
+      ],
+      "final": 27,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bathroom",
+      "base": 18,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 18
+        },
+        {
+          "source": "cooking_active",
+          "label_ko": "요리 진행 중",
+          "delta": 5
+        }
+      ],
+      "final": 23,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 12,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 12
+        },
+        {
+          "source": "cooking_active",
+          "label_ko": "요리 진행 중",
+          "delta": 5
+        }
+      ],
+      "final": 17,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "kitchen",
+      "base": 28,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 28
+        },
+        {
+          "source": "cooking_active",
+          "label_ko": "요리 진행 중",
+          "delta": -40
+        },
+        {
+          "source": "user_occupancy",
+          "label_ko": "사용자 머무름",
+          "delta": -20
+        }
+      ],
+      "final": -32,
+      "mode": "excluded",
+      "exclusion_reason": "요리 진행 중 (-40)"
+    }
+  ],
+  "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
+  "fallback": true,
+  "ml": {
+    "model_name": "RandomForest",
+    "cv_accuracy": 0.8514,
+    "dataset": "CASAS hh106",
+    "event_confidence": [
+      {
+        "event_id": "cooking_active",
+        "ml_label": "cooking_active",
+        "f1": 0.997
+      }
+    ]
+  },
+  "inferred_events": []
+}

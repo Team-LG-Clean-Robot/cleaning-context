@@ -1,0 +1,126 @@
+{
+  "scenario_id": "rainy_return",
+  "context_summary": "비 오는 날 귀가 · 시각 20:30 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "entrance",
+      "base": 22,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 22
+        },
+        {
+          "source": "rain",
+          "label_ko": "비",
+          "delta": 25
+        },
+        {
+          "source": "user_returned",
+          "label_ko": "사용자 귀가",
+          "delta": 15
+        }
+      ],
+      "final": 62,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "living",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        },
+        {
+          "source": "rain",
+          "label_ko": "비",
+          "delta": 5
+        },
+        {
+          "source": "user_returned",
+          "label_ko": "사용자 귀가",
+          "delta": 5
+        },
+        {
+          "source": "pre_sleep_2h",
+          "label_ko": "취침 2시간 이내",
+          "delta": 5
+        }
+      ],
+      "final": 35,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "kitchen",
+      "base": 28,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 28
+        }
+      ],
+      "final": 28,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bathroom",
+      "base": 18,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 18
+        }
+      ],
+      "final": 18,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 12,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 12
+        },
+        {
+          "source": "pre_sleep_2h",
+          "label_ko": "취침 2시간 이내",
+          "delta": -20
+        }
+      ],
+      "final": -8,
+      "mode": "excluded",
+      "exclusion_reason": "취침 2시간 이내 (-20)"
+    }
+  ],
+  "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
+  "fallback": true,
+  "ml": {
+    "model_name": "RandomForest",
+    "cv_accuracy": 0.8514,
+    "dataset": "CASAS hh106",
+    "event_confidence": [
+      {
+        "event_id": "user_returned",
+        "ml_label": "user_returned",
+        "f1": 0.995
+      },
+      {
+        "event_id": "pre_sleep_2h",
+        "ml_label": "pre_sleep",
+        "f1": 0.996
+      }
+    ]
+  },
+  "inferred_events": []
+}

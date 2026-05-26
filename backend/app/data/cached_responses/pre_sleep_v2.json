@@ -1,0 +1,116 @@
+{
+  "scenario_id": "pre_sleep",
+  "context_summary": "취침 직전 · 시각 22:50 · 취침예정 23:00",
+  "rooms": [
+    {
+      "room_id": "bathroom",
+      "base": 18,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 18
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": 15
+        }
+      ],
+      "final": 33,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "kitchen",
+      "base": 28,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 28
+        }
+      ],
+      "final": 28,
+      "mode": "quiet",
+      "exclusion_reason": "취침 임박 — 저소음 모드"
+    },
+    {
+      "room_id": "living",
+      "base": 20,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 20
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": 5
+        }
+      ],
+      "final": 25,
+      "mode": "quiet",
+      "exclusion_reason": "취침 임박 — 저소음 모드"
+    },
+    {
+      "room_id": "entrance",
+      "base": 22,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 22
+        }
+      ],
+      "final": 22,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bedroom",
+      "base": 12,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 12
+        },
+        {
+          "source": "pre_sleep_30min",
+          "label_ko": "취침 30분 이내",
+          "delta": -40
+        },
+        {
+          "source": "user_occupancy",
+          "label_ko": "사용자 머무름",
+          "delta": -20
+        },
+        {
+          "source": "noise_sleep_extra",
+          "label_ko": "소음 민감도×취침 임박",
+          "delta": -10
+        }
+      ],
+      "final": -58,
+      "mode": "excluded",
+      "exclusion_reason": "취침 30분 이내 (-40)"
+    }
+  ],
+  "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
+  "fallback": true,
+  "ml": {
+    "model_name": "RandomForest",
+    "cv_accuracy": 0.8514,
+    "dataset": "CASAS hh106",
+    "event_confidence": [
+      {
+        "event_id": "pre_sleep_30min",
+        "ml_label": "pre_sleep",
+        "f1": 0.996
+      }
+    ]
+  },
+  "inferred_events": []
+}
