@@ -7,9 +7,18 @@
 }
 
 @layer base {
-  /* Korean word break — 어절 단위 줄바꿈으로 단어가 잘리지 않게 */
   body {
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -10,6 +10,7 @@ import {
 import type {
   CustomRequest,
   EventMeta,
+  RoomId,
   ScenarioMeta,
   SimulateResponse,
 } from "@/lib/types";
@@ -20,7 +21,9 @@ import { ExplanationCard } from "./ExplanationCard";
 import { HouseMap } from "./HouseMap";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import { PriorityList } from "./PriorityList";
+import { RoomDetail } from "./RoomDetail";
 import { ScenarioPanel } from "./ScenarioPanel";
+import { SensorDashboard } from "./SensorDashboard";
 
 type ModeTab = "preset" | "custom";
 
@@ -191,24 +194,35 @@ export function Simulator() {
   const setCustomDraft = (customDraft: CustomRequest) =>
     setState((s) => ({ ...s, customDraft }));
 
+  const [selectedRoom, setSelectedRoom] = useState<RoomId | null>(null);
+
   const selected = state.scenarios.find((s) => s.id === state.selectedId);
   const userLocation =
     state.mode === "preset"
       ? selected?.user_location ?? null
       : state.customDraft.user_location;
 
+  const detailRoom = selectedRoom && state.response
+    ? state.response.rooms.find((r) => r.room_id === selectedRoom)
+    : null;
+
   return (
     <div className="space-y-6">
+    {detailRoom && (
+      <RoomDetail room={detailRoom} onClose={() => setSelectedRoom(null)} />
+    )}
     <AskPanel
       key={state.response?.scenario_id ?? "general"}
       response={state.response}
     />
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-      <div className="lg:col-span-3">
+      <div className="lg:col-span-3 space-y-4">
         <HouseMap
           rooms={state.response?.rooms}
           userLocation={userLocation}
+          onRoomClick={state.response ? setSelectedRoom : undefined}
         />
+        <SensorDashboard scenarioId={state.response?.scenario_id ?? state.selectedId} />
       </div>
       <div className="lg:col-span-2 space-y-4">
         <div
