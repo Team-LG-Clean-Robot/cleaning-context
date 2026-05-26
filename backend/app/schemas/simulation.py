@@ -69,6 +69,19 @@ from app.schemas.sensor import SensorReading  # noqa: E402
 SimulateRequest.model_rebuild()
 
 
+class MlEventConfidence(BaseModel):
+    event_id: str
+    ml_label: str
+    f1: float
+
+
+class MlInfo(BaseModel):
+    model_name: str
+    cv_accuracy: float
+    dataset: str
+    event_confidence: list[MlEventConfidence] = Field(default_factory=list)
+
+
 class SimulateResponse(BaseModel):
     scenario_id: str
     context_summary: str
@@ -76,3 +89,4 @@ class SimulateResponse(BaseModel):
     explanation: str
     fallback: bool
     duration_ms: int
+    ml: MlInfo | None = None

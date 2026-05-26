@@ -156,6 +156,10 @@ export function Simulator() {
   }, []);
 
   const handlePresetSelect = async (id: string) => {
+    if (state.selectedId === id) {
+      setState((s) => ({ ...s, selectedId: null, response: null, error: null }));
+      return;
+    }
     setState((s) => ({ ...s, selectedId: id, loading: true, error: null }));
     try {
       const response = await simulatePreset(id, sequencer.next());

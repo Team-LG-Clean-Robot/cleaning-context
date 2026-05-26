@@ -38,6 +38,19 @@ export type RoomScore = {
   exclusion_reason: string | null;
 };
 
+export type MlEventConfidence = {
+  event_id: string;
+  ml_label: string;
+  f1: number;
+};
+
+export type MlInfo = {
+  model_name: string;
+  cv_accuracy: number;
+  dataset: string;
+  event_confidence: MlEventConfidence[];
+};
+
 export type SimulateResponse = {
   scenario_id: string;
   context_summary: string;
@@ -45,6 +58,7 @@ export type SimulateResponse = {
   explanation: string;
   fallback: boolean;
   duration_ms: number;
+  ml: MlInfo | null;
 };
 
 export type ScenarioMeta = {

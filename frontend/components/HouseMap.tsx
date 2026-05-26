@@ -13,6 +13,31 @@ function roomCenter(room: RoomBbox): { x: number; y: number } {
   return { x: room.bbox.x + room.bbox.w / 2, y: room.bbox.y + room.bbox.h / 2 };
 }
 
+const PATROL_ORDER: RoomId[] = ["living", "kitchen", "bedroom", "bathroom", "entrance"];
+const PATROL_INTERVAL = 3000;
+
+function usePatrol(active: boolean): { x: number; y: number } {
+  const [idx, setIdx] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
+
+  useEffect(() => {
+    if (!active) {
+      clearInterval(timerRef.current);
+      return;
+    }
+    setIdx(0);
+    timerRef.current = setInterval(() => {
+      setIdx((i) => (i + 1) % PATROL_ORDER.length);
+    }, PATROL_INTERVAL);
+    return () => clearInterval(timerRef.current);
+  }, [active]);
+
+  const room = ROOMS_SEED.find((r) => r.id === PATROL_ORDER[idx]);
+  if (!room) return { x: -100, y: -100 };
+  const c = roomCenter(room);
+  return { x: c.x, y: c.y + 10 };
+}
+
 function PersonIcon({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x}, ${y})`} style={{ pointerEvents: "none" }}>
@@ -159,11 +184,13 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
 
+  const hasScenario = rooms && rooms.length > 0;
   const topRoom = rooms?.filter((r) => r.mode !== "excluded").sort((a, b) => b.final - a.final)[0];
   const robotSeed = topRoom ? ROOMS_SEED.find((r) => r.id === topRoom.room_id) : null;
-  const robotPos = robotSeed ? roomCenter(robotSeed) : null;
-  const robotX = robotPos ? robotPos.x : -100;
-  const robotY = robotPos ? robotPos.y + 10 : -100;
+  const scenarioPos = robotSeed ? { x: roomCenter(robotSeed).x, y: roomCenter(robotSeed).y + 10 } : null;
+  const patrolPos = usePatrol(!hasScenario);
+  const robotX = hasScenario && scenarioPos ? scenarioPos.x : patrolPos.x;
+  const robotY = hasScenario && scenarioPos ? scenarioPos.y : patrolPos.y;
 
   return (
     <div className="relative">
@@ -242,7 +269,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
         })()}
 
         {/* 로봇 청소기 (항상 표시) */}
-        {rooms && rooms.length > 0 && <RobotIcon x={robotX} y={robotY} />}
+        <RobotIcon x={robotX} y={robotY} />
       </svg>
 
       {/* 히트맵 토글 버튼 */}

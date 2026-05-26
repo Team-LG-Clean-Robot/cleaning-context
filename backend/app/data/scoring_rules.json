@@ -7,5 +7,5 @@
     "delayed_minutes": 30,
     "quiet_noise_threshold": 4
   },
-  "rule_version": "v1"
+  "rule_version": "v2"
 }

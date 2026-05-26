@@ -6,11 +6,18 @@ from fastapi import APIRouter, HTTPException
 from app.data_loader import (
     load_events,
     load_inference_engine,
+    load_ml_confidence,
     load_rooms,
     load_rules,
     load_scenarios,
 )
-from app.schemas.simulation import CustomContext, SimulateRequest, SimulateResponse
+from app.schemas.simulation import (
+    CustomContext,
+    MlEventConfidence,
+    MlInfo,
+    SimulateRequest,
+    SimulateResponse,
+)
 from app.services import cache, llm_explainer
 from app.services.context_builder import (
     ScoringContext,
@@ -22,6 +29,22 @@ from app.services.scoring import compute_scores
 router = APIRouter()
 
 
+def _build_ml_info(active_event_ids: list[str]) -> MlInfo:
+    conf = load_ml_confidence()
+    event_map = conf["event_map"]
+    items = []
+    for eid in active_event_ids:
+        if eid in event_map:
+            m = event_map[eid]
+            items.append(MlEventConfidence(event_id=eid, ml_label=m["ml_label"], f1=m["f1"]))
+    return MlInfo(
+        model_name=conf["model_name"],
+        cv_accuracy=conf["cv_accuracy"],
+        dataset=conf["dataset"],
+        event_confidence=items,
+    )
+
+
 def _run(
     ctx: ScoringContext,
     t0: float,
@@ -30,11 +53,13 @@ def _run(
 ) -> SimulateResponse:
     """scoring → cache hit 우선 → LLM. 시나리오/custom 공통 hot path."""
     scores = compute_scores(ctx, load_rooms(), load_rules())
+    ml_info = _build_ml_info([ev.id for ev in ctx.resolved_events])
+
     if cache_key is not None:
         cached = cache.get(cache_key)
         if cached:
             return SimulateResponse(
-                **{**cached, "duration_ms": int((time.perf_counter() - t0) * 1000)}
+                **{**cached, "duration_ms": int((time.perf_counter() - t0) * 1000), "ml": ml_info}
             )
     explanation, fallback = llm_explainer.generate_explanation(summary, scores)
     response = SimulateResponse(
@@ -44,10 +69,12 @@ def _run(
         explanation=explanation,
         fallback=fallback,
         duration_ms=int((time.perf_counter() - t0) * 1000),
+        ml=ml_info,
     )
     if cache_key is not None and not fallback:
         payload = response.model_dump()
         payload.pop("duration_ms", None)
+        payload.pop("ml", None)
         cache.put(cache_key, payload)
     return response
 

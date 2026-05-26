@@ -1,0 +1,18 @@
+{
+  "_comment": "ML RandomForest(85.1% CV) per-class F1 → 이벤트 매핑. CASAS hh106 기반.",
+  "event_map": {
+    "cooking_active":    {"ml_label": "cooking_active",    "f1": 0.997},
+    "cooking_done":      {"ml_label": "cooking_done",      "f1": 0.992},
+    "guest_arriving_2h": {"ml_label": "entertain_guests",  "f1": 0.960},
+    "guest_visit_recent":{"ml_label": "entertain_guests",  "f1": 0.960},
+    "pre_sleep_30min":   {"ml_label": "pre_sleep",         "f1": 0.996},
+    "pre_sleep_2h":      {"ml_label": "pre_sleep",         "f1": 0.996},
+    "recent_shower":     {"ml_label": "recent_shower",     "f1": 0.995},
+    "tv_watching":       {"ml_label": "tv_watching",       "f1": 0.995},
+    "user_left":         {"ml_label": "user_left",         "f1": 1.000},
+    "user_returned":     {"ml_label": "user_returned",     "f1": 0.995}
+  },
+  "model_name": "RandomForest",
+  "cv_accuracy": 0.8514,
+  "dataset": "CASAS hh106"
+}

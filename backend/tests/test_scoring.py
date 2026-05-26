@@ -1,8 +1,8 @@
 """
 Golden tests for scoring engine.
 
-기대값은 SCORING_RULES.md §6 기준. 시나리오 3(pre_sleep)의 침실 점수는
-TECHNICAL_PLAN.md(-35) vs 룰(-25) 차이가 있으며, 본 테스트는 룰을 ground truth로 본다.
+v2 재설계: ML feature importance 기반 base_score 재조정 + 이벤트 delta 차별화.
+6개 시나리오가 5개 방 모두를 1위로 활용하도록 설계.
 """
 
 import pytest
@@ -15,51 +15,48 @@ from app.services.scoring import compute_scores
 
 EXPECTED_SCORES: dict[str, dict[str, tuple[int, str]]] = {
     "rainy_return": {
-        "entrance": (65, "normal"),
-        "living": (40, "normal"),
-        "kitchen": (20, "normal"),
-        "bedroom": (-15, "excluded"),
-        "bathroom": (10, "normal"),
+        "entrance": (62, "normal"),
+        "living": (35, "normal"),
+        "kitchen": (28, "normal"),
+        "bathroom": (18, "normal"),
+        "bedroom": (-8, "excluded"),
     },
     "post_cooking": {
-        "kitchen": (50, "normal"),
+        "kitchen": (63, "normal"),
+        "entrance": (22, "normal"),
+        "bathroom": (18, "normal"),
+        "bedroom": (12, "normal"),
         "living": (5, "delayed"),
-        "entrance": (30, "normal"),
-        "bedroom": (15, "normal"),
-        "bathroom": (10, "normal"),
     },
     "guest_incoming": {
-        # MVP에서 cleanup_gap 차등 메커니즘 제외 (단일 +10 와일드카드는 PLANNING의 +15/+10 차이를 표현 못함)
-        # 결과: 거실=현관=50으로 동률, "거실/현관 우선" narrative는 유지
         "living": (50, "normal"),
-        "entrance": (50, "normal"),
-        "kitchen": (25, "normal"),
-        "bedroom": (5, "normal"),
-        "bathroom": (20, "normal"),
+        "kitchen": (38, "normal"),
+        "entrance": (37, "normal"),
+        "bathroom": (33, "normal"),
+        "bedroom": (7, "normal"),
     },
     "morning_quick_clean": {
-        "entrance": (35, "normal"),
-        "living": (30, "normal"),
-        "kitchen": (25, "normal"),
-        "bedroom": (20, "normal"),
-        "bathroom": (15, "normal"),
+        "bedroom": (37, "normal"),
+        "kitchen": (33, "normal"),
+        "entrance": (27, "normal"),
+        "living": (25, "normal"),
+        "bathroom": (23, "normal"),
     },
     "cooking_in_progress": {
-        "entrance": (30, "normal"),
-        "living": (30, "normal"),
-        "kitchen": (-25, "excluded"),
-        "bedroom": (15, "normal"),
-        "bathroom": (10, "normal"),
+        "living": (35, "normal"),
+        "entrance": (27, "normal"),
+        "bathroom": (23, "normal"),
+        "bedroom": (17, "normal"),
+        "kitchen": (-32, "excluded"),
     },
 }
 
-# pre_sleep는 점수가 룰 기반 derived → 모드만 검증
 EXPECTED_MODES_PRE_SLEEP = {
-    "bedroom": "excluded",
-    "entrance": "normal",  # 30 - 5 = 25, noise_sensitivity 2 < quiet threshold 4
-    "kitchen": "quiet",   # 20 - 5 = 15, noise 4 ≥ 4
-    "living": "quiet",    # 25 - 15 = 10, noise 5 ≥ 4
-    "bathroom": "normal", # 10 - 5 = 5, noise 3 < 4
+    "bathroom": "normal",   # 18 + 15 = 33, noise 3 < 4
+    "kitchen": "quiet",     # 28, noise 4 ≥ 4
+    "living": "quiet",      # 20 + 5 = 25, noise 5 ≥ 4
+    "entrance": "normal",   # 22, noise 2 < 4
+    "bedroom": "excluded",  # 12 - 40 - 20(occ) - 10(noise) = -58
 }
 
 
