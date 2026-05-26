@@ -6,7 +6,9 @@ import {
   fetchScenarios,
   simulateCustom,
   simulatePreset,
+  simulateSensors,
 } from "@/lib/api";
+import { getSensorStates, toSensorReadings } from "@/lib/sensor-mock";
 import type {
   CustomRequest,
   EventMeta,
@@ -162,7 +164,21 @@ export function Simulator() {
     }
     setState((s) => ({ ...s, selectedId: id, loading: true, error: null }));
     try {
-      const response = await simulatePreset(id, sequencer.next());
+      const scenario = state.scenarios.find((sc) => sc.id === id);
+      const sensors = getSensorStates(id);
+      const readings = toSensorReadings(sensors, scenario?.current_time ?? "20:00");
+
+      let response;
+      if (readings.length > 0) {
+        response = await simulateSensors(
+          readings,
+          scenario?.current_time ?? "20:00",
+          scenario?.sleep_time ?? "23:00",
+          sequencer.next(),
+        );
+      } else {
+        response = await simulatePreset(id, sequencer.next());
+      }
       setState((s) => ({ ...s, response, loading: false }));
     } catch (e) {
       if ((e as Error).name === "AbortError") return;

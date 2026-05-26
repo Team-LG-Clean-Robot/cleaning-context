@@ -66,6 +66,24 @@ export async function simulateCustom(
   return jsonOrThrow(r, "simulate");
 }
 
+export async function simulateSensors(
+  sensorReadings: unknown[],
+  currentTime: string,
+  sleepTime: string,
+  signal?: AbortSignal,
+): Promise<SimulateResponse> {
+  const r = await fetch(`${BASE}/api/simulate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sensor_readings: sensorReadings,
+      custom: { current_time: currentTime, sleep_time: sleepTime, active_events: [], gap_rooms: [] },
+    }),
+    signal,
+  });
+  return jsonOrThrow(r, "simulate-sensors");
+}
+
 export async function askQuestion(
   req: AskRequest,
   signal?: AbortSignal,

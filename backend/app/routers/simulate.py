@@ -14,6 +14,7 @@ from app.data_loader import (
 )
 from app.schemas.simulation import (
     CustomContext,
+    InferredEventInfo,
     MlEventConfidence,
     MlInfo,
     SimulateRequest,
@@ -51,6 +52,7 @@ def _run(
     t0: float,
     summary: str,
     cache_key: str | None,
+    inferred_events: list[InferredEventInfo] | None = None,
 ) -> SimulateResponse:
     """scoring → cache hit 우선 → LLM. 시나리오/custom 공통 hot path."""
     scores = compute_scores(ctx, load_rooms(), load_rules())
@@ -60,7 +62,8 @@ def _run(
         cached = cache.get(cache_key)
         if cached:
             return SimulateResponse(
-                **{**cached, "duration_ms": int((time.perf_counter() - t0) * 1000), "ml": ml_info}
+                **{**cached, "duration_ms": int((time.perf_counter() - t0) * 1000), "ml": ml_info},
+                inferred_events=inferred_events or [],
             )
     explanation, fallback = llm_explainer.generate_explanation(summary, scores)
     response = SimulateResponse(
@@ -71,11 +74,13 @@ def _run(
         fallback=fallback,
         duration_ms=int((time.perf_counter() - t0) * 1000),
         ml=ml_info,
+        inferred_events=inferred_events or [],
     )
     if cache_key is not None and not fallback:
         payload = response.model_dump()
         payload.pop("duration_ms", None)
         payload.pop("ml", None)
+        payload.pop("inferred_events", None)
         cache.put(cache_key, payload)
     return response
 
@@ -105,8 +110,9 @@ def simulate(req: SimulateRequest) -> SimulateResponse:
         return _run(ctx, t0, summary, cache.cache_key(req.scenario_id))
 
     # v2 — sensor_readings 경로: inference → custom으로 합쳐 기존 scoring 호출
+    inferred_info: list[InferredEventInfo] = []
     if req.sensor_readings is not None:
-        custom = _custom_from_sensors(req)
+        custom, inferred_info = _custom_from_sensors(req)
     else:
         custom = req.custom
 
@@ -119,36 +125,28 @@ def simulate(req: SimulateRequest) -> SimulateResponse:
         f"{label} · 시각 {custom.current_time}"
         f" · 취침예정 {custom.sleep_time}"
     )
-    return _run(ctx, t0, summary, cache_key=None)
+    return _run(ctx, t0, summary, cache_key=None, inferred_events=inferred_info)
 
 
-def _custom_from_sensors(req: SimulateRequest) -> CustomContext:
-    """sensor_readings → infer-events (hybrid: rule + ML) → CustomContext 빌드.
-
-    req.custom이 함께 제공되면 시간·user_location·sleep_time을 override로 사용.
-    """
-    from app.routers.infer import _merge_hybrid
-
+def _custom_from_sensors(
+    req: SimulateRequest,
+) -> tuple[CustomContext, list[InferredEventInfo]]:
+    """sensor_readings → ML 추론 → CustomContext + 추론 결과."""
     engine = load_inference_engine()
     override = req.custom
 
     now = datetime.now()
     current_time = override.current_time if override else f"{now.hour:02d}:{now.minute:02d}"
     sleep_time = override.sleep_time if override else "23:00"
-    weekday = now.weekday()  # 월=0 ... 일=6
-
-    rule_events = engine.evaluate(
-        readings=req.sensor_readings,
-        current_time=current_time,
-        weekday=weekday,
-        sleep_time=sleep_time,
-    )
 
     classifier = load_ml_classifier()
     ml_events = classifier.predict(req.sensor_readings, current_time)
 
-    inferred = _merge_hybrid(rule_events, ml_events)
-    sensor_event_ids = list(dict.fromkeys(e.event_id for e in inferred))
+    inferred_info = [
+        InferredEventInfo(event_id=e.event_id, confidence=e.confidence, source=e.source)
+        for e in ml_events
+    ]
+    sensor_event_ids = list(dict.fromkeys(e.event_id for e in ml_events))
 
     # custom.active_events가 있으면 합집합
     explicit_events = list(override.active_events) if override else []
@@ -160,10 +158,11 @@ def _custom_from_sensors(req: SimulateRequest) -> CustomContext:
         user_location = engine.user_location_hint(req.sensor_readings)
 
     gap_rooms = list(override.gap_rooms) if override else []
-    return CustomContext(
+    custom = CustomContext(
         current_time=current_time,
         sleep_time=sleep_time,
         user_location=user_location,
         active_events=merged_events,
         gap_rooms=gap_rooms,
     )
+    return custom, inferred_info

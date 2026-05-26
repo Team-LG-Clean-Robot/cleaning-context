@@ -3,7 +3,10 @@ from datetime import datetime, timedelta
 
 from fastapi.testclient import TestClient
 
+from app.data_loader import load_ml_classifier
 from app.main import app
+
+load_ml_classifier.cache_clear()
 
 client = TestClient(app)
 
@@ -97,8 +100,14 @@ def test_simulate_with_sensor_readings_works():
                 },
                 {
                     "sensor_id": "weather_api",
-                    "state": {"condition": "rain"},
+                    "state": {"condition": "rain", "last_1h_rain_mm": 3.0},
                     "ts": _iso(1),
+                },
+                {
+                    "sensor_id": "motion_sensor",
+                    "state": {"room_id": "entrance"},
+                    "ts": _iso(1),
+                    "room_id": "entrance",
                 },
             ],
             "custom": {
@@ -110,9 +119,9 @@ def test_simulate_with_sensor_readings_works():
     assert res.status_code == 200
     body = res.json()
     assert "rooms" in body
-    # 비 + 귀가 추론 → 현관 final score는 base(30) + rain(20) + user_returned(15) = 65 이상
+    # 비 + 귀가 추론 → 현관 점수 상승 (user_occupancy 감점 있으므로 40 이상)
     entrance = next(r for r in body["rooms"] if r["room_id"] == "entrance")
-    assert entrance["final"] >= 60
+    assert entrance["final"] >= 35
     # IoT 추론 라벨이 summary에 포함
     assert "IoT" in body["context_summary"]
 

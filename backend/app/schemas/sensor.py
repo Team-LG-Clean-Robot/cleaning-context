@@ -31,7 +31,7 @@ class InferRequest(BaseModel):
     current_time: str = Field(..., description="HH:MM 24h")
     weekday: int = Field(..., ge=0, le=6, description="0=월, 6=일")
     sleep_time: str = Field("23:00", description="HH:MM 24h, 취침 예정 시각")
-    mode: InferMode = "hybrid"
+    mode: InferMode = "ml"
 
     @field_validator("current_time", "sleep_time")
     @classmethod

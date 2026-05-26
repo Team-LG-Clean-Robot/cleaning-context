@@ -1,6 +1,21 @@
 "use client";
-import type { SimulateResponse } from "@/lib/types";
+import type { InferredEventInfo, SimulateResponse } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
+
+const EVENT_LABEL: Record<string, string> = {
+  user_returned: "사용자 귀가",
+  user_left: "사용자 외출",
+  cooking_done: "요리 완료",
+  cooking_active: "요리 진행 중",
+  pre_sleep_30min: "취침 30분 이내",
+  pre_sleep_2h: "취침 2시간 이내",
+  recent_shower: "샤워 직후",
+  tv_watching: "TV 시청 중",
+  rain: "비",
+  guest_arriving_2h: "손님 방문 임박",
+  guest_visit_recent: "최근 손님 방문",
+  meal_prep: "식사 준비",
+};
 
 export function ExplanationCard({ response }: { response: SimulateResponse }) {
   const top = response.rooms[0];
@@ -77,6 +92,47 @@ export function ExplanationCard({ response }: { response: SimulateResponse }) {
                 </li>
               ))}
             </ul>
+          </details>
+        )}
+
+        {response.inferred_events && response.inferred_events.length > 0 && (
+          <details className="group">
+            <summary
+              className="cursor-pointer list-none bg-surface-base hover:bg-border-default/40
+                         border border-border-default rounded-lg px-4 py-2
+                         text-[13px] font-medium inline-flex items-center gap-1 select-none"
+            >
+              센서 → 이벤트 추론 결과
+              <span className="text-gray-500 group-open:hidden">▾</span>
+              <span className="text-gray-500 hidden group-open:inline">▴</span>
+            </summary>
+            <div className="mt-2.5 space-y-1.5">
+              {response.inferred_events.map((ev) => (
+                <div key={ev.event_id} className="flex items-center gap-2 text-[12px]">
+                  <span className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium border ${
+                    ev.source === "rule"
+                      ? "text-blue-700 bg-blue-50 border-blue-200"
+                      : "text-purple-700 bg-purple-50 border-purple-200"
+                  }`}>
+                    {ev.source === "rule" ? "Rule" : "ML"}
+                  </span>
+                  <span className="text-text-default font-medium">
+                    {EVENT_LABEL[ev.event_id] ?? ev.event_id}
+                  </span>
+                  <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        ev.source === "rule" ? "bg-blue-400" : "bg-purple-400"
+                      }`}
+                      style={{ width: `${Math.round(ev.confidence * 100)}%` }}
+                    />
+                  </div>
+                  <span className="font-mono text-[11px] text-text-muted shrink-0">
+                    {(ev.confidence * 100).toFixed(0)}%
+                  </span>
+                </div>
+              ))}
+            </div>
           </details>
         )}
 

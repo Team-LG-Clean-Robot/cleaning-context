@@ -69,6 +69,12 @@ from app.schemas.sensor import SensorReading  # noqa: E402
 SimulateRequest.model_rebuild()
 
 
+class InferredEventInfo(BaseModel):
+    event_id: str
+    confidence: float
+    source: str  # "rule" | "ml"
+
+
 class MlEventConfidence(BaseModel):
     event_id: str
     ml_label: str
@@ -90,3 +96,4 @@ class SimulateResponse(BaseModel):
     fallback: bool
     duration_ms: int
     ml: MlInfo | None = None
+    inferred_events: list[InferredEventInfo] = Field(default_factory=list)

@@ -106,3 +106,86 @@ export function addNoise(sensors: SensorState[]): SensorState[] {
     return { ...s, value: Math.round((s.value + noise) * 10) / 10 };
   });
 }
+
+type SensorReadingPayload = {
+  sensor_id: string;
+  state: Record<string, unknown>;
+  ts: string;
+  room_id?: string;
+};
+
+const STATE_BUILDERS: Record<string, (s: SensorState) => Record<string, unknown>> = {
+  door_lock: (s) => {
+    const unlocked = s.label.includes("열림");
+    return { state: unlocked ? "unlocked" : "locked", side: "out" };
+  },
+  induction: (s) => {
+    const off = s.label.includes("OFF") || s.label === "꺼짐";
+    if (off) return { state: "off", transition_from: "on", prev_on_within_min: 20 };
+    return { state: "on", duration_min: Math.max(5, Math.round(s.value / 300)) };
+  },
+  microwave: (s) => {
+    const on = s.value > 0 && s.active;
+    return { state: on ? "on" : "off", duration_min: on ? 3 : 0 };
+  },
+  refrigerator: (s) => ({
+    open_count_last_1h: s.value,
+    ...(s.value >= 4 ? { open_count_last_1h_gte: 4 } : {}),
+  }),
+  tv: (s) => ({
+    state: s.active ? "on" : "off",
+    duration_min: s.value,
+  }),
+  bed_sensor: (s) => ({ occupied: s.active }),
+  motion_sensor: (s) => {
+    const room = s.label.includes("현관") ? "entrance"
+      : s.label.includes("주방") ? "kitchen"
+      : s.label.includes("침실") ? "bedroom"
+      : s.label.includes("욕실") ? "bathroom"
+      : "living";
+    return { room_id: room };
+  },
+  humidity_bath: (s) => ({
+    rh: s.value,
+    rh_gte: s.value >= 80 ? 80 : undefined,
+    rh_delta_last_10min: s.value >= 70 ? 25 : 5,
+    rh_delta_last_10min_gte: s.value >= 70 ? 20 : undefined,
+  }),
+  weather_api: (s) => ({
+    condition: s.label.includes("비") ? "rain" : "clear",
+    last_1h_rain_mm: s.label.includes("비") ? 3 : 0,
+  }),
+  calendar: (s) => ({
+    upcoming_event_tag: s.active ? "guest" : undefined,
+    within_min_lte: s.active ? 120 : undefined,
+  }),
+  air_conditioner: (s) => ({
+    state: s.active ? "on" : "off",
+    target_temp: s.value,
+  }),
+  smart_speaker: () => ({}),
+};
+
+export function toSensorReadings(
+  sensors: SensorState[],
+  currentTime: string,
+): SensorReadingPayload[] {
+  const now = new Date();
+  const [h, m] = currentTime.split(":").map(Number);
+  now.setHours(h, m, 0, 0);
+
+  return sensors
+    .filter((s) => s.active)
+    .map((s, i) => {
+      const builder = STATE_BUILDERS[s.id];
+      const state = builder ? builder(s) : {};
+      const ts = new Date(now.getTime() - i * 60_000);
+      const room = s.room === "external" ? undefined : s.room;
+      return {
+        sensor_id: s.id,
+        state,
+        ts: ts.toISOString(),
+        ...(room ? { room_id: room } : {}),
+      };
+    });
+}

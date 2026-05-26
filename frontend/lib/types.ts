@@ -51,6 +51,12 @@ export type MlInfo = {
   event_confidence: MlEventConfidence[];
 };
 
+export type InferredEventInfo = {
+  event_id: string;
+  confidence: number;
+  source: "rule" | "ml";
+};
+
 export type SimulateResponse = {
   scenario_id: string;
   context_summary: string;
@@ -59,6 +65,7 @@ export type SimulateResponse = {
   fallback: boolean;
   duration_ms: number;
   ml: MlInfo | null;
+  inferred_events: InferredEventInfo[];
 };
 
 export type ScenarioMeta = {
