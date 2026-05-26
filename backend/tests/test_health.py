@@ -19,3 +19,8 @@ def test_health():
     assert isinstance(body["cold_start"], bool)
     assert body["inference_rules_loaded"] == 13
     assert body["ml_classifier_loaded"] is False
+    # v3 — CASAS 데이터셋 검증 결과
+    validation = body["dataset_validation"]
+    assert validation is not None
+    assert validation["accuracy"] > 0.5
+    assert validation["mapped_rules"] >= 8

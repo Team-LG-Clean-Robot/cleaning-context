@@ -1,4 +1,6 @@
+import json
 import time
+from pathlib import Path
 
 from fastapi import APIRouter
 
@@ -7,9 +9,29 @@ from app.data_loader import load_events, load_inference_engine, load_rooms, load
 
 router = APIRouter()
 
-# 프로세스 시작 시각 — cold_start 판정용 (v2, 멘토 피드백 2026-05-16)
 _BOOT_TS = time.monotonic()
 _COLD_START_WINDOW_SEC = 30
+
+_METRICS_PATH = Path(__file__).resolve().parent.parent.parent / "reports" / "casas_metrics.json"
+
+
+def _load_validation_summary() -> dict | None:
+    if not _METRICS_PATH.exists():
+        return None
+    data = json.loads(_METRICS_PATH.read_text(encoding="utf-8"))
+    return {
+        "dataset": data["dataset"],
+        "accuracy": data["overall_accuracy"],
+        "segments": data["activity_segments"],
+        "mapped_rules": len(data["mapped_rules"]),
+        "top_f1": {
+            k: v["f1"]
+            for k, v in sorted(
+                data["per_class_metrics"].items(),
+                key=lambda x: -x[1]["f1"],
+            )[:3]
+        },
+    }
 
 
 @router.get("/health")
@@ -21,10 +43,9 @@ def health() -> dict:
         "rooms_loaded": len(load_rooms()),
         "events_loaded": len(load_events()),
         "scenarios_loaded": len(load_scenarios()),
-        # v2 — Flutter splash가 "서버 깨우는 중..." 메시지 노출용
         "cold_start": uptime_sec < _COLD_START_WINDOW_SEC,
         "uptime_sec": int(uptime_sec),
-        # v2 — IoT 멀티센서 도메인
         "inference_rules_loaded": len(load_inference_engine().rules),
-        "ml_classifier_loaded": False,  # 학습 완료 후 services/event_classifier에서 True 반환
+        "ml_classifier_loaded": False,
+        "dataset_validation": _load_validation_summary(),
     }
