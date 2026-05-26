@@ -43,3 +43,11 @@ def load_inference_engine():
     from app.services.sensor_inference import SensorInferenceEngine
 
     return SensorInferenceEngine(DATA_DIR / "sensor_inference_rules.json")
+
+
+@lru_cache
+def load_ml_classifier():
+    """ML RandomForest 이벤트 분류기. backend/models/event_classifier.joblib."""
+    from app.services.ml_classifier import MlEventClassifier
+
+    return MlEventClassifier()

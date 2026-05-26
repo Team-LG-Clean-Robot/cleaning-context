@@ -34,7 +34,7 @@
 | 1 | **라이브 데모** (웹 + 모바일 APK + IoT 시뮬) | 전유성 | 5/30 100% 작동 + 멘토 2차 일정 fixed |
 | 2 | **사업계획서 제출본** (`BUSINESS_PLAN.md` → hwp) | **김준성** | 전 섹션 통합 작성 + 부수로 시뮬용 mock data·아파트 도면 납품 |
 | 3 | **ML 분류 결과** (정확도·confusion matrix) | 박주상 | 정확도 ≥75% / 5-fold CV ≥70% (학습 데이터 본인 발굴) · 미달 시 5/24까지 정직 보고 → Plan B (rule + LLM 중심 발표) |
-| 4 | **외부 증거 + 멘토 Q&A** | 조현서 | `docs/research/*.md` 자료 수집·hand-off + Q&A 10종 |
+| 4 | **외부 증거 + 멘토 Q&A** | 조현서 | `docs/research/*.md` 자료 수집·hand-off + Q&A 10종 — 🔄 PR #3 머지 (persona.md + user_voice.md + DEMO_SCRIPT Q&A 10) · 시연 시나리오 placeholder는 전유성 후속
 | (5) | 발표 PPT 8슬라이드 | TBD | W3 결정 |
 
 **Hand-off 구조**:

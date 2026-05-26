@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException
 from app.data_loader import (
     load_events,
     load_inference_engine,
+    load_ml_classifier,
     load_ml_confidence,
     load_rooms,
     load_rules,
@@ -122,10 +123,12 @@ def simulate(req: SimulateRequest) -> SimulateResponse:
 
 
 def _custom_from_sensors(req: SimulateRequest) -> CustomContext:
-    """sensor_readings → infer-events → CustomContext 빌드.
+    """sensor_readings → infer-events (hybrid: rule + ML) → CustomContext 빌드.
 
     req.custom이 함께 제공되면 시간·user_location·sleep_time을 override로 사용.
     """
+    from app.routers.infer import _merge_hybrid
+
     engine = load_inference_engine()
     override = req.custom
 
@@ -134,12 +137,17 @@ def _custom_from_sensors(req: SimulateRequest) -> CustomContext:
     sleep_time = override.sleep_time if override else "23:00"
     weekday = now.weekday()  # 월=0 ... 일=6
 
-    inferred = engine.evaluate(
+    rule_events = engine.evaluate(
         readings=req.sensor_readings,
         current_time=current_time,
         weekday=weekday,
         sleep_time=sleep_time,
     )
+
+    classifier = load_ml_classifier()
+    ml_events = classifier.predict(req.sensor_readings, current_time)
+
+    inferred = _merge_hybrid(rule_events, ml_events)
     sensor_event_ids = list(dict.fromkeys(e.event_id for e in inferred))
 
     # custom.active_events가 있으면 합집합
