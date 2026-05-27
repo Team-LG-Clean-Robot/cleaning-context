@@ -47,7 +47,7 @@ def load_inference_engine():
 
 @lru_cache
 def load_ml_classifier():
-    """ML RandomForest 이벤트 분류기. backend/models/event_classifier.joblib."""
+    """ML RandomForest 이벤트 분류기. backend/models/event_classifier_v2.joblib."""
     from app.services.ml_classifier import MlEventClassifier
 
     return MlEventClassifier()
