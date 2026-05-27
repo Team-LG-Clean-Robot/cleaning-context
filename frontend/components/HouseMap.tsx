@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ROOMS_SEED, ROOM_LABEL, type Mode, type RoomBbox, type RoomId, type RoomScore } from "@/lib/types";
 
 type Props = {
@@ -7,48 +7,220 @@ type Props = {
   userLocation?: RoomId | null;
   onRoomClick?: (roomId: RoomId) => void;
 };
+type Pt = { x: number; y: number };
 
-function roomCenter(room: RoomBbox): { x: number; y: number } {
+function roomCenter(room: RoomBbox): Pt {
   if (room.center) return room.center;
   return { x: room.bbox.x + room.bbox.w / 2, y: room.bbox.y + room.bbox.h / 2 };
 }
 
-const ROBOT_OFFSET: Record<string, { dx: number; dy: number }> = {
-  kitchen:  { dx:  50, dy:  35 },
-  bedroom:  { dx:  40, dy:  60 },
-  living:   { dx: -50, dy: -40 },
-  entrance: { dx:  20, dy:  45 },
-  bathroom: { dx:  35, dy: -25 },
+/* ── 문 위치 & 방 인접 그래프 (도면 좌표 기준) ── */
+const DOORS: Record<string, Pt> = {
+  "living|kitchen":   { x: 197, y: 148 },
+  "living|entrance":  { x: 262, y: 215 },
+  "kitchen|entrance": { x: 250, y: 176 },
+  "kitchen|bedroom":  { x: 362, y: 120 },
+  "entrance|bathroom":{ x: 355, y: 278 },
 };
 
-function robotOffset(room: RoomBbox): { x: number; y: number } {
-  const c = roomCenter(room);
-  const off = ROBOT_OFFSET[room.id] ?? { dx: 0, dy: 25 };
-  return { x: c.x + off.dx, y: c.y + off.dy };
+const ADJACENCY: Record<string, RoomId[]> = {
+  living:   ["kitchen", "entrance"],
+  kitchen:  ["living", "entrance", "bedroom"],
+  entrance: ["living", "kitchen", "bathroom"],
+  bedroom:  ["kitchen"],
+  bathroom: ["entrance"],
+};
+
+function doorKey(a: string, b: string): string {
+  return [a, b].sort().join("|");
 }
 
-const PATROL_ORDER: RoomId[] = ["living", "kitchen", "bedroom", "bathroom", "entrance"];
-const PATROL_INTERVAL = 3000;
+function getDoor(a: string, b: string): Pt {
+  return DOORS[doorKey(a, b)] ?? { x: 300, y: 200 };
+}
 
-function usePatrol(active: boolean): { x: number; y: number } {
-  const [idx, setIdx] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
+function dist(a: Pt, b: Pt): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+/* BFS 최단 경로 (방 ID 시퀀스) */
+function bfsPath(from: RoomId, to: RoomId): RoomId[] {
+  if (from === to) return [from];
+  const visited = new Set<string>([from]);
+  const queue: RoomId[][] = [[from]];
+  while (queue.length) {
+    const path = queue.shift()!;
+    const last = path[path.length - 1];
+    for (const nb of ADJACENCY[last] ?? []) {
+      if (visited.has(nb)) continue;
+      const next = [...path, nb];
+      if (nb === to) return next;
+      visited.add(nb);
+      queue.push(next);
+    }
+  }
+  return [from, to];
+}
+
+/* 방 시퀀스 → 문 경유 좌표 waypoints */
+function buildWaypoints(roomPath: RoomId[]): Pt[] {
+  const pts: Pt[] = [];
+  for (let i = 0; i < roomPath.length - 1; i++) {
+    pts.push(getDoor(roomPath[i], roomPath[i + 1]));
+  }
+  return pts;
+}
+
+/* ── 방 내부 청소 패턴 (지그재그) ── */
+const CLEAN_PATHS: Record<string, Pt[]> = {
+  kitchen:  [{ x: 220, y: 65 }, { x: 335, y: 65 }, { x: 335, y: 150 }, { x: 220, y: 150 }, { x: 220, y: 108 }, { x: 335, y: 108 }],
+  bedroom:  [{ x: 390, y: 70 }, { x: 488, y: 70 }, { x: 488, y: 200 }, { x: 390, y: 200 }, { x: 390, y: 135 }, { x: 488, y: 135 }],
+  living:   [{ x: 115, y: 145 }, { x: 230, y: 145 }, { x: 230, y: 310 }, { x: 115, y: 310 }, { x: 115, y: 228 }, { x: 230, y: 228 }],
+  entrance: [{ x: 280, y: 200 }, { x: 340, y: 200 }, { x: 340, y: 320 }, { x: 280, y: 320 }, { x: 280, y: 260 }, { x: 340, y: 260 }],
+  bathroom: [{ x: 375, y: 262 }, { x: 470, y: 262 }, { x: 470, y: 328 }, { x: 375, y: 328 }, { x: 375, y: 295 }, { x: 470, y: 295 }],
+};
+
+const ROBOT_SPEED = 120; // SVG units per second
+const MIN_MS = 300;
+
+function msForSegment(a: Pt, b: Pt): number {
+  return Math.max(MIN_MS, (dist(a, b) / ROBOT_SPEED) * 1000);
+}
+
+/* ── 로봇 이동 훅: 경로 탐색 + 문 통과 + 청소 패턴 ── */
+function useRobotMotion(targetRoom: RoomId | null): { pos: Pt; durationMs: number } {
+  const startPt: Pt = { x: 170, y: 265 };
+  const [pos, setPos] = useState<Pt>(startPt);
+  const [durationMs, setDurationMs] = useState(0);
+  const currentRoom = useRef<RoomId>("living");
+  const phase = useRef<"idle" | "traveling" | "cleaning">("idle");
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const clearTimers = useCallback(() => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  }, []);
+
+  const moveTo = useCallback((pt: Pt, ms: number) => {
+    setDurationMs(ms);
+    setPos(pt);
+  }, []);
+
+  const startCleaning = useCallback((room: RoomId) => {
+    phase.current = "cleaning";
+    const path = CLEAN_PATHS[room] ?? [];
+    if (!path.length) return;
+    let i = 0;
+    const step = () => {
+      if (phase.current !== "cleaning") return;
+      const target = path[i % path.length];
+      const prev = i === 0 ? pos : path[(i - 1) % path.length];
+      const ms = msForSegment(prev, target);
+      moveTo(target, ms);
+      i++;
+      timers.current.push(setTimeout(step, ms + 50));
+    };
+    step();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moveTo]);
+
+  /* patrol 모드 (시나리오 없을 때) */
+  const startPatrol = useCallback(() => {
+    const order: RoomId[] = ["living", "kitchen", "bedroom", "bathroom", "entrance"];
+    let idx = 0;
+
+    const goNext = () => {
+      const from = currentRoom.current;
+      const to = order[idx % order.length];
+      idx++;
+      const roomSeq = bfsPath(from, to);
+      const waypoints = buildWaypoints(roomSeq);
+      const cleanPts = CLEAN_PATHS[to] ?? [];
+      const allPts = [...waypoints, ...(cleanPts.length ? [cleanPts[0]] : [])];
+
+      phase.current = "traveling";
+      let prev = pos;
+      let delay = 0;
+
+      for (const wp of allPts) {
+        const ms = msForSegment(prev, wp);
+        const p = prev;
+        timers.current.push(setTimeout(() => {
+          if (phase.current !== "traveling" && phase.current !== "cleaning") return;
+          moveTo(wp, ms);
+        }, delay));
+        delay += ms + 60;
+        prev = wp;
+      }
+
+      timers.current.push(setTimeout(() => {
+        currentRoom.current = to;
+        phase.current = "cleaning";
+        const path = CLEAN_PATHS[to] ?? [];
+        if (!path.length) { timers.current.push(setTimeout(goNext, 1000)); return; }
+        let ci = 1;
+        const cleanStep = () => {
+          if (phase.current !== "cleaning") return;
+          const target = path[ci % path.length];
+          const pr = path[(ci - 1) % path.length];
+          const ms2 = msForSegment(pr, target);
+          moveTo(target, ms2);
+          ci++;
+          if (ci <= path.length + 1) {
+            timers.current.push(setTimeout(cleanStep, ms2 + 50));
+          } else {
+            timers.current.push(setTimeout(goNext, 400));
+          }
+        };
+        cleanStep();
+      }, delay));
+    };
+
+    goNext();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moveTo]);
 
   useEffect(() => {
-    if (!active) {
-      clearInterval(timerRef.current);
-      return;
+    if (!targetRoom) {
+      clearTimers();
+      phase.current = "idle";
+      startPatrol();
+      return () => clearTimers();
     }
-    setIdx(0);
-    timerRef.current = setInterval(() => {
-      setIdx((i) => (i + 1) % PATROL_ORDER.length);
-    }, PATROL_INTERVAL);
-    return () => clearInterval(timerRef.current);
-  }, [active]);
 
-  const room = ROOMS_SEED.find((r) => r.id === PATROL_ORDER[idx]);
-  if (!room) return { x: -100, y: -100 };
-  return robotOffset(room);
+    clearTimers();
+    const from = currentRoom.current;
+    if (from === targetRoom) {
+      startCleaning(targetRoom);
+      return () => clearTimers();
+    }
+
+    const roomSeq = bfsPath(from, targetRoom);
+    const waypoints = buildWaypoints(roomSeq);
+    const cleanStart = CLEAN_PATHS[targetRoom]?.[0];
+    if (cleanStart) waypoints.push(cleanStart);
+
+    phase.current = "traveling";
+    let prev = pos;
+    let delay = 0;
+
+    for (const wp of waypoints) {
+      const ms = msForSegment(prev, wp);
+      timers.current.push(setTimeout(() => moveTo(wp, ms), delay));
+      delay += ms + 60;
+      prev = wp;
+    }
+
+    timers.current.push(setTimeout(() => {
+      currentRoom.current = targetRoom;
+      startCleaning(targetRoom);
+    }, delay));
+
+    return () => clearTimers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetRoom]);
+
+  return { pos, durationMs };
 }
 
 function PersonIcon({ x, y }: { x: number; y: number }) {
@@ -62,9 +234,9 @@ function PersonIcon({ x, y }: { x: number; y: number }) {
   );
 }
 
-function RobotIcon({ x, y }: { x: number; y: number }) {
+function RobotIcon({ x, y, durationMs = 1200 }: { x: number; y: number; durationMs?: number }) {
   return (
-    <g className="transition-all duration-[1200ms] ease-in-out" style={{ transform: `translate(${x}px, ${y}px)` }}>
+    <g style={{ transform: `translate(${x}px, ${y}px)`, transition: `transform ${durationMs}ms linear` }}>
       <circle cx={0} cy={0} r={18} fill="none" stroke="oklch(50% 0.12 250)" strokeWidth={1.2} opacity={0.3}>
         <animate attributeName="r" values="18;25;18" dur="2.5s" repeatCount="indefinite" />
         <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
@@ -197,13 +369,9 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
 
-  const hasScenario = rooms && rooms.length > 0;
   const topRoom = rooms?.filter((r) => r.mode !== "excluded").sort((a, b) => b.final - a.final)[0];
-  const robotSeed = topRoom ? ROOMS_SEED.find((r) => r.id === topRoom.room_id) : null;
-  const scenarioPos = robotSeed ? robotOffset(robotSeed) : null;
-  const patrolPos = usePatrol(!hasScenario);
-  const robotX = hasScenario && scenarioPos ? scenarioPos.x : patrolPos.x;
-  const robotY = hasScenario && scenarioPos ? scenarioPos.y : patrolPos.y;
+  const targetRoom = topRoom?.room_id ?? null;
+  const { pos: robotPos, durationMs } = useRobotMotion(targetRoom);
 
   return (
     <div className="relative">
@@ -282,7 +450,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
         })()}
 
         {/* 로봇 청소기 (항상 표시) */}
-        <RobotIcon x={robotX} y={robotY} />
+        <RobotIcon x={robotPos.x} y={robotPos.y} durationMs={durationMs} />
       </svg>
 
       {/* 히트맵 토글 버튼 */}
