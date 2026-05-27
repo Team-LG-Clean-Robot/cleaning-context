@@ -275,6 +275,7 @@ export function Simulator() {
           rooms={effectiveResponse?.rooms}
           userLocation={userLocation}
           onRoomClick={effectiveResponse ? setSelectedRoom : undefined}
+          paused={isTimeline && !timeline.playing}
         />
         <SensorDashboard
           scenarioId={isTimeline ? null : (state.response?.scenario_id ?? state.selectedId)}

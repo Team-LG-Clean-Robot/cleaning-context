@@ -6,6 +6,7 @@ type Props = {
   rooms?: RoomScore[];
   userLocation?: RoomId | null;
   onRoomClick?: (roomId: RoomId) => void;
+  paused?: boolean;
 };
 type Pt = { x: number; y: number };
 
@@ -22,7 +23,6 @@ const DOORS: Record<string, Pt> = {
   "kitchen|bedroom":  { x: 362, y: 120 },
   "entrance|bathroom":{ x: 355, y: 280 },
 };
-
 const ADJACENCY: Record<string, RoomId[]> = {
   living:   ["kitchen", "entrance"],
   kitchen:  ["living", "entrance", "bedroom"],
@@ -30,7 +30,6 @@ const ADJACENCY: Record<string, RoomId[]> = {
   bedroom:  ["kitchen"],
   bathroom: ["entrance"],
 };
-
 function doorKey(a: string, b: string): string { return [a, b].sort().join("|"); }
 function getDoor(a: string, b: string): Pt { return DOORS[doorKey(a, b)] ?? { x: 300, y: 200 }; }
 function dist(a: Pt, b: Pt): number { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -53,10 +52,8 @@ function bfsPath(from: RoomId, to: RoomId): RoomId[] {
   return [from, to];
 }
 
-/* 수평→수직 L자 경로 (대각선 이동 방지) */
 function hvSteps(from: Pt, to: Pt): Pt[] {
-  if (Math.abs(from.x - to.x) < 2) return [to];
-  if (Math.abs(from.y - to.y) < 2) return [to];
+  if (Math.abs(from.x - to.x) < 2 || Math.abs(from.y - to.y) < 2) return [to];
   return [{ x: to.x, y: from.y }, to];
 }
 
@@ -71,14 +68,14 @@ function buildTravelPath(roomSeq: RoomId[], startPt: Pt): Pt[] {
   return pts;
 }
 
-/* ── 방 내부 청소 패턴 (지그재그 + 원형 회전) ── */
+/* ── 청소 패턴 ── */
 const ORBIT_R = 12;
-const ORBIT_PTS = 6;
-function orbitAround(center: Pt): Pt[] {
+const ORBIT_N = 6;
+function orbit(c: Pt): Pt[] {
   const pts: Pt[] = [];
-  for (let i = 0; i <= ORBIT_PTS; i++) {
-    const a = (2 * Math.PI * i) / ORBIT_PTS;
-    pts.push({ x: center.x + Math.cos(a) * ORBIT_R, y: center.y + Math.sin(a) * ORBIT_R });
+  for (let i = 0; i <= ORBIT_N; i++) {
+    const a = (2 * Math.PI * i) / ORBIT_N;
+    pts.push({ x: c.x + Math.cos(a) * ORBIT_R, y: c.y + Math.sin(a) * ORBIT_R });
   }
   return pts;
 }
@@ -95,14 +92,10 @@ function buildCleanPath(room: RoomId): Pt[] {
   const anchors = CLEAN_ANCHORS[room];
   if (!anchors?.length) return [];
   const pts: Pt[] = [];
-  for (const a of anchors) {
-    pts.push(a);
-    pts.push(...orbitAround(a));
-  }
+  for (const a of anchors) { pts.push(a); pts.push(...orbit(a)); }
   return pts;
 }
 
-/* ── 속도 ── */
 const ROBOT_SPEED = 60;
 const MIN_MS = 400;
 function msFor(a: Pt, b: Pt): number { return Math.max(MIN_MS, (dist(a, b) / ROBOT_SPEED) * 1000); }
@@ -110,25 +103,23 @@ function msFor(a: Pt, b: Pt): number { return Math.max(MIN_MS, (dist(a, b) / ROB
 /* ── 먼지 파티클 ── */
 type Dust = { id: string; x: number; y: number; roomId: RoomId };
 
-function seededRandom(seed: number): () => number {
+function seededRng(seed: number): () => number {
   let s = seed;
-  return () => { s = (s * 16807 + 0) % 2147483647; return s / 2147483647; };
+  return () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
 }
 
 function generateDust(roomScores: RoomScore[]): Dust[] {
   const particles: Dust[] = [];
   for (const rs of roomScores) {
     if (rs.mode === "excluded") continue;
-    const seed = ROOMS_SEED.find((r) => r.id === rs.room_id);
-    if (!seed) continue;
-    const count = Math.min(Math.ceil(rs.final / 6), 12);
-    const rng = seededRandom(rs.room_id.charCodeAt(0) * 1000 + rs.final);
     const anchors = CLEAN_ANCHORS[rs.room_id];
     if (!anchors?.length) continue;
-    const minX = Math.min(...anchors.map((a) => a.x)) - 5;
-    const maxX = Math.max(...anchors.map((a) => a.x)) + 5;
-    const minY = Math.min(...anchors.map((a) => a.y)) - 5;
-    const maxY = Math.max(...anchors.map((a) => a.y)) + 5;
+    const count = Math.min(Math.ceil(rs.final / 5), 14);
+    const rng = seededRng(rs.room_id.charCodeAt(0) * 1000 + rs.final);
+    const minX = Math.min(...anchors.map((a) => a.x)) - 8;
+    const maxX = Math.max(...anchors.map((a) => a.x)) + 8;
+    const minY = Math.min(...anchors.map((a) => a.y)) - 8;
+    const maxY = Math.max(...anchors.map((a) => a.y)) + 8;
     for (let i = 0; i < count; i++) {
       particles.push({
         id: `${rs.room_id}-${i}`,
@@ -141,47 +132,61 @@ function generateDust(roomScores: RoomScore[]): Dust[] {
   return particles;
 }
 
-/* ── 로봇 이동 훅: 방별 순차 청소 ── */
-type RobotState = { pos: Pt; durationMs: number; cleaning: boolean; cleaningRoom: RoomId | null };
+/* ── 로봇 이동 훅 ── */
+type RobotOut = { pos: Pt; durationMs: number; cleaning: boolean; cleaningRoom: RoomId | null };
 
-function useRobotMotion(roomScores: RoomScore[] | null): RobotState {
-  const IDLE_PT: Pt = { x: 170, y: 265 };
-  const [pos, setPos] = useState<Pt>(IDLE_PT);
+function useRobotMotion(
+  roomScores: RoomScore[] | null,
+  hiddenDust: Set<string>,
+  allDust: Dust[],
+  paused: boolean,
+): RobotOut {
+  const IDLE: Pt = { x: 170, y: 265 };
+  const [pos, setPos] = useState<Pt>(IDLE);
   const [durationMs, setDurationMs] = useState(0);
   const [cleaning, setCleaning] = useState(false);
   const [cleaningRoom, setCleaningRoom] = useState<RoomId | null>(null);
   const currentRoom = useRef<RoomId>("living");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const cancelledRef = useRef(false);
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
 
   const clearTimers = useCallback(() => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
+    cancelledRef.current = true;
   }, []);
 
   const sortedRooms = useMemo(() => {
     if (!roomScores) return [];
-    return roomScores
-      .filter((r) => r.mode !== "excluded" && r.final > 0)
-      .sort((a, b) => b.final - a.final);
+    return roomScores.filter((r) => r.mode !== "excluded" && r.final > 0).sort((a, b) => b.final - a.final);
   }, [roomScores]);
+
+  // Check if current room dust is all cleared → trigger next room
+  const roomDustCleared = useCallback((room: RoomId): boolean => {
+    const roomDust = allDust.filter((d) => d.roomId === room);
+    if (roomDust.length === 0) return true;
+    return roomDust.every((d) => hiddenDust.has(d.id));
+  }, [allDust, hiddenDust]);
 
   useEffect(() => {
     clearTimers();
+    cancelledRef.current = false;
     setCleaning(false);
     setCleaningRoom(null);
 
     if (!sortedRooms.length) {
-      setPos(IDLE_PT);
+      setPos(IDLE);
       setDurationMs(0);
       currentRoom.current = "living";
       return;
     }
 
-    let cancelled = false;
     let roomIdx = 0;
 
     function scheduleRoom() {
-      if (cancelled) return;
+      if (cancelledRef.current) return;
       const target = sortedRooms[roomIdx % sortedRooms.length];
       roomIdx++;
       const from = currentRoom.current;
@@ -192,7 +197,6 @@ function useRobotMotion(roomScores: RoomScore[] | null): RobotState {
       let prev = pos;
       let delay = 0;
 
-      // travel phase
       setCleaning(false);
       setCleaningRoom(null);
 
@@ -200,18 +204,16 @@ function useRobotMotion(roomScores: RoomScore[] | null): RobotState {
         const ms = msFor(prev, wp);
         const w = wp;
         timers.current.push(setTimeout(() => {
-          if (cancelled) return;
-          setDurationMs(ms);
-          setPos(w);
+          if (cancelledRef.current || pausedRef.current) return;
+          setDurationMs(ms); setPos(w);
         }, delay));
         delay += ms + 40;
         prev = wp;
       }
 
-      // cleaning phase
       const cleanStart = delay;
       timers.current.push(setTimeout(() => {
-        if (cancelled) return;
+        if (cancelledRef.current) return;
         currentRoom.current = target.room_id;
         setCleaning(true);
         setCleaningRoom(target.room_id);
@@ -221,90 +223,92 @@ function useRobotMotion(roomScores: RoomScore[] | null): RobotState {
         const ms = msFor(prev, cp);
         const c = cp;
         timers.current.push(setTimeout(() => {
-          if (cancelled) return;
-          setDurationMs(ms);
-          setPos(c);
+          if (cancelledRef.current || pausedRef.current) return;
+          setDurationMs(ms); setPos(c);
         }, delay));
         delay += ms + 30;
         prev = cp;
       }
 
-      // move to next room
       timers.current.push(setTimeout(() => {
-        if (cancelled) return;
+        if (cancelledRef.current) return;
         setCleaning(false);
         setCleaningRoom(null);
         scheduleRoom();
       }, delay + 300));
     }
 
-    // small initial delay to let first render settle
     timers.current.push(setTimeout(scheduleRoom, 200));
-
-    return () => {
-      cancelled = true;
-      clearTimers();
-    };
+    return () => clearTimers();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedRooms]);
 
-  return { pos, durationMs, cleaning, cleaningRoom };
+  // Pause/resume: when paused, clear timers. But we can't easily resume mid-path,
+  // so we just stop transitions. The robot freezes in place.
+  useEffect(() => {
+    if (paused) {
+      setDurationMs(0);
+    }
+  }, [paused]);
+
+  return { pos, durationMs: paused ? 0 : durationMs, cleaning: paused ? false : cleaning, cleaningRoom: paused ? null : cleaningRoom };
 }
 
-/* ── 먼지 제거 훅 ── */
-function useDustState(
-  roomScores: RoomScore[] | null,
+/* ── 먼지 제거 훅: 로봇이 청소 중인 방의 먼지를 순차 제거 ── */
+function useDustRemoval(
+  dust: Dust[],
   cleaningRoom: RoomId | null,
+  paused: boolean,
 ): Set<string> {
   const [hidden, setHidden] = useState<Set<string>>(new Set());
-  const dustRef = useRef<Dust[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
+  const prevDustKey = useRef("");
 
-  const dust = useMemo(() => (roomScores ? generateDust(roomScores) : []), [roomScores]);
-  dustRef.current = dust;
-
-  // reset when scenario changes
-  useEffect(() => { setHidden(new Set()); }, [roomScores]);
+  const dustKey = dust.map((d) => d.id).join(",");
+  useEffect(() => {
+    if (dustKey !== prevDustKey.current) {
+      prevDustKey.current = dustKey;
+      setHidden(new Set());
+    }
+  }, [dustKey]);
 
   useEffect(() => {
     clearInterval(intervalRef.current);
-    if (!cleaningRoom) return;
+    if (!cleaningRoom || paused) return;
 
-    const roomDust = dustRef.current
-      .filter((d) => d.roomId === cleaningRoom)
-      .map((d) => d.id);
+    const roomDust = dust.filter((d) => d.roomId === cleaningRoom).map((d) => d.id);
     let idx = 0;
 
     intervalRef.current = setInterval(() => {
-      if (idx >= roomDust.length) {
-        clearInterval(intervalRef.current);
-        return;
-      }
-      setHidden((prev) => {
-        const next = new Set(prev);
-        next.add(roomDust[idx]);
-        return next;
-      });
+      if (idx >= roomDust.length) { clearInterval(intervalRef.current); return; }
+      setHidden((prev) => { const n = new Set(prev); n.add(roomDust[idx]); return n; });
       idx++;
-    }, 800);
+    }, 600);
 
     return () => clearInterval(intervalRef.current);
-  }, [cleaningRoom]);
+  }, [cleaningRoom, dust, paused]);
 
   return hidden;
 }
 
+/* ── 사용자 아이콘 (CSS) ── */
 function PersonIcon({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x}, ${y})`} style={{ pointerEvents: "none" }}>
-      <circle cx={0} cy={0} r={13} fill="white" stroke="#1a1a1a" strokeWidth={1.2} />
-      <circle cx={0} cy={-5} r={3.5} fill="#1a1a1a" />
-      <path d="M -5 1 q 5 -3 10 0 v 5 q -5 3 -10 0 z" fill="#1a1a1a" />
-      <text x={0} y={24} textAnchor="middle" style={{ font: "600 9px var(--font-sans)", fill: "#1a1a1a" }}>사용자</text>
+      {/* 몸통 */}
+      <circle cx={0} cy={-1} r={15} fill="rgba(255,255,255,0.9)" stroke="#4a6cf7" strokeWidth={1.5} />
+      {/* 머리 */}
+      <circle cx={0} cy={-6} r={4.5} fill="#4a6cf7" />
+      {/* 어깨 */}
+      <path d="M -7 2 Q 0 -2 7 2 V 7 Q 0 4 -7 7 Z" fill="#4a6cf7" rx={2} />
+      {/* 라벨 */}
+      <rect x={-18} y={16} width={36} height={14} rx={4} fill="#4a6cf7" />
+      <text x={0} y={26} textAnchor="middle" style={{ font: "600 8px var(--font-sans)", fill: "white" }}>사용자</text>
     </g>
   );
 }
 
+/* ── 로봇 아이콘 ── */
 function RobotIcon({ x, y, durationMs = 0, cleaning = false }: { x: number; y: number; durationMs?: number; cleaning?: boolean }) {
   return (
     <g style={{ transform: `translate(${x}px, ${y}px)`, transition: durationMs > 0 ? `transform ${durationMs}ms linear` : "none" }}>
@@ -323,6 +327,24 @@ function RobotIcon({ x, y, durationMs = 0, cleaning = false }: { x: number; y: n
         </circle>
         <text x={0} y={24} textAnchor="middle" style={{ font: "600 8px var(--font-sans)", fill: "#666" }}>청소기</text>
       </g>
+    </g>
+  );
+}
+
+/* ── 먼지 SVG ── */
+function DustParticle({ d, hidden }: { d: Dust; hidden: boolean }) {
+  return (
+    <g style={{
+      opacity: hidden ? 0 : 1,
+      transform: hidden ? "scale(0)" : "scale(1)",
+      transformOrigin: `${d.x}px ${d.y}px`,
+      transition: "opacity 0.5s ease-out, transform 0.4s ease-out",
+      pointerEvents: "none",
+    }}>
+      <circle cx={d.x} cy={d.y} r={5} fill="rgba(180,160,130,0.35)" />
+      <circle cx={d.x - 1.5} cy={d.y - 1} r={2.8} fill="rgba(160,140,110,0.5)" />
+      <circle cx={d.x + 2} cy={d.y + 1.5} r={2} fill="rgba(170,150,120,0.45)" />
+      <circle cx={d.x + 0.5} cy={d.y - 2.5} r={1.5} fill="rgba(150,130,100,0.4)" />
     </g>
   );
 }
@@ -348,9 +370,7 @@ function useCountUp(target: number, duration = 400): number {
 }
 
 function buildAriaLabel(rooms?: RoomScore[], userLocation?: RoomId | null): string {
-  if (!rooms?.length) {
-    return `아파트 평면도. ${ROOMS_SEED.map((r) => `${r.name_ko} ${r.base_score}점`).join(", ")}.`;
-  }
+  if (!rooms?.length) return `아파트 평면도. ${ROOMS_SEED.map((r) => `${r.name_ko} ${r.base_score}점`).join(", ")}.`;
   const parts = rooms.map((r) => {
     const m = r.mode === "excluded" ? " 제외" : r.mode === "quiet" ? " 저소음" : "";
     return `${ROOM_LABEL[r.room_id]} ${r.final}점${m}`;
@@ -374,13 +394,6 @@ function HeatmapLegend({ visible }: { visible: boolean }) {
         </span>
         <span>높음</span>
       </div>
-      <div className="flex items-center gap-1.5">
-        <svg width={16} height={10} aria-hidden className="border border-border-default">
-          <defs><pattern id="hl" patternUnits="userSpaceOnUse" width="4" height="4"><path d="M0 4 L4 0" stroke="#9ca3af" strokeWidth="0.8" /></pattern></defs>
-          <rect width={16} height={10} fill="url(#hl)" />
-        </svg>
-        <span>제외</span>
-      </div>
     </div>
   );
 }
@@ -392,38 +405,31 @@ function RoomShape({
   style: React.CSSProperties; onMouseEnter: () => void; onMouseLeave: () => void; onClick: () => void;
 }) {
   if (room.polygon) {
-    return (
-      <polygon points={room.polygon} fill={fill} stroke={stroke} strokeWidth={strokeWidth}
-        strokeLinejoin="round" style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick} />
-    );
+    return (<polygon points={room.polygon} fill={fill} stroke={stroke} strokeWidth={strokeWidth}
+      strokeLinejoin="round" style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick} />);
   }
-  return (
-    <rect x={room.bbox.x} y={room.bbox.y} width={room.bbox.w} height={room.bbox.h}
-      fill={fill} stroke={stroke} strokeWidth={strokeWidth} rx={1}
-      style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick} />
-  );
+  return (<rect x={room.bbox.x} y={room.bbox.y} width={room.bbox.w} height={room.bbox.h}
+    fill={fill} stroke={stroke} strokeWidth={strokeWidth} rx={1}
+    style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick} />);
 }
 
-/* ── 메인 컴포넌트 ── */
-export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
+/* ── 메인 ── */
+export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: Props) {
   const scoreMap = new Map(rooms?.map((r) => [r.room_id, r]) ?? []);
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
 
   const hasScenario = rooms && rooms.length > 0;
-  const { pos: robotPos, durationMs, cleaning, cleaningRoom } = useRobotMotion(hasScenario ? rooms! : null);
-
   const dust = useMemo(() => (hasScenario ? generateDust(rooms!) : []), [rooms, hasScenario]);
-  const hiddenDust = useDustState(hasScenario ? rooms! : null, cleaningRoom);
+  const { pos: robotPos, durationMs, cleaning, cleaningRoom } = useRobotMotion(
+    hasScenario ? rooms! : null, new Set(), dust, paused,
+  );
+  const hiddenDust = useDustRemoval(dust, cleaningRoom, paused);
 
   return (
     <div className="relative">
-      <svg
-        viewBox="0 0 600 400"
-        role="img"
-        aria-label={buildAriaLabel(rooms, userLocation)}
-        className="w-full h-auto rounded-xl border border-border-default shadow-[0_4px_24px_-12px_rgba(0,0,0,0.2)] overflow-hidden"
-      >
+      <svg viewBox="0 0 600 400" role="img" aria-label={buildAriaLabel(rooms, userLocation)}
+        className="w-full h-auto rounded-xl border border-border-default shadow-[0_4px_24px_-12px_rgba(0,0,0,0.2)] overflow-hidden">
         <defs>
           <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6">
             <path d="M0 6 L6 0" stroke="rgba(120,120,120,0.5)" strokeWidth="1" />
@@ -437,25 +443,20 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
             75%  { transform: translate(-6px, 4px); }
             100% { transform: translate(0, 0); }
           }
-          @keyframes dust-fade {
-            from { opacity: 0.5; }
-            to   { opacity: 0; transform: scale(0); }
-          }
         `}</style>
 
         <image href="/floorplan-bg.png" x={0} y={0} width={600} height={400} preserveAspectRatio="xMidYMid slice" />
 
+        {/* 히트맵 오버레이 */}
         {ROOMS_SEED.map((room) => {
           const s = scoreMap.get(room.id);
           const score = s?.final ?? room.base_score;
           const mode = (s?.mode ?? "normal") as Mode;
           const isHovered = hoveredRoom === room.id;
-
           let fill: string;
           if (!showOverlay) fill = "transparent";
           else if (mode === "excluded") fill = "url(#hatch)";
           else { const t = Math.min(Math.max(score, 0), 80) / 80; fill = `rgba(20, 50, 100, ${0.08 + t * 0.3})`; }
-
           return (
             <RoomShape key={room.id} room={room} fill={fill}
               stroke={showOverlay && isHovered ? "oklch(40% 0.15 250)" : "transparent"}
@@ -466,21 +467,10 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
           );
         })}
 
-        {/* 먼지 파티클 */}
-        {showOverlay && dust.map((d) => {
-          const isHidden = hiddenDust.has(d.id);
-          return (
-            <circle key={d.id} cx={d.x} cy={d.y} r={3} fill="rgba(140,120,100,0.5)" style={{
-              transition: "opacity 0.6s ease, transform 0.6s ease",
-              opacity: isHidden ? 0 : 0.5,
-              transform: isHidden ? "scale(0)" : "scale(1)",
-              transformOrigin: `${d.x}px ${d.y}px`,
-              pointerEvents: "none",
-            }} />
-          );
-        })}
+        {/* 먼지 (항상 표시) */}
+        {dust.map((d) => <DustParticle key={d.id} d={d} hidden={hiddenDust.has(d.id)} />)}
 
-        {/* 라벨 + 점수 */}
+        {/* 라벨 + 점수 (히트맵 토글) */}
         {showOverlay && ROOMS_SEED.map((room) => {
           const s = scoreMap.get(room.id);
           const score = s?.final ?? room.base_score;
@@ -496,6 +486,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
           );
         })}
 
+        {/* 사용자 */}
         {userLocation && (() => {
           const room = ROOMS_SEED.find((r) => r.id === userLocation);
           if (!room) return null;
