@@ -108,7 +108,7 @@ function seededRng(seed: number): () => number {
   return () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
 }
 
-const MAX_DUST = 14;
+const MAX_DUST_PER_ROOM = 6;
 
 function generateDustPool(roomIds: RoomId[]): Dust[] {
   const particles: Dust[] = [];
@@ -120,7 +120,7 @@ function generateDustPool(roomIds: RoomId[]): Dust[] {
     const maxX = Math.max(...anchors.map((a) => a.x)) + 8;
     const minY = Math.min(...anchors.map((a) => a.y)) - 8;
     const maxY = Math.max(...anchors.map((a) => a.y)) + 8;
-    for (let i = 0; i < MAX_DUST; i++) {
+    for (let i = 0; i < MAX_DUST_PER_ROOM; i++) {
       particles.push({
         id: `${rid}-${i}`,
         x: minX + rng() * (maxX - minX),
@@ -133,11 +133,13 @@ function generateDustPool(roomIds: RoomId[]): Dust[] {
 }
 
 function activeDustIds(pool: Dust[], roomScores: RoomScore[]): Set<string> {
+  const ranked = roomScores
+    .filter((r) => r.mode !== "excluded" && r.final > 0)
+    .sort((a, b) => b.final - a.final);
   const active = new Set<string>();
-  for (const rs of roomScores) {
-    if (rs.mode === "excluded" || rs.final <= 0) continue;
-    const count = Math.min(Math.ceil(rs.final / 5), MAX_DUST);
-    for (let i = 0; i < count; i++) active.add(`${rs.room_id}-${i}`);
+  for (let rank = 0; rank < ranked.length; rank++) {
+    const count = Math.max(1, MAX_DUST_PER_ROOM - rank);
+    for (let i = 0; i < count; i++) active.add(`${ranked[rank].room_id}-${i}`);
   }
   return active;
 }
