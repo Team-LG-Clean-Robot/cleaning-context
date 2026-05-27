@@ -108,28 +108,38 @@ function seededRng(seed: number): () => number {
   return () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
 }
 
-function generateDust(roomScores: RoomScore[]): Dust[] {
+const MAX_DUST = 14;
+
+function generateDustPool(roomIds: RoomId[]): Dust[] {
   const particles: Dust[] = [];
-  for (const rs of roomScores) {
-    if (rs.mode === "excluded") continue;
-    const anchors = CLEAN_ANCHORS[rs.room_id];
+  for (const rid of roomIds) {
+    const anchors = CLEAN_ANCHORS[rid];
     if (!anchors?.length) continue;
-    const count = Math.min(Math.ceil(rs.final / 5), 14);
-    const rng = seededRng(rs.room_id.charCodeAt(0) * 1000 + rs.final);
+    const rng = seededRng(rid.charCodeAt(0) * 1000 + rid.charCodeAt(1) * 31);
     const minX = Math.min(...anchors.map((a) => a.x)) - 8;
     const maxX = Math.max(...anchors.map((a) => a.x)) + 8;
     const minY = Math.min(...anchors.map((a) => a.y)) - 8;
     const maxY = Math.max(...anchors.map((a) => a.y)) + 8;
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < MAX_DUST; i++) {
       particles.push({
-        id: `${rs.room_id}-${i}`,
+        id: `${rid}-${i}`,
         x: minX + rng() * (maxX - minX),
         y: minY + rng() * (maxY - minY),
-        roomId: rs.room_id,
+        roomId: rid,
       });
     }
   }
   return particles;
+}
+
+function activeDustIds(pool: Dust[], roomScores: RoomScore[]): Set<string> {
+  const active = new Set<string>();
+  for (const rs of roomScores) {
+    if (rs.mode === "excluded" || rs.final <= 0) continue;
+    const count = Math.min(Math.ceil(rs.final / 5), MAX_DUST);
+    for (let i = 0; i < count; i++) active.add(`${rs.room_id}-${i}`);
+  }
+  return active;
 }
 
 /* ── 로봇 이동 훅 ── */
@@ -457,7 +467,15 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
   const [showOverlay, setShowOverlay] = useState(false);
 
   const hasScenario = rooms && rooms.length > 0;
-  const dust = useMemo(() => (hasScenario ? generateDust(rooms!) : []), [rooms, hasScenario]);
+  const roomIds = useMemo(
+    () => (rooms ? rooms.filter((r) => r.mode !== "excluded").map((r) => r.room_id) : []),
+    // only regenerate when the set of room IDs changes, not on score changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rooms?.map((r) => r.room_id).join(",")],
+  );
+  const dustPool = useMemo(() => generateDustPool(roomIds), [roomIds]);
+  const activeIds = useMemo(() => (rooms ? activeDustIds(dustPool, rooms) : new Set<string>()), [dustPool, rooms]);
+  const dust = useMemo(() => dustPool.filter((d) => activeIds.has(d.id)), [dustPool, activeIds]);
 
   const [hiddenDust, setHiddenDustRaw] = useState<Set<string>>(new Set());
   const { pos: robotPos, durationMs, cleaning, cleaningRoom } = useRobotMotion(
