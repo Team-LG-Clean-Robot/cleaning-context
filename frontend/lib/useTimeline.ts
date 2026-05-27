@@ -4,6 +4,7 @@ import type { SensorState } from "./sensor-mock";
 import { getSensorStates } from "./sensor-mock";
 import { simulateCustom } from "./api";
 import { DAY_KEYFRAMES } from "./timeline-data";
+import STATIC_TIMELINE from "./static-timeline.json";
 
 const TICK_MS = 50;
 const MINUTES_PER_REAL_SEC = 8;
@@ -130,6 +131,21 @@ export function useTimeline(active: boolean): TimelineHook {
       setPrefetchStatus("ready");
       return;
     }
+
+    // Use static pre-generated data (instant, no backend needed)
+    const staticData = STATIC_TIMELINE as Array<Omit<SimulateResponse, "duration_ms">>;
+    if (staticData.length === DAY_KEYFRAMES.length) {
+      const results = new Map<number, SimulateResponse>();
+      for (let i = 0; i < staticData.length; i++) {
+        results.set(i, { ...staticData[i], duration_ms: 0 } as SimulateResponse);
+      }
+      cacheRef.current = results;
+      setPrefetchProgress(results.size);
+      setPrefetchStatus("ready");
+      return;
+    }
+
+    // Fallback to API if static data missing
     abortRef.current?.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;

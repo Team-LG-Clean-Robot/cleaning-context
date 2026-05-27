@@ -18,6 +18,9 @@ import type {
   SimulateResponse,
 } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
+import STATIC_SCENARIOS from "@/lib/static-scenarios.json";
+import STATIC_EVENTS from "@/lib/static-events.json";
+import STATIC_RESPONSES from "@/lib/static-responses.json";
 import { useTimeline } from "@/lib/useTimeline";
 import { AskPanel } from "./AskPanel";
 import { CustomModePanel } from "./CustomModePanel";
@@ -126,11 +129,13 @@ const DEFAULT_CUSTOM: CustomRequest = {
   gap_rooms: [],
 };
 
+const staticResponseMap = STATIC_RESPONSES as Record<string, Omit<SimulateResponse, "duration_ms">>;
+
 export function Simulator() {
   const [coldStart, setColdStart] = useState(false);
   const [state, setState] = useState<State>({
-    scenarios: [],
-    events: [],
+    scenarios: STATIC_SCENARIOS as ScenarioMeta[],
+    events: STATIC_EVENTS as EventMeta[],
     mode: "preset",
     selectedId: null,
     customDraft: DEFAULT_CUSTOM,
@@ -145,7 +150,10 @@ export function Simulator() {
   }
   const sequencer = sequencerRef.current;
 
+  // Static mode: no backend needed for init
+  // Fallback to API if static data missing (shouldn't happen)
   useEffect(() => {
+    if (state.scenarios.length > 0) return;
     const ctrl = new AbortController();
     async function init() {
       try {
@@ -174,6 +182,7 @@ export function Simulator() {
     }
     init();
     return () => ctrl.abort();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePresetSelect = async (id: string) => {
@@ -181,6 +190,16 @@ export function Simulator() {
       setState((s) => ({ ...s, selectedId: null, response: null, error: null }));
       return;
     }
+
+    // Try static cache first (instant, no backend)
+    const cached = staticResponseMap[id];
+    if (cached) {
+      const response: SimulateResponse = { ...cached, duration_ms: 0 };
+      setState((s) => ({ ...s, selectedId: id, response, loading: false, error: null }));
+      return;
+    }
+
+    // Fallback to API
     setState((s) => ({ ...s, selectedId: id, loading: true, error: null }));
     try {
       const scenario = state.scenarios.find((sc) => sc.id === id);
@@ -250,7 +269,7 @@ export function Simulator() {
     ? state.response.rooms.find((r) => r.room_id === selectedRoom)
     : null;
 
-  if (coldStart) {
+  if (coldStart && state.scenarios.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
         <div className="w-8 h-8 border-3 border-accent-500 border-t-transparent rounded-full animate-spin" />

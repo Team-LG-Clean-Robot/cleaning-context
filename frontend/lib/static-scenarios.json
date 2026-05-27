@@ -1,0 +1,92 @@
+[
+  {
+    "id": "rainy_return",
+    "name_ko": "비 오는 날 귀가",
+    "description": "사용자가 비 오는 저녁 귀가, 취침 2시간 후",
+    "current_time": "20:30",
+    "sleep_time": "23:00",
+    "user_location": null,
+    "active_events": [
+      "rain",
+      "user_returned",
+      "pre_sleep_2h"
+    ]
+  },
+  {
+    "id": "post_cooking",
+    "name_ko": "요리 직후",
+    "description": "요리 마치고 사용자가 거실에서 휴식",
+    "current_time": "19:20",
+    "sleep_time": "23:00",
+    "user_location": "living",
+    "active_events": [
+      "cooking_done"
+    ]
+  },
+  {
+    "id": "pre_sleep",
+    "name_ko": "취침 직전",
+    "description": "사용자가 침실에 들어가 곧 취침",
+    "current_time": "22:50",
+    "sleep_time": "23:00",
+    "user_location": "bedroom",
+    "active_events": [
+      "pre_sleep_30min"
+    ]
+  },
+  {
+    "id": "guest_incoming",
+    "name_ko": "손님 방문 예정",
+    "description": "2시간 후 손님 도착, 거실·현관 청소 공백",
+    "current_time": "17:00",
+    "sleep_time": "23:00",
+    "user_location": null,
+    "active_events": [
+      "guest_arriving_2h"
+    ]
+  },
+  {
+    "id": "morning_quick_clean",
+    "name_ko": "아침 외출 직후 빠른 청소",
+    "description": "사용자가 07:00 외출 직후, 모든 방 청소 가능",
+    "current_time": "07:00",
+    "sleep_time": "23:00",
+    "user_location": null,
+    "active_events": [
+      "user_left"
+    ]
+  },
+  {
+    "id": "cooking_in_progress",
+    "name_ko": "요리 중",
+    "description": "19:00 인덕션 사용 중, 주방 회피하고 거실·침실 청소",
+    "current_time": "19:00",
+    "sleep_time": "23:00",
+    "user_location": "kitchen",
+    "active_events": [
+      "cooking_active"
+    ]
+  },
+  {
+    "id": "package_after_delivery",
+    "name_ko": "택배 도착 후 현관 정리",
+    "description": "배송완료 알림 이후 현관 출입 감지, 현관·거실 동선 우선 청소",
+    "current_time": "15:20",
+    "sleep_time": "23:30",
+    "user_location": "living",
+    "active_events": [
+      "package_delivery"
+    ]
+  },
+  {
+    "id": "after_meal_cleanup",
+    "name_ko": "식사 후 주방 정리",
+    "description": "냉장고·조리기기 사용 후 식사 종료 추정, 주방 우선 청소",
+    "current_time": "19:45",
+    "sleep_time": "23:30",
+    "user_location": "living",
+    "active_events": [
+      "meal_finished"
+    ]
+  }
+]
