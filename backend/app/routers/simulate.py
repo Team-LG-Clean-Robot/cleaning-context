@@ -1,3 +1,4 @@
+import logging
 import time
 from datetime import datetime
 
@@ -12,6 +13,7 @@ from app.data_loader import (
     load_rules,
     load_scenarios,
 )
+from app.schemas.sensor import SensorReading
 from app.schemas.simulation import (
     CustomContext,
     InferredEventInfo,
@@ -29,6 +31,87 @@ from app.services.context_builder import (
 from app.services.scoring import compute_scores
 
 router = APIRouter()
+log = logging.getLogger(__name__)
+
+_EVENT_TO_SENSORS: dict[str, list[dict]] = {
+    "user_returned": [
+        {"sensor_id": "door_lock", "state": {"state": "unlocked", "side": "out"}, "room_id": "entrance"},
+    ],
+    "user_left": [
+        {"sensor_id": "door_lock", "state": {"state": "locked", "side": "out"}, "room_id": "entrance"},
+    ],
+    "cooking_active": [
+        {"sensor_id": "induction", "state": {"state": "on", "duration_min": 15}, "room_id": "kitchen"},
+    ],
+    "cooking_done": [
+        {"sensor_id": "induction", "state": {"state": "off", "transition_from": "on", "prev_on_min": 20}, "room_id": "kitchen"},
+    ],
+    "pre_sleep_30min": [
+        {"sensor_id": "bed_sensor", "state": {"occupied": True}, "room_id": "bedroom"},
+    ],
+    "pre_sleep_2h": [
+        {"sensor_id": "bed_sensor", "state": {"occupied": False}, "room_id": "bedroom"},
+    ],
+    "rain": [
+        {"sensor_id": "weather_api", "state": {"condition": "rain", "last_1h_rain_mm": 5.0}},
+    ],
+    "guest_arriving_2h": [
+        {"sensor_id": "calendar", "state": {"upcoming_event_tag": "guest", "minutes_until": 90}},
+    ],
+    "meal_prep": [
+        {"sensor_id": "refrigerator", "state": {"open_count_last_1h": 5}, "room_id": "kitchen"},
+    ],
+    "package_delivery": [
+        {"sensor_id": "door_lock", "state": {"state": "unlocked", "side": "out"}, "room_id": "entrance"},
+    ],
+    "meal_finished": [
+        {"sensor_id": "induction", "state": {"state": "off", "transition_from": "on", "prev_on_min": 20}, "room_id": "kitchen"},
+        {"sensor_id": "refrigerator", "state": {"open_count_last_1h": 5}, "room_id": "kitchen"},
+    ],
+}
+
+
+def _synthesize_readings(
+    active_events: list[str], current_time: str,
+) -> list[SensorReading]:
+    ts = datetime.now().replace(
+        hour=int(current_time.split(":")[0]),
+        minute=int(current_time.split(":")[1]),
+        second=0, microsecond=0,
+    )
+    readings: list[SensorReading] = []
+    seen: set[tuple[str, str]] = set()
+    for eid in active_events:
+        for s in _EVENT_TO_SENSORS.get(eid, []):
+            key = (s["sensor_id"], str(s["state"]))
+            if key in seen:
+                continue
+            seen.add(key)
+            readings.append(SensorReading(
+                sensor_id=s["sensor_id"],
+                state=s["state"],
+                ts=ts,
+                room_id=s.get("room_id"),
+            ))
+    return readings
+
+
+def _infer_for_scenario(
+    active_events: list[str], current_time: str,
+) -> list[InferredEventInfo]:
+    readings = _synthesize_readings(active_events, current_time)
+    if not readings:
+        return []
+    try:
+        classifier = load_ml_classifier()
+        ml_events = classifier.predict(readings, current_time)
+        return [
+            InferredEventInfo(event_id=e.event_id, confidence=e.confidence, source=e.source)
+            for e in ml_events
+        ]
+    except Exception:
+        log.warning("ML inference skipped for scenario", exc_info=True)
+        return []
 
 
 def _build_ml_info(active_event_ids: list[str]) -> MlInfo:
@@ -110,7 +193,10 @@ def simulate(req: SimulateRequest) -> SimulateResponse:
             f"{ctx.scenario.name_ko} · 시각 {ctx.scenario.current_time}"
             f" · 취침예정 {ctx.scenario.sleep_time}"
         )
-        return _run(ctx, t0, summary, cache.cache_key(req.scenario_id))
+        inferred = _infer_for_scenario(
+            ctx.scenario.active_events, ctx.scenario.current_time,
+        )
+        return _run(ctx, t0, summary, cache.cache_key(req.scenario_id), inferred_events=inferred)
 
     # v2 — sensor_readings 경로: inference → custom으로 합쳐 기존 scoring 호출
     inferred_info: list[InferredEventInfo] = []

@@ -28,6 +28,21 @@ async function jsonOrThrow<T>(r: Response, ctx: string): Promise<T> {
   return r.json() as Promise<T>;
 }
 
+async function fetchWithRetry(
+  input: RequestInfo,
+  init?: RequestInit,
+): Promise<Response> {
+  try {
+    const r = await fetch(input, init);
+    if (r.status >= 500) throw new Error(`${r.status}`);
+    return r;
+  } catch (err) {
+    if (init?.signal?.aborted) throw err;
+    await new Promise((res) => setTimeout(res, 1500));
+    return fetch(input, init);
+  }
+}
+
 export async function checkHealth(signal?: AbortSignal): Promise<boolean> {
   try {
     const r = await fetch(`${BASE}/api/health`, { signal });
@@ -45,12 +60,12 @@ export async function waitForBackend(signal?: AbortSignal): Promise<void> {
 }
 
 export async function fetchScenarios(signal?: AbortSignal): Promise<ScenarioMeta[]> {
-  const r = await fetch(`${BASE}/api/scenarios`, { cache: "no-store", signal });
+  const r = await fetchWithRetry(`${BASE}/api/scenarios`, { cache: "no-store", signal });
   return jsonOrThrow(r, "scenarios");
 }
 
 export async function fetchEvents(signal?: AbortSignal): Promise<EventMeta[]> {
-  const r = await fetch(`${BASE}/api/events`, { cache: "no-store", signal });
+  const r = await fetchWithRetry(`${BASE}/api/events`, { cache: "no-store", signal });
   return jsonOrThrow(r, "events");
 }
 
@@ -58,7 +73,7 @@ export async function simulatePreset(
   scenarioId: string,
   signal?: AbortSignal,
 ): Promise<SimulateResponse> {
-  const r = await fetch(`${BASE}/api/simulate`, {
+  const r = await fetchWithRetry(`${BASE}/api/simulate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ scenario_id: scenarioId }),
@@ -71,7 +86,7 @@ export async function simulateCustom(
   req: CustomRequest,
   signal?: AbortSignal,
 ): Promise<SimulateResponse> {
-  const r = await fetch(`${BASE}/api/simulate`, {
+  const r = await fetchWithRetry(`${BASE}/api/simulate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -88,7 +103,7 @@ export async function simulateSensors(
   sleepTime: string,
   signal?: AbortSignal,
 ): Promise<SimulateResponse> {
-  const r = await fetch(`${BASE}/api/simulate`, {
+  const r = await fetchWithRetry(`${BASE}/api/simulate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -104,7 +119,7 @@ export async function askQuestion(
   req: AskRequest,
   signal?: AbortSignal,
 ): Promise<AskResponse> {
-  const r = await fetch(`${BASE}/api/ask`, {
+  const r = await fetchWithRetry(`${BASE}/api/ask`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(req),

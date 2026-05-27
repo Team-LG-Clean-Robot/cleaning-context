@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter
 
 from app.config import get_settings
-from app.data_loader import load_events, load_inference_engine, load_rooms, load_scenarios
+from app.data_loader import load_events, load_inference_engine, load_ml_classifier, load_rooms, load_scenarios
 
 router = APIRouter()
 
@@ -34,6 +34,14 @@ def _load_validation_summary() -> dict | None:
     }
 
 
+def _ml_loaded() -> bool:
+    try:
+        load_ml_classifier()
+        return True
+    except Exception:
+        return False
+
+
 @router.get("/health")
 def health() -> dict:
     uptime_sec = time.monotonic() - _BOOT_TS
@@ -46,6 +54,6 @@ def health() -> dict:
         "cold_start": uptime_sec < _COLD_START_WINDOW_SEC,
         "uptime_sec": int(uptime_sec),
         "inference_rules_loaded": len(load_inference_engine().rules),
-        "ml_classifier_loaded": False,
+        "ml_classifier_loaded": _ml_loaded(),
         "dataset_validation": _load_validation_summary(),
     }

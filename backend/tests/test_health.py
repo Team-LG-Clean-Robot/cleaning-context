@@ -18,7 +18,7 @@ def test_health():
     # v2 신규 필드
     assert isinstance(body["cold_start"], bool)
     assert body["inference_rules_loaded"] == 13
-    assert body["ml_classifier_loaded"] is False
+    assert body["ml_classifier_loaded"] is True
     # v3 — CASAS 데이터셋 검증 결과
     validation = body["dataset_validation"]
     assert validation is not None

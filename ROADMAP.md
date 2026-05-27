@@ -1,7 +1,7 @@
 # ROADMAP — 생활 맥락 로봇청소기 시뮬레이터
 
 > **마지막 업데이트**: 2026-05-27
-> **현재 위치**: 3주차 — 서비스 완성도 강화 (타임라인 시뮬레이션) + 발표 준비
+> **현재 위치**: 3주차 — 서비스 완성도 ✅ + 발표 준비 (D-3)
 > **최종 발표**: 2026-05-30 (금)
 > 사업성 트랙은 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md), 기술 트랙은 [TECHNICAL_PLAN.md](./TECHNICAL_PLAN.md), 모바일·IoT 도메인은 [docs/IOT_DOMAIN.md](./docs/IOT_DOMAIN.md) 참조.
 
@@ -51,9 +51,13 @@
 **서비스 완성도 (5/27~28)**:
 - [x] simulate 캐시 inferred_events 중복 키워드 버그 수정
 - [x] 타임라인 시뮬레이션 — 하루 24h 재생 모드 (10 키프레임, 센서→이벤트→점수→로봇이동 연동)
-- [ ] Cold start UX 개선 (서버 준비 중 로딩 UI)
-- [ ] 시나리오 +2 추가 (택배 도착·식사 후)
-- [ ] 에러 retry + UX 개선
+- [x] 타임라인 prefetch 배치 처리 (2개씩 순차, 2개 로드 시 즉시 재생) — ✅ 배포 확인 완료
+- [x] Cold start UX 개선 (서버 준비 중 로딩 UI) — waitForBackend() 폴링 + 스피너
+- [x] 시나리오 +2 추가 (택배 도착·식사 후) — 8종 라이브 확인 완료
+- [x] ML 런타임 의존성 수정 (numpy/scikit-learn/joblib → pyproject.toml) + v2 모델 전환
+- [x] 에러 retry (fetchWithRetry — 5xx/네트워크 에러 시 1.5s 후 1회 재시도)
+- [x] health 엔드포인트 ML 분류기 상태 실측 반영 (하드코딩 False → 실제 로드 체크)
+- [x] 시나리오 모드에서 ML 추론 결과 표시 (이벤트→센서 합성→RandomForest predict→inferred_events)
 
 **빌드 (5/28~29)**:
 - [ ] APK 빌드 (Android SDK 설치 가능 시)
@@ -69,8 +73,8 @@
 
 | 종류 | 산출물 | 상태 |
 |---|---|---|
-| 웹 시뮬레이터 | https://robot-cleaner.askewly.com | ✅ 라이브 |
-| 백엔드 API | https://cleaning-context-backend.onrender.com | ✅ 라이브 (50 pytest) |
+| 웹 시뮬레이터 | https://robot-cleaner.askewly.com | ✅ 라이브 (8 시나리오 + 타임라인) |
+| 백엔드 API | https://cleaning-context-backend.onrender.com | ✅ 라이브 (50 pytest, 8 시나리오) |
 | 모바일 앱 (APK) | mobile/build/.../app-release.apk | 🔄 SDK 설치 후 |
 | 사업계획서 | BUSINESS_PLAN.md + exports/planning-v2/planning.pdf | ✅ + 갱신 예정 |
 | 기술 기획서 | TECHNICAL_PLAN.md | ✅ |
@@ -83,7 +87,7 @@
 
 | 카테고리 | 지표 | 목표 | 현재 |
 |---|---|---|---|
-| 기능 | 작동 시나리오 수 | ≥ 4 | 4 (확장 예정 +2) |
+| 기능 | 작동 시나리오 수 | ≥ 4 | ✅ 8 (라이브 확인) |
 | ML | 이벤트 분류기 정확도 | ≥ 75% | ✅ v1 CASAS 85.1% / v2 IoT 99.3% |
 | ML | 5-fold CV mean | ≥ 70% | ✅ v1 85.1% / v2 99.3% |
 | 데이터 | 공개 데이터셋 기반 보정 근거 | ≥ 1건 | ✅ CASAS hh106 (Zenodo CC BY 4.0) |
