@@ -21,6 +21,7 @@ const TICK_MS = 1500;
 
 type Props = {
   scenarioId: string | null;
+  overrideSensors?: SensorState[];
 };
 
 function Sparkline({ history }: { history: number[] }) {
@@ -66,17 +67,28 @@ function LedDot({ active }: { active: boolean }) {
   );
 }
 
-export function SensorDashboard({ scenarioId }: Props) {
+export function SensorDashboard({ scenarioId, overrideSensors }: Props) {
   const [sensors, setSensors] = useState<SensorState[]>(() => getSensorStates(null));
   const historyRef = useRef<Map<string, number[]>>(new Map());
 
   useEffect(() => {
+    if (overrideSensors) return;
     const base = getSensorStates(scenarioId);
     setSensors(base);
     historyRef.current = new Map(base.map((s) => [s.id, [s.value]]));
-  }, [scenarioId]);
+  }, [scenarioId, overrideSensors]);
 
   useEffect(() => {
+    if (overrideSensors) {
+      setSensors(overrideSensors);
+      for (const s of overrideSensors) {
+        const h = historyRef.current.get(s.id) ?? [];
+        h.push(s.value);
+        if (h.length > HISTORY_LEN) h.shift();
+        historyRef.current.set(s.id, h);
+      }
+      return;
+    }
     if (!scenarioId) return;
     const id = setInterval(() => {
       setSensors((prev) => {
@@ -91,7 +103,7 @@ export function SensorDashboard({ scenarioId }: Props) {
       });
     }, TICK_MS);
     return () => clearInterval(id);
-  }, [scenarioId]);
+  }, [scenarioId, overrideSensors]);
 
   const activeCount = sensors.filter((s) => s.active).length;
 

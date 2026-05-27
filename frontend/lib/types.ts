@@ -112,6 +112,16 @@ export const ROOMS_SEED: RoomBbox[] = [
 
 export const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+export type TimelineKeyframe = {
+  time: string;
+  minuteOfDay: number;
+  icon: string;
+  description: string;
+  robotAction: string;
+  request: CustomRequest;
+  sensorOverrides: Record<string, { value: number; label: string; active: boolean }>;
+};
+
 export type AskRequest = {
   context_summary: string;
   rooms: RoomScore[];

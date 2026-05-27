@@ -17,6 +17,7 @@ import type {
   SimulateResponse,
 } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
+import { useTimeline } from "@/lib/useTimeline";
 import { AskPanel } from "./AskPanel";
 import { CustomModePanel } from "./CustomModePanel";
 import { ExplanationCard } from "./ExplanationCard";
@@ -26,8 +27,9 @@ import { PriorityList } from "./PriorityList";
 import { RoomDetail } from "./RoomDetail";
 import { ScenarioPanel } from "./ScenarioPanel";
 import { SensorDashboard } from "./SensorDashboard";
+import { TimelinePanel } from "./TimelinePanel";
 
-type ModeTab = "preset" | "custom";
+type ModeTab = "preset" | "custom" | "timeline";
 
 type State = {
   scenarios: ScenarioMeta[];
@@ -202,6 +204,8 @@ export function Simulator() {
     }
   };
 
+  const timeline = useTimeline(state.mode === "timeline");
+
   const switchMode = (mode: ModeTab) =>
     setState((s) => ({
       ...s,
@@ -217,8 +221,11 @@ export function Simulator() {
   const [selectedRoom, setSelectedRoom] = useState<RoomId | null>(null);
 
   const selected = state.scenarios.find((s) => s.id === state.selectedId);
-  const userLocation =
-    state.mode === "preset"
+  const isTimeline = state.mode === "timeline";
+  const effectiveResponse = isTimeline ? timeline.currentResponse : state.response;
+  const userLocation = isTimeline
+    ? timeline.currentUserLocation
+    : state.mode === "preset"
       ? selected?.user_location ?? null
       : state.customDraft.user_location;
 
@@ -232,17 +239,20 @@ export function Simulator() {
       <RoomDetail room={detailRoom} onClose={() => setSelectedRoom(null)} />
     )}
     <AskPanel
-      key={state.response?.scenario_id ?? "general"}
-      response={state.response}
+      key={effectiveResponse?.scenario_id ?? "general"}
+      response={effectiveResponse}
     />
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       <div className="lg:col-span-3 space-y-4">
         <HouseMap
-          rooms={state.response?.rooms}
+          rooms={effectiveResponse?.rooms}
           userLocation={userLocation}
-          onRoomClick={state.response ? setSelectedRoom : undefined}
+          onRoomClick={effectiveResponse ? setSelectedRoom : undefined}
         />
-        <SensorDashboard scenarioId={state.response?.scenario_id ?? state.selectedId} />
+        <SensorDashboard
+          scenarioId={isTimeline ? null : (state.response?.scenario_id ?? state.selectedId)}
+          overrideSensors={isTimeline ? timeline.currentSensors : undefined}
+        />
       </div>
       <div className="lg:col-span-2 space-y-4">
         <div
@@ -254,6 +264,7 @@ export function Simulator() {
             [
               { id: "preset", label: "시나리오 선택" },
               { id: "custom", label: "직접 입력" },
+              { id: "timeline", label: "하루 시뮬레이션" },
             ] as const
           ).map((t) => (
             <button
@@ -281,13 +292,28 @@ export function Simulator() {
             loading={state.loading}
             onSelect={handlePresetSelect}
           />
-        ) : (
+        ) : state.mode === "custom" ? (
           <CustomModePanel
             events={state.events}
             value={state.customDraft}
             loading={state.loading}
             onChange={setCustomDraft}
             onSubmit={handleCustomSubmit}
+          />
+        ) : (
+          <TimelinePanel
+            currentMinute={timeline.currentMinute}
+            currentTimeStr={timeline.currentTimeStr}
+            playing={timeline.playing}
+            speed={timeline.speed}
+            prefetchStatus={timeline.prefetchStatus}
+            prefetchProgress={timeline.prefetchProgress}
+            prefetchTotal={timeline.prefetchTotal}
+            keyframes={timeline.keyframes}
+            activeKeyframeIndex={timeline.activeKeyframeIndex}
+            onTogglePlay={timeline.togglePlay}
+            onSpeedChange={timeline.setSpeed}
+            onSeek={timeline.seek}
           />
         )}
 
@@ -307,9 +333,9 @@ export function Simulator() {
           </div>
         )}
 
-        {state.loading && <LoadingSkeleton />}
+        {state.loading && !isTimeline && <LoadingSkeleton />}
 
-        {!state.response && !state.loading && (
+        {!isTimeline && !state.response && !state.loading && (
           state.mode === "preset" ? (
             <SamplePreview />
           ) : (
@@ -324,16 +350,18 @@ export function Simulator() {
           )
         )}
 
-        {state.response && !state.loading && (
+        {effectiveResponse && (isTimeline || !state.loading) && (
           <>
-            <ContextSummary
-              mode={state.mode}
-              selected={selected}
-              customDraft={state.customDraft}
-              events={state.events}
-            />
-            <PriorityList rooms={state.response.rooms} />
-            <ExplanationCard response={state.response} />
+            {!isTimeline && (
+              <ContextSummary
+                mode={state.mode}
+                selected={selected}
+                customDraft={state.customDraft}
+                events={state.events}
+              />
+            )}
+            <PriorityList rooms={effectiveResponse.rooms} />
+            <ExplanationCard response={effectiveResponse} />
           </>
         )}
       </div>
