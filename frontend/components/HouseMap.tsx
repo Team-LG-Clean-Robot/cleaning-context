@@ -413,22 +413,43 @@ function RoomShape({
     style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick} />);
 }
 
+/* ── 먼지 제거율 → 표시 점수 계산 ── */
+function useDisplayScores(
+  rooms: RoomScore[] | undefined,
+  dust: Dust[],
+  hiddenDust: Set<string>,
+): RoomScore[] | undefined {
+  return useMemo(() => {
+    if (!rooms) return undefined;
+    return rooms.map((r) => {
+      const total = dust.filter((d) => d.roomId === r.room_id).length;
+      if (total === 0) return r;
+      const removed = dust.filter((d) => d.roomId === r.room_id && hiddenDust.has(d.id)).length;
+      const ratio = 1 - removed / total;
+      return { ...r, final: Math.round(r.final * ratio) };
+    });
+  }, [rooms, dust, hiddenDust]);
+}
+
 /* ── 메인 ── */
 export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: Props) {
-  const scoreMap = new Map(rooms?.map((r) => [r.room_id, r]) ?? []);
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
 
   const hasScenario = rooms && rooms.length > 0;
   const dust = useMemo(() => (hasScenario ? generateDust(rooms!) : []), [rooms, hasScenario]);
+
+  // Robot uses display scores (decreasing as dust removed) to pick next room
   const { pos: robotPos, durationMs, cleaning, cleaningRoom } = useRobotMotion(
     hasScenario ? rooms! : null, new Set(), dust, paused,
   );
   const hiddenDust = useDustRemoval(dust, cleaningRoom, paused);
+  const displayScores = useDisplayScores(rooms, dust, hiddenDust);
+  const scoreMap = new Map(displayScores?.map((r) => [r.room_id, r]) ?? []);
 
   return (
     <div className="relative">
-      <svg viewBox="0 0 600 400" role="img" aria-label={buildAriaLabel(rooms, userLocation)}
+      <svg viewBox="0 0 600 400" role="img" aria-label={buildAriaLabel(displayScores, userLocation)}
         className="w-full h-auto rounded-xl border border-border-default shadow-[0_4px_24px_-12px_rgba(0,0,0,0.2)] overflow-hidden">
         <defs>
           <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6">
@@ -447,7 +468,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
 
         <image href="/floorplan-bg.png" x={0} y={0} width={600} height={400} preserveAspectRatio="xMidYMid slice" />
 
-        {/* 히트맵 오버레이 */}
+        {/* 히트맵 오버레이 — 감소된 점수 반영 */}
         {ROOMS_SEED.map((room) => {
           const s = scoreMap.get(room.id);
           const score = s?.final ?? room.base_score;
@@ -470,7 +491,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
         {/* 먼지 (항상 표시) */}
         {dust.map((d) => <DustParticle key={d.id} d={d} hidden={hiddenDust.has(d.id)} />)}
 
-        {/* 라벨 + 점수 (히트맵 토글) */}
+        {/* 라벨 + 점수 — 감소된 점수 표시 */}
         {showOverlay && ROOMS_SEED.map((room) => {
           const s = scoreMap.get(room.id);
           const score = s?.final ?? room.base_score;
@@ -480,7 +501,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
               <rect x={c.x - 28} y={c.y - 14} width={56} height={30} rx={5} fill="rgba(255,255,255,0.75)" stroke="rgba(0,0,0,0.06)" strokeWidth={0.5} />
               <text x={c.x} y={c.y - 1} textAnchor="middle" style={{ font: "500 11px var(--font-sans)", fill: "#333" }}>{room.name_ko}</text>
               <text x={c.x} y={c.y + 13} textAnchor="middle" style={{ font: "700 13px var(--font-mono)", fill: "#111" }}>
-                {rooms ? <AnimatedScoreText score={score} /> : score}
+                {displayScores ? <AnimatedScoreText score={score} /> : score}
               </text>
             </g>
           );
