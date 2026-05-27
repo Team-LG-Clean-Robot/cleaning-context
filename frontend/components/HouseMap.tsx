@@ -135,10 +135,28 @@ function generateDust(roomScores: RoomScore[]): Dust[] {
 /* ── 로봇 이동 훅 ── */
 type RobotOut = { pos: Pt; durationMs: number; cleaning: boolean; cleaningRoom: RoomId | null };
 
+function pickNextRoom(
+  roomScores: RoomScore[],
+  dust: Dust[],
+  hidden: Set<string>,
+): RoomId | null {
+  let best: { id: RoomId; score: number } | null = null;
+  for (const r of roomScores) {
+    if (r.mode === "excluded") continue;
+    const total = dust.filter((d) => d.roomId === r.room_id).length;
+    const removed = dust.filter((d) => d.roomId === r.room_id && hidden.has(d.id)).length;
+    if (total > 0 && removed >= total) continue;
+    const effective = total > 0 ? Math.round(r.final * (1 - removed / total)) : r.final;
+    if (effective <= 0) continue;
+    if (!best || effective > best.score) best = { id: r.room_id, score: effective };
+  }
+  return best?.id ?? null;
+}
+
 function useRobotMotion(
   roomScores: RoomScore[] | null,
-  hiddenDust: Set<string>,
   allDust: Dust[],
+  hiddenDust: Set<string>,
   paused: boolean,
 ): RobotOut {
   const IDLE: Pt = { x: 170, y: 265 };
@@ -151,6 +169,15 @@ function useRobotMotion(
   const cancelledRef = useRef(false);
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
+  // refs so scheduleRoom can read latest values
+  const roomScoresRef = useRef(roomScores);
+  roomScoresRef.current = roomScores;
+  const dustRef = useRef(allDust);
+  dustRef.current = allDust;
+  const hiddenRef = useRef(hiddenDust);
+  hiddenRef.current = hiddenDust;
+  // track which room is being cleaned to avoid re-triggering
+  const activeTarget = useRef<RoomId | null>(null);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach(clearTimeout);
@@ -158,41 +185,33 @@ function useRobotMotion(
     cancelledRef.current = true;
   }, []);
 
-  const sortedRooms = useMemo(() => {
-    if (!roomScores) return [];
-    return roomScores.filter((r) => r.mode !== "excluded" && r.final > 0).sort((a, b) => b.final - a.final);
-  }, [roomScores]);
+  const hasRooms = roomScores && roomScores.some((r) => r.mode !== "excluded" && r.final > 0);
 
-  // Check if current room dust is all cleared → trigger next room
-  const roomDustCleared = useCallback((room: RoomId): boolean => {
-    const roomDust = allDust.filter((d) => d.roomId === room);
-    if (roomDust.length === 0) return true;
-    return roomDust.every((d) => hiddenDust.has(d.id));
-  }, [allDust, hiddenDust]);
-
+  // Main scheduling effect — triggered by scenario change
   useEffect(() => {
     clearTimers();
     cancelledRef.current = false;
     setCleaning(false);
     setCleaningRoom(null);
+    activeTarget.current = null;
 
-    if (!sortedRooms.length) {
+    if (!hasRooms || !roomScores) {
       setPos(IDLE);
       setDurationMs(0);
       currentRoom.current = "living";
       return;
     }
 
-    let roomIdx = 0;
-
     function scheduleRoom() {
       if (cancelledRef.current) return;
-      const target = sortedRooms[roomIdx % sortedRooms.length];
-      roomIdx++;
+      const next = pickNextRoom(roomScoresRef.current!, dustRef.current, hiddenRef.current);
+      if (!next) { setCleaning(false); setCleaningRoom(null); return; }
+
+      activeTarget.current = next;
       const from = currentRoom.current;
-      const roomSeq = bfsPath(from, target.room_id);
+      const roomSeq = bfsPath(from, next);
       const travelPts = buildTravelPath(roomSeq, pos);
-      const cleanPts = buildCleanPath(target.room_id);
+      const cleanPts = buildCleanPath(next);
 
       let prev = pos;
       let delay = 0;
@@ -211,13 +230,12 @@ function useRobotMotion(
         prev = wp;
       }
 
-      const cleanStart = delay;
       timers.current.push(setTimeout(() => {
         if (cancelledRef.current) return;
-        currentRoom.current = target.room_id;
+        currentRoom.current = next;
         setCleaning(true);
-        setCleaningRoom(target.room_id);
-      }, cleanStart));
+        setCleaningRoom(next);
+      }, delay));
 
       for (const cp of cleanPts) {
         const ms = msFor(prev, cp);
@@ -230,10 +248,12 @@ function useRobotMotion(
         prev = cp;
       }
 
+      // After cleaning pattern ends, pick next room based on current dust state
       timers.current.push(setTimeout(() => {
         if (cancelledRef.current) return;
         setCleaning(false);
         setCleaningRoom(null);
+        activeTarget.current = null;
         scheduleRoom();
       }, delay + 300));
     }
@@ -241,7 +261,7 @@ function useRobotMotion(
     timers.current.push(setTimeout(scheduleRoom, 200));
     return () => clearTimers();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortedRooms]);
+  }, [hasRooms, roomScores]);
 
   // Pause/resume: when paused, clear timers. But we can't easily resume mid-path,
   // so we just stop transitions. The robot freezes in place.
@@ -439,11 +459,20 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
   const hasScenario = rooms && rooms.length > 0;
   const dust = useMemo(() => (hasScenario ? generateDust(rooms!) : []), [rooms, hasScenario]);
 
-  // Robot uses display scores (decreasing as dust removed) to pick next room
+  const [hiddenDust, setHiddenDustRaw] = useState<Set<string>>(new Set());
   const { pos: robotPos, durationMs, cleaning, cleaningRoom } = useRobotMotion(
-    hasScenario ? rooms! : null, new Set(), dust, paused,
+    hasScenario ? rooms! : null, dust, hiddenDust, paused,
   );
-  const hiddenDust = useDustRemoval(dust, cleaningRoom, paused);
+  // dust removal feeds into hiddenDust
+  const hiddenFromHook = useDustRemoval(dust, cleaningRoom, paused);
+  // sync hook output → state (avoid infinite loop by checking identity)
+  const hiddenRef = useRef(hiddenDust);
+  useEffect(() => {
+    if (hiddenFromHook !== hiddenRef.current) {
+      hiddenRef.current = hiddenFromHook;
+      setHiddenDustRaw(hiddenFromHook);
+    }
+  }, [hiddenFromHook]);
   const displayScores = useDisplayScores(rooms, dust, hiddenDust);
   const scoreMap = new Map(displayScores?.map((r) => [r.room_id, r]) ?? []);
 
