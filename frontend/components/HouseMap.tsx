@@ -13,6 +13,20 @@ function roomCenter(room: RoomBbox): { x: number; y: number } {
   return { x: room.bbox.x + room.bbox.w / 2, y: room.bbox.y + room.bbox.h / 2 };
 }
 
+const ROBOT_OFFSET: Record<string, { dx: number; dy: number }> = {
+  kitchen:  { dx:  50, dy:  35 },
+  bedroom:  { dx:  40, dy:  60 },
+  living:   { dx: -50, dy: -40 },
+  entrance: { dx:  20, dy:  45 },
+  bathroom: { dx:  35, dy: -25 },
+};
+
+function robotOffset(room: RoomBbox): { x: number; y: number } {
+  const c = roomCenter(room);
+  const off = ROBOT_OFFSET[room.id] ?? { dx: 0, dy: 25 };
+  return { x: c.x + off.dx, y: c.y + off.dy };
+}
+
 const PATROL_ORDER: RoomId[] = ["living", "kitchen", "bedroom", "bathroom", "entrance"];
 const PATROL_INTERVAL = 3000;
 
@@ -34,8 +48,7 @@ function usePatrol(active: boolean): { x: number; y: number } {
 
   const room = ROOMS_SEED.find((r) => r.id === PATROL_ORDER[idx]);
   if (!room) return { x: -100, y: -100 };
-  const c = roomCenter(room);
-  return { x: c.x, y: c.y + 10 };
+  return robotOffset(room);
 }
 
 function PersonIcon({ x, y }: { x: number; y: number }) {
@@ -187,7 +200,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick }: Props) {
   const hasScenario = rooms && rooms.length > 0;
   const topRoom = rooms?.filter((r) => r.mode !== "excluded").sort((a, b) => b.final - a.final)[0];
   const robotSeed = topRoom ? ROOMS_SEED.find((r) => r.id === topRoom.room_id) : null;
-  const scenarioPos = robotSeed ? { x: roomCenter(robotSeed).x, y: roomCenter(robotSeed).y + 10 } : null;
+  const scenarioPos = robotSeed ? robotOffset(robotSeed) : null;
   const patrolPos = usePatrol(!hasScenario);
   const robotX = hasScenario && scenarioPos ? scenarioPos.x : patrolPos.x;
   const robotY = hasScenario && scenarioPos ? scenarioPos.y : patrolPos.y;
