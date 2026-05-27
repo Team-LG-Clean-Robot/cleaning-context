@@ -32,8 +32,9 @@ import { RoomDetail } from "./RoomDetail";
 import { ScenarioPanel } from "./ScenarioPanel";
 import { SensorDashboard } from "./SensorDashboard";
 import { TimelinePanel } from "./TimelinePanel";
+import { PipelinePanel } from "./PipelinePanel";
 
-type ModeTab = "preset" | "custom" | "timeline";
+type ModeTab = "preset" | "custom" | "timeline" | "pipeline";
 
 type State = {
   scenarios: ScenarioMeta[];
@@ -246,9 +247,9 @@ export function Simulator() {
     setState((s) => ({
       ...s,
       mode,
-      response: null,
+      response: mode === "pipeline" ? s.response : null,
       error: null,
-      selectedId: null,
+      selectedId: mode === "pipeline" ? s.selectedId : null,
     }));
 
   const setCustomDraft = (customDraft: CustomRequest) =>
@@ -261,7 +262,7 @@ export function Simulator() {
   const effectiveResponse = isTimeline ? timeline.currentResponse : state.response;
   const userLocation = isTimeline
     ? timeline.currentUserLocation
-    : state.mode === "preset"
+    : (state.mode === "preset" || state.mode === "pipeline")
       ? selected?.user_location ?? null
       : state.customDraft.user_location;
 
@@ -312,6 +313,7 @@ export function Simulator() {
               { id: "preset", label: "시나리오 선택" },
               { id: "custom", label: "직접 입력" },
               { id: "timeline", label: "하루 시뮬레이션" },
+              { id: "pipeline", label: "파이프라인" },
             ] as const
           ).map((t) => (
             <button
@@ -347,7 +349,7 @@ export function Simulator() {
             onChange={setCustomDraft}
             onSubmit={handleCustomSubmit}
           />
-        ) : (
+        ) : state.mode === "timeline" ? (
           <TimelinePanel
             currentMinute={timeline.currentMinute}
             currentTimeStr={timeline.currentTimeStr}
@@ -362,7 +364,21 @@ export function Simulator() {
             onSpeedChange={timeline.setSpeed}
             onSeek={timeline.seek}
           />
-        )}
+        ) : state.mode === "pipeline" ? (
+          <>
+            <ScenarioPanel
+              scenarios={state.scenarios}
+              events={state.events}
+              selectedId={state.selectedId}
+              loading={state.loading}
+              onSelect={handlePresetSelect}
+            />
+            <PipelinePanel
+              response={state.response}
+              scenarioId={state.selectedId}
+            />
+          </>
+        ) : null}
 
         {state.error && (
           <div className="p-3 bg-surface-muted border-l-4 border-l-text-default border border-border-default rounded-md text-[13px] text-text-default">
@@ -397,7 +413,7 @@ export function Simulator() {
           )
         )}
 
-        {effectiveResponse && (isTimeline || !state.loading) && (
+        {effectiveResponse && (isTimeline || !state.loading) && state.mode !== "pipeline" && (
           <>
             {!isTimeline && (
               <ContextSummary
