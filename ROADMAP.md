@@ -1,6 +1,6 @@
 # ROADMAP — 생활 맥락 로봇청소기 시뮬레이터
 
-> **마지막 업데이트**: 2026-05-17
+> **마지막 업데이트**: 2026-05-26
 > **현재 위치**: 2주차 진입 — 직무 분배(산출물 ownership) + 문서 정리 완료, hand-off 흐름 가동 직전
 > **최종 발표**: 2026-05-30 (금)
 > 사업성 트랙은 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md), 기술 트랙은 [TECHNICAL_PLAN.md](./TECHNICAL_PLAN.md), 모바일·IoT 도메인은 [docs/IOT_DOMAIN.md](./docs/IOT_DOMAIN.md) 참조.
@@ -62,8 +62,9 @@
 | 모바일 앱 (APK) | mobile/build/.../app-release.apk | 🔄 SDK 설치 후 |
 | 사업계획서 | BUSINESS_PLAN.md + exports/planning-v2/planning.pdf | ✅ + 갱신 예정 |
 | 기술 기획서 | TECHNICAL_PLAN.md | ✅ |
-| ML 모델 | backend/models/event_classifier.joblib | ⬜ 학습 후 |
-| 평가 리포트 | backend/reports/metrics.json | ⬜ |
+| ML 모델 v1 | backend/models/event_classifier.joblib | ✅ CASAS 85.1% |
+| ML 모델 v2 | backend/models/event_classifier_v2.joblib | ✅ IoT multi-label 99.3% |
+| 평가 리포트 | backend/reports/ml_metrics_v2.json | ✅ |
 | 데모 영상 | (TBD) | ⬜ |
 
 ## KPI
@@ -71,9 +72,9 @@
 | 카테고리 | 지표 | 목표 | 현재 |
 |---|---|---|---|
 | 기능 | 작동 시나리오 수 | ≥ 4 | 4 (확장 예정 +2) |
-| ML | 이벤트 분류기 정확도 | ≥ 75% | — |
-| ML | 5-fold CV mean | ≥ 70% | — |
-| 데이터 | 공개 데이터셋 기반 보정 근거 | ≥ 1건 | — |
+| ML | 이벤트 분류기 정확도 | ≥ 75% | ✅ v1 CASAS 85.1% / v2 IoT 99.3% |
+| ML | 5-fold CV mean | ≥ 70% | ✅ v1 85.1% / v2 99.3% |
+| 데이터 | 공개 데이터셋 기반 보정 근거 | ≥ 1건 | ✅ CASAS hh106 (Zenodo CC BY 4.0) |
 | 응답 | 이벤트 입력 → 설명 출력 | ≤ 5s | ~3s |
 | 일관성 | 동일 입력 우선순위 일치 | 100% | ✅ (Rule-based) |
 | 설명 품질 | 점수 근거 포함 비율 | ≥ 95% | ✅ |

@@ -61,8 +61,11 @@ def _run(
     if cache_key is not None:
         cached = cache.get(cache_key)
         if cached:
+            merged = {k: v for k, v in cached.items() if k not in ("duration_ms", "ml", "inferred_events")}
             return SimulateResponse(
-                **{**cached, "duration_ms": int((time.perf_counter() - t0) * 1000), "ml": ml_info},
+                **merged,
+                duration_ms=int((time.perf_counter() - t0) * 1000),
+                ml=ml_info,
                 inferred_events=inferred_events or [],
             )
     explanation, fallback = llm_explainer.generate_explanation(summary, scores)
