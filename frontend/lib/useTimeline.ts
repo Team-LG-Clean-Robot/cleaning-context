@@ -137,20 +137,29 @@ export function useTimeline(active: boolean): TimelineHook {
     setPrefetchStatus("loading");
     setPrefetchProgress(0);
     const results = new Map<number, SimulateResponse>();
-    let done = 0;
 
-    const promises = DAY_KEYFRAMES.map(async (kf, i) => {
-      try {
-        const res = await simulateCustom(kf.request, ctrl.signal);
-        results.set(i, res);
-      } catch {
-        // skip failed
+    const BATCH = 2;
+    for (let start = 0; start < DAY_KEYFRAMES.length; start += BATCH) {
+      if (ctrl.signal.aborted) break;
+      const batch = DAY_KEYFRAMES.slice(start, start + BATCH);
+      const promises = batch.map(async (kf, j) => {
+        const i = start + j;
+        try {
+          const res = await simulateCustom(kf.request, ctrl.signal);
+          results.set(i, res);
+        } catch {
+          // skip failed
+        }
+      });
+      await Promise.allSettled(promises);
+      if (!ctrl.signal.aborted) {
+        cacheRef.current = new Map(results);
+        setPrefetchProgress(results.size);
+        if (results.size >= 2) {
+          setPrefetchStatus("ready");
+        }
       }
-      done++;
-      setPrefetchProgress(done);
-    });
-
-    await Promise.allSettled(promises);
+    }
     if (!ctrl.signal.aborted) {
       cacheRef.current = results;
       setPrefetchStatus(results.size > 0 ? "ready" : "error");

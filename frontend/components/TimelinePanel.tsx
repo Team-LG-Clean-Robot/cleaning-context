@@ -44,7 +44,7 @@ export function TimelinePanel({
   const minStart = keyframes[0].minuteOfDay;
   const minEnd = keyframes[keyframes.length - 1].minuteOfDay;
 
-  if (prefetchStatus === "loading" || prefetchStatus === "idle") {
+  if (prefetchStatus === "idle" || (prefetchStatus === "loading" && prefetchProgress < 2)) {
     return (
       <section className="bg-white border border-border-default rounded-xl p-5 shadow-sm space-y-3">
         <h2 className="text-[14px] font-semibold">하루 시뮬레이션 준비 중</h2>
@@ -105,6 +105,16 @@ export function TimelinePanel({
           ))}
         </div>
       </div>
+
+      {/* Loading badge */}
+      {prefetchStatus === "loading" && prefetchProgress < prefetchTotal && (
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          <span className="text-[11px] text-amber-700">
+            추가 시나리오 로딩 중 ({prefetchProgress}/{prefetchTotal})
+          </span>
+        </div>
+      )}
 
       {/* Slider */}
       <div className="space-y-1">
