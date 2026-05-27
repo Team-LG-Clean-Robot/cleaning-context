@@ -122,7 +122,7 @@ def test_scenarios_list():
     res = client.get("/api/scenarios")
     assert res.status_code == 200
     body = res.json()
-    assert len(body) == 6
+    assert len(body) == 8
     ids = {s["id"] for s in body}
     assert ids == {
         "rainy_return",
@@ -131,4 +131,6 @@ def test_scenarios_list():
         "guest_incoming",
         "morning_quick_clean",
         "cooking_in_progress",
+        "package_after_delivery",
+        "after_meal_cleanup",
     }

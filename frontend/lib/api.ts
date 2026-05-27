@@ -28,6 +28,22 @@ async function jsonOrThrow<T>(r: Response, ctx: string): Promise<T> {
   return r.json() as Promise<T>;
 }
 
+export async function checkHealth(signal?: AbortSignal): Promise<boolean> {
+  try {
+    const r = await fetch(`${BASE}/api/health`, { signal });
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function waitForBackend(signal?: AbortSignal): Promise<void> {
+  while (!signal?.aborted) {
+    if (await checkHealth(signal)) return;
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+}
+
 export async function fetchScenarios(signal?: AbortSignal): Promise<ScenarioMeta[]> {
   const r = await fetch(`${BASE}/api/scenarios`, { cache: "no-store", signal });
   return jsonOrThrow(r, "scenarios");

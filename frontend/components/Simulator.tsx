@@ -7,6 +7,7 @@ import {
   simulateCustom,
   simulatePreset,
   simulateSensors,
+  waitForBackend,
 } from "@/lib/api";
 import { getSensorStates, toSensorReadings } from "@/lib/sensor-mock";
 import type {
@@ -126,6 +127,7 @@ const DEFAULT_CUSTOM: CustomRequest = {
 };
 
 export function Simulator() {
+  const [coldStart, setColdStart] = useState(false);
   const [state, setState] = useState<State>({
     scenarios: [],
     events: [],
@@ -145,17 +147,32 @@ export function Simulator() {
 
   useEffect(() => {
     const ctrl = new AbortController();
-    Promise.all([
-      fetchScenarios(ctrl.signal),
-      fetchEvents(ctrl.signal),
-    ])
-      .then(([scenarios, events]) => {
+    async function init() {
+      try {
+        const [scenarios, events] = await Promise.all([
+          fetchScenarios(ctrl.signal),
+          fetchEvents(ctrl.signal),
+        ]);
         setState((s) => ({ ...s, scenarios, events }));
-      })
-      .catch((e) => {
+      } catch (e) {
         if ((e as Error).name === "AbortError") return;
-        setState((s) => ({ ...s, error: `초기 로딩 실패: ${String(e)}` }));
-      });
+        setColdStart(true);
+        await waitForBackend(ctrl.signal);
+        if (ctrl.signal.aborted) return;
+        setColdStart(false);
+        try {
+          const [scenarios, events] = await Promise.all([
+            fetchScenarios(ctrl.signal),
+            fetchEvents(ctrl.signal),
+          ]);
+          setState((s) => ({ ...s, scenarios, events }));
+        } catch (e2) {
+          if ((e2 as Error).name === "AbortError") return;
+          setState((s) => ({ ...s, error: `초기 로딩 실패: ${String(e2)}` }));
+        }
+      }
+    }
+    init();
     return () => ctrl.abort();
   }, []);
 
@@ -232,6 +249,16 @@ export function Simulator() {
   const detailRoom = selectedRoom && state.response
     ? state.response.rooms.find((r) => r.room_id === selectedRoom)
     : null;
+
+  if (coldStart) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <div className="w-8 h-8 border-3 border-accent-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-[14px] text-text-muted">서버 준비 중입니다 — 잠시만 기다려 주세요</p>
+        <p className="text-[11px] text-text-muted">무료 서버라 첫 접속 시 30초~1분 소요될 수 있습니다</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

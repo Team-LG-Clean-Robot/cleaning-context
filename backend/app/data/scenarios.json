@@ -58,5 +58,25 @@
     "user_location": "kitchen",
     "active_events": ["cooking_active"],
     "gap_rooms": []
+  },
+  {
+    "id": "package_after_delivery",
+    "name_ko": "택배 도착 후 현관 정리",
+    "description": "배송완료 알림 이후 현관 출입 감지, 현관·거실 동선 우선 청소",
+    "current_time": "15:20",
+    "sleep_time": "23:30",
+    "user_location": "living",
+    "active_events": ["package_delivery"],
+    "gap_rooms": []
+  },
+  {
+    "id": "after_meal_cleanup",
+    "name_ko": "식사 후 주방 정리",
+    "description": "냉장고·조리기기 사용 후 식사 종료 추정, 주방 우선 청소",
+    "current_time": "19:45",
+    "sleep_time": "23:30",
+    "user_location": "living",
+    "active_events": ["meal_finished"],
+    "gap_rooms": []
   }
 ]

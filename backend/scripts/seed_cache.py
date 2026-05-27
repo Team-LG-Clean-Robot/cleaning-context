@@ -24,6 +24,8 @@ SCENARIOS = [
     "guest_incoming",
     "morning_quick_clean",
     "cooking_in_progress",
+    "package_after_delivery",
+    "after_meal_cleanup",
 ]
 
 

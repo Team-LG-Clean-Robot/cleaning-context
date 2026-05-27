@@ -123,14 +123,12 @@ def test_simulate_422_invalid_user_location():
 
 
 def test_get_events_returns_all_known_ids():
-    # v2: 기존 7개 + IoT 추론 신규 5개 = 12개
     res = client.get("/api/events")
     assert res.status_code == 200
     body = res.json()
-    assert len(body) == 12
+    assert len(body) == 14
     ids = {e["id"] for e in body}
     assert ids == {
-        # 기존 7개 (사용자 직접 입력용)
         "rain",
         "user_returned",
         "cooking_done",
@@ -138,12 +136,13 @@ def test_get_events_returns_all_known_ids():
         "pre_sleep_2h",
         "pre_sleep_30min",
         "guest_visit_recent",
-        # v2 IoT 추론 신규 5개 (docs/IOT_DOMAIN.md §4.2)
         "cooking_active",
         "tv_watching",
         "recent_shower",
         "user_left",
         "meal_prep",
+        "package_delivery",
+        "meal_finished",
     }
     rain = next(e for e in body if e["id"] == "rain")
     assert rain["name_ko"] == "비"

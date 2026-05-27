@@ -1,26 +1,7 @@
 {
-  "scenario_id": "morning_quick_clean",
-  "context_summary": "아침 외출 직후 빠른 청소 · 시각 07:00 · 취침예정 23:00",
+  "scenario_id": "after_meal_cleanup",
+  "context_summary": "식사 후 주방 정리 · 시각 19:45 · 취침예정 23:30",
   "rooms": [
-    {
-      "room_id": "bedroom",
-      "base": 12,
-      "breakdown": [
-        {
-          "source": "base",
-          "label_ko": "기본 점수",
-          "delta": 12
-        },
-        {
-          "source": "user_left",
-          "label_ko": "사용자 외출 중",
-          "delta": 25
-        }
-      ],
-      "final": 37,
-      "mode": "normal",
-      "exclusion_reason": null
-    },
     {
       "room_id": "kitchen",
       "base": 28,
@@ -31,12 +12,12 @@
           "delta": 28
         },
         {
-          "source": "user_left",
-          "label_ko": "사용자 외출 중",
-          "delta": 5
+          "source": "meal_finished",
+          "label_ko": "식사 종료 추정",
+          "delta": 35
         }
       ],
-      "final": 33,
+      "final": 63,
       "mode": "normal",
       "exclusion_reason": null
     },
@@ -48,14 +29,23 @@
           "source": "base",
           "label_ko": "기본 점수",
           "delta": 22
-        },
-        {
-          "source": "user_left",
-          "label_ko": "사용자 외출 중",
-          "delta": 5
         }
       ],
-      "final": 27,
+      "final": 22,
+      "mode": "normal",
+      "exclusion_reason": null
+    },
+    {
+      "room_id": "bathroom",
+      "base": 18,
+      "breakdown": [
+        {
+          "source": "base",
+          "label_ko": "기본 점수",
+          "delta": 18
+        }
+      ],
+      "final": 18,
       "mode": "normal",
       "exclusion_reason": null
     },
@@ -69,31 +59,31 @@
           "delta": 20
         },
         {
-          "source": "user_left",
-          "label_ko": "사용자 외출 중",
-          "delta": 5
+          "source": "meal_finished",
+          "label_ko": "식사 종료 추정",
+          "delta": 15
+        },
+        {
+          "source": "user_occupancy",
+          "label_ko": "사용자 머무름",
+          "delta": -20
         }
       ],
-      "final": 25,
-      "mode": "normal",
-      "exclusion_reason": null
+      "final": 15,
+      "mode": "delayed",
+      "exclusion_reason": "30분 후 재시도"
     },
     {
-      "room_id": "bathroom",
-      "base": 18,
+      "room_id": "bedroom",
+      "base": 12,
       "breakdown": [
         {
           "source": "base",
           "label_ko": "기본 점수",
-          "delta": 18
-        },
-        {
-          "source": "user_left",
-          "label_ko": "사용자 외출 중",
-          "delta": 5
+          "delta": 12
         }
       ],
-      "final": 23,
+      "final": 12,
       "mode": "normal",
       "exclusion_reason": null
     }
@@ -104,13 +94,7 @@
     "model_name": "RandomForest",
     "cv_accuracy": 0.8514,
     "dataset": "CASAS hh106",
-    "event_confidence": [
-      {
-        "event_id": "user_left",
-        "ml_label": "user_left",
-        "f1": 1.0
-      }
-    ]
+    "event_confidence": []
   },
   "inferred_events": []
 }

@@ -166,17 +166,18 @@ export function useTimeline(active: boolean): TimelineHook {
     }
   }, []);
 
+  const prefetchStatusRef = useRef(prefetchStatus);
+  prefetchStatusRef.current = prefetchStatus;
+
   useEffect(() => {
-    if (active && prefetchStatus === "idle") {
+    if (active && prefetchStatusRef.current === "idle") {
       prefetchAll();
     }
     if (!active) {
       setPlaying(false);
-    }
-    return () => {
       abortRef.current?.abort();
-    };
-  }, [active, prefetchStatus, prefetchAll]);
+    }
+  }, [active, prefetchAll]);
 
   useEffect(() => {
     if (!active || !playing || prefetchStatus !== "ready") return;

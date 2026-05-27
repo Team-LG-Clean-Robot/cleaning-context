@@ -84,6 +84,25 @@ const SCENARIO_OVERRIDES: ScenarioSensorConfig = {
     air_conditioner: { value: 24, label: "24°C 가동", active: true },
     weather_api: { value: 0, label: "맑음", active: false },
   },
+  package_after_delivery: {
+    door_lock: { value: 1, label: "외부에서 열림", active: true },
+    motion_sensor: { value: 1, label: "현관 감지", active: true },
+    weather_api: { value: 0, label: "맑음", active: false },
+    tv: { value: 0, label: "꺼짐", active: false },
+    induction: { value: 0, label: "꺼짐", active: false },
+    air_conditioner: { value: 25, label: "25°C 가동", active: true },
+    bed_sensor: { value: 0, label: "비어있음", active: false },
+  },
+  after_meal_cleanup: {
+    induction: { value: 0, label: "방금 OFF", active: true },
+    refrigerator: { value: 6, label: "6회/h 개폐", active: true },
+    microwave: { value: 0, label: "사용 종료", active: true },
+    motion_sensor: { value: 1, label: "거실 감지", active: true },
+    air_conditioner: { value: 24, label: "24°C 가동", active: true },
+    humidity_bath: { value: 48, label: "48%", active: false },
+    weather_api: { value: 0, label: "맑음", active: false },
+    tv: { value: 0, label: "꺼짐", active: false },
+  },
 };
 
 export function getSensorStates(scenarioId: string | null): SensorState[] {

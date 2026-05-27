@@ -102,5 +102,21 @@
     "effects": [
       {"room_id": "kitchen", "delta": 15}
     ]
+  },
+  {
+    "id": "package_delivery",
+    "name_ko": "택배 도착",
+    "effects": [
+      {"room_id": "entrance", "delta": 35},
+      {"room_id": "living", "delta": 10}
+    ]
+  },
+  {
+    "id": "meal_finished",
+    "name_ko": "식사 종료 추정",
+    "effects": [
+      {"room_id": "kitchen", "delta": 35},
+      {"room_id": "living", "delta": 15}
+    ]
   }
 ]
