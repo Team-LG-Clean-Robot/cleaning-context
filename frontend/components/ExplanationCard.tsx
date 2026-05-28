@@ -1,6 +1,40 @@
 "use client";
-import type { SimulateResponse } from "@/lib/types";
+import type { ScoreContribution, SimulateResponse } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
+
+function BreakdownAxis({
+  title, rows, sum,
+}: { title: string; rows: ScoreContribution[]; sum: number }) {
+  return (
+    <div className="border border-border-default bg-surface-muted rounded-lg p-2.5">
+      <div className="text-[11px] font-semibold uppercase tracking-wider mb-1 text-text-muted">
+        {title}
+      </div>
+      {rows.length === 0 ? (
+        <div className="text-[12px] text-gray-500 italic">해당 항목 없음</div>
+      ) : (
+        <table className="w-full text-[12px]">
+          <tbody>
+            {rows.map((c, i) => (
+              <tr key={i} className="border-t border-border-default first:border-t-0">
+                <td className="py-1 text-text-muted">{c.label_ko}</td>
+                <td className="py-1 text-right font-mono text-text-default">
+                  {c.delta >= 0 ? `+${c.delta}` : c.delta}
+                </td>
+              </tr>
+            ))}
+            <tr className="border-t border-border-default font-semibold">
+              <td className="py-1">소계</td>
+              <td className="py-1 text-right font-mono">
+                {sum >= 0 ? `+${sum}` : sum}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
 
 const EVENT_LABEL: Record<string, string> = {
   user_returned: "사용자 귀가",
@@ -22,7 +56,7 @@ export function ExplanationCard({ response }: { response: SimulateResponse }) {
   const excluded = response.rooms.filter((r) => r.mode === "excluded");
 
   return (
-    <section className="bg-white border border-border-default rounded-xl p-5 shadow-sm relative">
+    <section className="p-5 relative">
       <div
         className="absolute top-5 bottom-5 left-0 w-1 bg-accent-500 rounded-r"
         aria-hidden
@@ -41,35 +75,33 @@ export function ExplanationCard({ response }: { response: SimulateResponse }) {
           {response.explanation || "(설명 없음)"}
         </p>
 
-        {top && (
-          <details className="group">
-            <summary
-              className="cursor-pointer list-none bg-surface-base hover:bg-border-default/40
-                         border border-border-default rounded-lg px-4 py-2
-                         text-[13px] font-medium inline-flex items-center gap-1 select-none"
-            >
-              왜 {ROOM_LABEL[top.room_id]}부터?
-              <span className="text-gray-500 group-open:hidden">▾</span>
-              <span className="text-gray-500 hidden group-open:inline">▴</span>
-            </summary>
-            <table className="w-full text-[12px] mt-2.5">
-              <tbody>
-                {top.breakdown.map((c, i) => (
-                  <tr key={i} className="border-t border-border-default">
-                    <td className="py-1.5 text-text-muted">{c.label_ko}</td>
-                    <td className="py-1.5 text-right font-mono text-text-default">
-                      {c.delta >= 0 ? `+${c.delta}` : c.delta}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="border-t border-border-default font-semibold">
-                  <td className="py-1.5">최종</td>
-                  <td className="py-1.5 text-right font-mono">{top.final}</td>
-                </tr>
-              </tbody>
-            </table>
-          </details>
-        )}
+        {top && (() => {
+          const needs = top.breakdown.filter((c) => (c.axis ?? "need") === "need");
+          const opps = top.breakdown.filter((c) => c.axis === "opportunity");
+          const needSum = needs.reduce((s, c) => s + c.delta, 0);
+          const oppSum = opps.reduce((s, c) => s + c.delta, 0);
+          return (
+            <details className="group">
+              <summary
+                className="cursor-pointer list-none bg-surface-base hover:bg-border-default/40
+                           border border-border-default rounded-lg px-4 py-2
+                           text-[13px] font-medium inline-flex items-center gap-1 select-none"
+              >
+                왜 {ROOM_LABEL[top.room_id]}부터?
+                <span className="text-gray-500 group-open:hidden">▾</span>
+                <span className="text-gray-500 hidden group-open:inline">▴</span>
+              </summary>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2.5">
+                <BreakdownAxis title="Need · 얼마나 더러운가" rows={needs} sum={needSum} />
+                <BreakdownAxis title="Opportunity · 지금 청소해도 되는가" rows={opps} sum={oppSum} />
+              </div>
+              <div className="flex justify-between items-baseline mt-2.5 pt-2 border-t border-border-default text-[12px] font-semibold">
+                <span>최종 (Need + Opportunity)</span>
+                <span className="font-mono text-text-default">{top.final}</span>
+              </div>
+            </details>
+          );
+        })()}
 
         {excluded.length > 0 && (
           <details className="group">

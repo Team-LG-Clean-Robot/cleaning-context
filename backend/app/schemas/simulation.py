@@ -9,10 +9,14 @@ TIME_PATTERN = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 ROOM_IDS = {"entrance", "living", "kitchen", "bedroom", "bathroom"}
 
 
+Axis = Literal["need", "opportunity"]
+
+
 class ScoreContribution(BaseModel):
     source: str
     label_ko: str
     delta: int
+    axis: Axis = "need"
 
 
 class RoomScore(BaseModel):

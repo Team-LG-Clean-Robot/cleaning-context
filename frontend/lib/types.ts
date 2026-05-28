@@ -23,10 +23,13 @@ export const ROOM_LABEL: Record<RoomId, string> = {
   bathroom: "욕실",
 };
 
+export type Axis = "need" | "opportunity";
+
 export type ScoreContribution = {
   source: string;
   label_ko: string;
   delta: number;
+  axis?: Axis; // 백엔드 v2부터 채워짐. 옛 캐시는 기본 "need"로 fallback
 };
 
 export type RoomScore = {

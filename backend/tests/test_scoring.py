@@ -93,6 +93,29 @@ def test_consistency():
         assert compute_scores(ctx, load_rooms(), load_rules()) == first
 
 
+def test_axis_assignment():
+    """Need = base + dirt 이벤트, Opportunity = 취침·점유·캘린더 신호."""
+    ctx = build_context("rainy_return", load_scenarios(), load_events())
+    results = {r.room_id: r for r in compute_scores(ctx, load_rooms(), load_rules())}
+    # base는 항상 need
+    for r in results.values():
+        base = next(c for c in r.breakdown if c.source == "base")
+        assert base.axis == "need"
+    # rain·user_returned는 need
+    entrance = results["entrance"]
+    rain = next((c for c in entrance.breakdown if c.source == "rain"), None)
+    assert rain and rain.axis == "need"
+
+    # pre_sleep_30min 시나리오: 침실 페널티는 opportunity
+    ctx2 = build_context("pre_sleep", load_scenarios(), load_events())
+    res2 = {r.room_id: r for r in compute_scores(ctx2, load_rooms(), load_rules())}
+    bedroom = res2["bedroom"]
+    pre = next((c for c in bedroom.breakdown if c.source == "pre_sleep_30min"), None)
+    assert pre and pre.axis == "opportunity"
+    occ = next((c for c in bedroom.breakdown if c.source == "user_occupancy"), None)
+    assert occ and occ.axis == "opportunity"
+
+
 def test_sorted_descending():
     ctx = build_context("guest_incoming", load_scenarios(), load_events())
     results = compute_scores(ctx, load_rooms(), load_rules())

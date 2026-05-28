@@ -13,7 +13,7 @@ import { getSensorStates, toSensorReadings } from "@/lib/sensor-mock";
 import type {
   CustomRequest,
   EventMeta,
-  RoomId,
+  RoomScore,
   ScenarioMeta,
   SimulateResponse,
 } from "@/lib/types";
@@ -130,6 +130,8 @@ const DEFAULT_CUSTOM: CustomRequest = {
   gap_rooms: [],
 };
 
+const DEFAULT_SCENARIO_ID = "rainy_return";
+
 const staticResponseMap = STATIC_RESPONSES as Record<string, Omit<SimulateResponse, "duration_ms">>;
 
 export function Simulator() {
@@ -183,6 +185,15 @@ export function Simulator() {
     }
     init();
     return () => ctrl.abort();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-select default ambient scenario on mount — matches click flow
+  useEffect(() => {
+    const cached = staticResponseMap[DEFAULT_SCENARIO_ID];
+    if (!cached) return;
+    const response: SimulateResponse = { ...cached, duration_ms: 0 };
+    setState((s) => ({ ...s, selectedId: DEFAULT_SCENARIO_ID, response, loading: false, error: null }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -255,7 +266,7 @@ export function Simulator() {
   const setCustomDraft = (customDraft: CustomRequest) =>
     setState((s) => ({ ...s, customDraft }));
 
-  const [selectedRoom, setSelectedRoom] = useState<RoomId | null>(null);
+  const [detailRoom, setDetailRoom] = useState<RoomScore | null>(null);
 
   const selected = state.scenarios.find((s) => s.id === state.selectedId);
   const isTimeline = state.mode === "timeline";
@@ -265,10 +276,12 @@ export function Simulator() {
     : (state.mode === "preset" || state.mode === "pipeline")
       ? selected?.user_location ?? null
       : state.customDraft.user_location;
+  const currentTime = isTimeline
+    ? timeline.currentTimeStr
+    : (state.mode === "preset" || state.mode === "pipeline")
+      ? selected?.current_time ?? null
+      : state.customDraft.current_time;
 
-  const detailRoom = selectedRoom && state.response
-    ? state.response.rooms.find((r) => r.room_id === selectedRoom)
-    : null;
 
   if (coldStart && state.scenarios.length === 0) {
     return (
@@ -283,19 +296,16 @@ export function Simulator() {
   return (
     <div className="space-y-6">
     {detailRoom && (
-      <RoomDetail room={detailRoom} onClose={() => setSelectedRoom(null)} />
+      <RoomDetail room={detailRoom} onClose={() => setDetailRoom(null)} />
     )}
-    <AskPanel
-      key={effectiveResponse?.scenario_id ?? "general"}
-      response={effectiveResponse}
-    />
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       <div className="lg:col-span-3 space-y-4">
         <HouseMap
           rooms={effectiveResponse?.rooms}
           userLocation={userLocation}
-          onRoomClick={effectiveResponse ? setSelectedRoom : undefined}
+          onRoomClick={effectiveResponse ? setDetailRoom : undefined}
           paused={isTimeline && !timeline.playing}
+          currentTime={currentTime}
         />
         <SensorDashboard
           scenarioId={isTimeline ? null : (state.response?.scenario_id ?? state.selectedId)}
@@ -424,11 +434,21 @@ export function Simulator() {
               />
             )}
             <PriorityList rooms={effectiveResponse.rooms} />
-            <ExplanationCard response={effectiveResponse} />
           </>
         )}
       </div>
     </div>
+
+    {/* 최하단 통합 카드: AI 설명 + 후속 질문 */}
+    {effectiveResponse && (isTimeline || !state.loading) && state.mode !== "pipeline" && (
+      <div className="bg-white border border-border-default rounded-xl shadow-sm divide-y divide-border-default overflow-hidden">
+        <ExplanationCard response={effectiveResponse} />
+        <AskPanel
+          key={effectiveResponse?.scenario_id ?? "general"}
+          response={effectiveResponse}
+        />
+      </div>
+    )}
     </div>
   );
 }

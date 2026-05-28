@@ -5,8 +5,9 @@ import { ROOMS_SEED, ROOM_LABEL, type Mode, type RoomBbox, type RoomId, type Roo
 type Props = {
   rooms?: RoomScore[];
   userLocation?: RoomId | null;
-  onRoomClick?: (roomId: RoomId) => void;
+  onRoomClick?: (room: RoomScore) => void;
   paused?: boolean;
+  currentTime?: string | null;
 };
 type Pt = { x: number; y: number };
 
@@ -69,17 +70,6 @@ function buildTravelPath(roomSeq: RoomId[], startPt: Pt): Pt[] {
 }
 
 /* ── 청소 패턴 ── */
-const ORBIT_R = 12;
-const ORBIT_N = 6;
-function orbit(c: Pt): Pt[] {
-  const pts: Pt[] = [];
-  for (let i = 0; i <= ORBIT_N; i++) {
-    const a = (2 * Math.PI * i) / ORBIT_N;
-    pts.push({ x: c.x + Math.cos(a) * ORBIT_R, y: c.y + Math.sin(a) * ORBIT_R });
-  }
-  return pts;
-}
-
 const CLEAN_ANCHORS: Record<string, Pt[]> = {
   kitchen:  [{ x: 240, y: 75 }, { x: 320, y: 75 }, { x: 320, y: 145 }, { x: 240, y: 145 }],
   bedroom:  [{ x: 400, y: 80 }, { x: 478, y: 80 }, { x: 478, y: 195 }, { x: 400, y: 195 }],
@@ -88,12 +78,13 @@ const CLEAN_ANCHORS: Record<string, Pt[]> = {
   bathroom: [{ x: 380, y: 262 }, { x: 465, y: 262 }, { x: 465, y: 325 }, { x: 380, y: 325 }],
 };
 
-function buildCleanPath(room: RoomId): Pt[] {
-  const anchors = CLEAN_ANCHORS[room];
-  if (!anchors?.length) return [];
-  const pts: Pt[] = [];
-  for (const a of anchors) { pts.push(a); pts.push(...orbit(a)); }
-  return pts;
+/** 청소 경로 — 방 안의 먼지 좌표를 순서대로 방문. 먼지가 없으면 anchor 코너 순회. */
+function buildCleanPath(room: RoomId, allDust: Dust[], hidden: Set<string>): Pt[] {
+  const roomDust = allDust.filter((d) => d.roomId === room && !hidden.has(d.id));
+  if (roomDust.length > 0) {
+    return roomDust.map((d) => ({ x: d.x, y: d.y }));
+  }
+  return CLEAN_ANCHORS[room] ?? [];
 }
 
 const ROBOT_SPEED = 60;
@@ -171,12 +162,12 @@ function useRobotMotion(
   hiddenDust: Set<string>,
   paused: boolean,
 ): RobotOut {
-  const IDLE: Pt = { x: 170, y: 265 };
+  const IDLE: Pt = { x: 309, y: 220 };
   const [pos, setPos] = useState<Pt>(IDLE);
   const [durationMs, setDurationMs] = useState(0);
   const [cleaning, setCleaning] = useState(false);
   const [cleaningRoom, setCleaningRoom] = useState<RoomId | null>(null);
-  const currentRoom = useRef<RoomId>("living");
+  const currentRoom = useRef<RoomId>("entrance");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const cancelledRef = useRef(false);
   const pausedRef = useRef(paused);
@@ -188,6 +179,9 @@ function useRobotMotion(
   dustRef.current = allDust;
   const hiddenRef = useRef(hiddenDust);
   hiddenRef.current = hiddenDust;
+  // posRef tracks latest robot position so recursive scheduleRoom uses actual current pos, not closure capture
+  const posRef = useRef(pos);
+  posRef.current = pos;
   // track which room is being cleaned to avoid re-triggering
   const activeTarget = useRef<RoomId | null>(null);
 
@@ -210,7 +204,7 @@ function useRobotMotion(
     if (!hasRooms || !roomScores) {
       setPos(IDLE);
       setDurationMs(0);
-      currentRoom.current = "living";
+      currentRoom.current = "entrance";
       return;
     }
 
@@ -221,11 +215,12 @@ function useRobotMotion(
 
       activeTarget.current = next;
       const from = currentRoom.current;
+      const startPt = posRef.current;
       const roomSeq = bfsPath(from, next);
-      const travelPts = buildTravelPath(roomSeq, pos);
-      const cleanPts = buildCleanPath(next);
+      const travelPts = buildTravelPath(roomSeq, startPt);
+      const cleanPts = buildCleanPath(next, dustRef.current, hiddenRef.current);
 
-      let prev = pos;
+      let prev = startPt;
       let delay = 0;
 
       setCleaning(false);
@@ -286,14 +281,15 @@ function useRobotMotion(
   return { pos, durationMs: paused ? 0 : durationMs, cleaning: paused ? false : cleaning, cleaningRoom: paused ? null : cleaningRoom };
 }
 
-/* ── 먼지 제거 훅: 로봇이 청소 중인 방의 먼지를 순차 제거 ── */
+/* ── 먼지 제거 훅: 로봇이 먼지에 접촉(반경 내) 하면 제거 ── */
+const ROBOT_REACH = 18;
+
 function useDustRemoval(
   dust: Dust[],
-  cleaningRoom: RoomId | null,
+  robotPos: Pt,
   paused: boolean,
 ): Set<string> {
   const [hidden, setHidden] = useState<Set<string>>(new Set());
-  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
   const prevDustKey = useRef("");
 
   const dustKey = dust.map((d) => d.id).join(",");
@@ -305,20 +301,22 @@ function useDustRemoval(
   }, [dustKey]);
 
   useEffect(() => {
-    clearInterval(intervalRef.current);
-    if (!cleaningRoom || paused) return;
-
-    const roomDust = dust.filter((d) => d.roomId === cleaningRoom).map((d) => d.id);
-    let idx = 0;
-
-    intervalRef.current = setInterval(() => {
-      if (idx >= roomDust.length) { clearInterval(intervalRef.current); return; }
-      setHidden((prev) => { const n = new Set(prev); n.add(roomDust[idx]); return n; });
-      idx++;
-    }, 600);
-
-    return () => clearInterval(intervalRef.current);
-  }, [cleaningRoom, dust, paused]);
+    if (paused) return;
+    setHidden((prev) => {
+      let next: Set<string> | null = null;
+      const r2 = ROBOT_REACH * ROBOT_REACH;
+      for (const d of dust) {
+        if (prev.has(d.id)) continue;
+        const dx = d.x - robotPos.x;
+        const dy = d.y - robotPos.y;
+        if (dx * dx + dy * dy <= r2) {
+          if (!next) next = new Set(prev);
+          next.add(d.id);
+        }
+      }
+      return next ?? prev;
+    });
+  }, [robotPos, dust, paused]);
 
   return hidden;
 }
@@ -445,7 +443,10 @@ function RoomShape({
     style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick} />);
 }
 
-/* ── 먼지 제거율 → 표시 점수 계산 ── */
+/* ── 먼지 제거 완료 시 Need 항 baseline residual로 재계산, 진행 중에는 원본 유지 ──
+ * 청소 직후 score가 0이 아니라 base × 0.2 + opportunity 합 (dirt accumulation 모델의 단순화).
+ * breakdown도 함께 재작성되므로 RoomDetail·ExplanationCard에서 청소 후 산식이 그대로 보임.
+ */
 function useDisplayScores(
   rooms: RoomScore[] | undefined,
   dust: Dust[],
@@ -457,14 +458,31 @@ function useDisplayScores(
       const total = dust.filter((d) => d.roomId === r.room_id).length;
       if (total === 0) return r;
       const removed = dust.filter((d) => d.roomId === r.room_id && hiddenDust.has(d.id)).length;
-      const ratio = 1 - removed / total;
-      return { ...r, final: Math.round(r.final * ratio) };
+      if (removed < total) return r;
+      // 청소 완료 — Need 합산 결과를 단일 baseline 라인으로 대체, Opportunity 항은 그대로
+      const residualNeed = Math.round(r.base * 0.2);
+      const opps = r.breakdown.filter((c) => c.axis === "opportunity");
+      const oppSum = opps.reduce((s, c) => s + c.delta, 0);
+      const cleanedBreakdown = [
+        {
+          source: "post_clean_baseline",
+          label_ko: "청소 직후 baseline (Need 리셋)",
+          delta: residualNeed,
+          axis: "need" as const,
+        },
+        ...opps,
+      ];
+      return {
+        ...r,
+        final: residualNeed + oppSum,
+        breakdown: cleanedBreakdown,
+      };
     });
   }, [rooms, dust, hiddenDust]);
 }
 
 /* ── 메인 ── */
-export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: Props) {
+export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, currentTime }: Props) {
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -480,11 +498,11 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
   const dust = useMemo(() => dustPool.filter((d) => activeIds.has(d.id)), [dustPool, activeIds]);
 
   const [hiddenDust, setHiddenDustRaw] = useState<Set<string>>(new Set());
-  const { pos: robotPos, durationMs, cleaning, cleaningRoom } = useRobotMotion(
+  const { pos: robotPos, durationMs, cleaning } = useRobotMotion(
     hasScenario ? rooms! : null, dust, hiddenDust, paused,
   );
-  // dust removal feeds into hiddenDust
-  const hiddenFromHook = useDustRemoval(dust, cleaningRoom, paused);
+  // dust removal feeds into hiddenDust — robot contact based
+  const hiddenFromHook = useDustRemoval(dust, robotPos, paused);
   // sync hook output → state (avoid infinite loop by checking identity)
   const hiddenRef = useRef(hiddenDust);
   useEffect(() => {
@@ -526,14 +544,18 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
           let fill: string;
           if (!showOverlay) fill = "transparent";
           else if (mode === "excluded") fill = "url(#hatch)";
-          else { const t = Math.min(Math.max(score, 0), 80) / 80; fill = `rgba(20, 50, 100, ${0.08 + t * 0.3})`; }
+          else {
+            const t = Math.min(Math.max(score, 0), 80) / 80;
+            const eased = Math.pow(t, 2.2);
+            fill = `rgba(20, 50, 100, ${0.05 + eased * 0.6})`;
+          }
           return (
             <RoomShape key={room.id} room={room} fill={fill}
               stroke={showOverlay && isHovered ? "oklch(40% 0.15 250)" : "transparent"}
               strokeWidth={isHovered && showOverlay ? 2.5 : 0}
               style={{ transition: "fill 0.6s ease, stroke 0.2s ease", cursor: onRoomClick ? "pointer" : "default" }}
               onMouseEnter={() => setHoveredRoom(room.id)} onMouseLeave={() => setHoveredRoom(null)}
-              onClick={() => onRoomClick?.(room.id)} />
+              onClick={() => { if (s) onRoomClick?.(s); }} />
           );
         })}
 
@@ -567,8 +589,18 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false }: P
         <RobotIcon x={robotPos.x} y={robotPos.y} durationMs={durationMs} cleaning={cleaning} />
       </svg>
 
+      {currentTime && (
+        <div
+          aria-label="현재 시각"
+          className="absolute top-3 right-3 flex items-center gap-2 rounded-md bg-white/85 backdrop-blur-sm px-3 py-1.5 font-mono text-[16px] font-semibold text-text-default tracking-[0.12em] tabular-nums"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-text-default animate-pulse" aria-hidden />
+          {currentTime}
+        </div>
+      )}
+
       <button type="button" onClick={() => setShowOverlay((v) => !v)}
-        className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-white/80 backdrop-blur-sm border border-border-default px-2.5 py-1.5 text-[11px] font-medium text-gray-600 shadow-sm hover:bg-white/95 transition-colors">
+        className="absolute top-3 left-3 flex items-center gap-1.5 rounded-lg bg-white/80 backdrop-blur-sm border border-border-default px-2.5 py-1.5 text-[11px] font-medium text-gray-600 shadow-sm hover:bg-white/95 transition-colors">
         <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           {showOverlay ? (
             <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx={12} cy={12} r={3} /></>

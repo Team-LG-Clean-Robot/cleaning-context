@@ -8,9 +8,9 @@ type Turn = { question: string; answer: string; fallback: boolean };
 type Props = { response: SimulateResponse | null };
 
 const GROUNDED_SUGGESTIONS = [
-  "왜 거실이 우선이 아니야?",
-  "이 시간에 안전한 청소 모드는?",
-  "추가로 청소하면 좋은 공간 있어?",
+  "왜 이 방을 가장 먼저 청소해?",
+  "이 점수는 어떤 센서들이 영향을 줬어?",
+  "지금 청소 안 해도 되는 곳은 어디야?",
 ];
 
 const GENERAL_SUGGESTIONS = [
@@ -60,7 +60,7 @@ export function AskPanel({ response }: Props) {
   return (
     <section
       aria-label="AI 후속 질문"
-      className="bg-white border border-border-default rounded-xl p-5 shadow-sm space-y-3"
+      className="p-5 space-y-3"
     >
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-[16px] font-semibold text-text-default">
