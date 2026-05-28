@@ -3,10 +3,7 @@ from datetime import datetime, timedelta
 
 from fastapi.testclient import TestClient
 
-from app.data_loader import load_ml_classifier
 from app.main import app
-
-load_ml_classifier.cache_clear()
 
 client = TestClient(app)
 
@@ -29,7 +26,7 @@ def test_infer_endpoint_returns_user_returned_for_door_unlock():
             "current_time": "19:30",
             "weekday": 1,
             "sleep_time": "23:00",
-            "mode": "hybrid",
+            "mode": "rule",
         },
     )
     assert res.status_code == 200

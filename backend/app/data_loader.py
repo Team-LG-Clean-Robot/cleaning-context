@@ -33,21 +33,8 @@ def load_rules() -> dict:
 
 
 @lru_cache
-def load_ml_confidence() -> dict:
-    return json.loads((DATA_DIR / "ml_confidence.json").read_text(encoding="utf-8"))
-
-
-@lru_cache
 def load_inference_engine():
     """v2 — IoT sensor → event 추론 엔진. docs/IOT_DOMAIN.md 참조."""
     from app.services.sensor_inference import SensorInferenceEngine
 
     return SensorInferenceEngine(DATA_DIR / "sensor_inference_rules.json")
-
-
-@lru_cache
-def load_ml_classifier():
-    """ML RandomForest 이벤트 분류기. backend/models/event_classifier_v2.joblib."""
-    from app.services.ml_classifier import MlEventClassifier
-
-    return MlEventClassifier()
