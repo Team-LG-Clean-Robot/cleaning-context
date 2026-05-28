@@ -49,6 +49,15 @@ export function ScenarioPanel({
             <div className="text-[16px] font-semibold leading-tight">
               {s.name_ko}
             </div>
+            {s.description && (
+              <div
+                className={`text-[11.5px] mt-1 leading-snug ${
+                  active ? "text-white/85" : "text-text-muted"
+                }`}
+              >
+                {s.description}
+              </div>
+            )}
             <div
               className={`text-[12px] mt-1.5 ${
                 active ? "text-white/80" : "text-gray-500"

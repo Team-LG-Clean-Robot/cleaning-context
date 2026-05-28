@@ -101,18 +101,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "pre_sleep_30min",
-          "ml_label": "pre_sleep",
-          "f1": 0.996
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -217,18 +205,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "user_left",
-          "ml_label": "user_left",
-          "f1": 1.0
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -333,18 +309,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "user_left",
-          "ml_label": "user_left",
-          "f1": 1.0
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -439,18 +403,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "user_returned",
-          "ml_label": "user_returned",
-          "f1": 0.995
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -560,18 +512,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "cooking_active",
-          "ml_label": "cooking_active",
-          "f1": 0.997
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -666,18 +606,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "cooking_done",
-          "ml_label": "cooking_done",
-          "f1": 0.992
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -782,18 +710,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "guest_arriving_2h",
-          "ml_label": "entertain_guests",
-          "f1": 0.96
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -878,12 +794,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": []
-    },
     "inferred_events": []
   },
   {
@@ -978,18 +888,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "pre_sleep_2h",
-          "ml_label": "pre_sleep",
-          "f1": 0.996
-        }
-      ]
-    },
     "inferred_events": []
   },
   {
@@ -1094,18 +992,6 @@
     ],
     "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
     "fallback": true,
-    "ml": {
-      "model_name": "RandomForest",
-      "cv_accuracy": 0.8514,
-      "dataset": "CASAS hh106",
-      "event_confidence": [
-        {
-          "event_id": "pre_sleep_30min",
-          "ml_label": "pre_sleep",
-          "f1": 0.996
-        }
-      ]
-    },
     "inferred_events": []
   }
 ]

@@ -38,19 +38,6 @@ export type RoomScore = {
   exclusion_reason: string | null;
 };
 
-export type MlEventConfidence = {
-  event_id: string;
-  ml_label: string;
-  f1: number;
-};
-
-export type MlInfo = {
-  model_name: string;
-  cv_accuracy: number;
-  dataset: string;
-  event_confidence: MlEventConfidence[];
-};
-
 export type InferredEventInfo = {
   event_id: string;
   confidence: number;
@@ -64,14 +51,13 @@ export type SimulateResponse = {
   explanation: string;
   fallback: boolean;
   duration_ms: number;
-  ml: MlInfo | null;
   inferred_events: InferredEventInfo[];
 };
 
 export type ScenarioMeta = {
   id: string;
   name_ko: string;
-  description: string;
+  description?: string;
   current_time: string;
   sleep_time: string;
   user_location: RoomId | null;

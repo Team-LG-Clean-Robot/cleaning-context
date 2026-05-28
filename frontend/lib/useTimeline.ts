@@ -225,7 +225,6 @@ export function useTimeline(active: boolean): TimelineHook {
       context_summary: t < 0.5 ? prevResp.context_summary : nextResp.context_summary,
       fallback: t < 0.5 ? prevResp.fallback : nextResp.fallback,
       inferred_events: t < 0.5 ? prevResp.inferred_events : nextResp.inferred_events,
-      ml: t < 0.5 ? prevResp.ml : nextResp.ml,
     };
   } else {
     currentResponse = prevResp;

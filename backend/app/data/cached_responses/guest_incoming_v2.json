@@ -98,19 +98,6 @@
       "exclusion_reason": null
     }
   ],
-  "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
-  "fallback": true,
-  "ml": {
-    "model_name": "RandomForest",
-    "cv_accuracy": 0.8514,
-    "dataset": "CASAS hh106",
-    "event_confidence": [
-      {
-        "event_id": "guest_arriving_2h",
-        "ml_label": "entertain_guests",
-        "f1": 0.96
-      }
-    ]
-  },
-  "inferred_events": []
+  "explanation": "먼저 거실을 청소하는 이유는 손님이 곧 방문할 예정이기 때문입니다. 거실은 손님과의 소통이 이루어지는 주요 공간으로, 오염 가능성이 높고 청결이 특히 중요합니다. 점수표에서도 거실은 손님 방문 임박으로 인해 점수가 크게 상승하여 최상위 공간으로 선정되었습니다. 반면 침실은 사용자가 머무는 공간이 아니며, 손님 방문과 관련된 점수가 낮아 청소 우선순위에서 제외되었습니다. 또한, 침실은 취침 시간이 가까워지면서 조용한 환경이 필요하므로, 청소를 지연하는 것이 적절합니다. 이러한 결정은 손님을 맞이하는 데 있어 최적의 청결 상태를 유지하고, 사용자의 편안한 수면 환경을 보장하기 위한 것입니다.",
+  "fallback": false
 }

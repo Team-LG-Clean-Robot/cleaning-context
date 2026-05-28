@@ -131,8 +131,8 @@ export function PipelinePanel({ response, scenarioId }: Props) {
         )}
       </StepCard>
 
-      {/* Step 2: 이벤트 추론 */}
-      <StepCard step={1} icon="🧠" title="이벤트 추론 (Rule + ML)" visible={visibleStep >= 1}>
+      {/* Step 2: ML 사용자 위치 추정 + 룰 맥락 (박주상 v3) */}
+      <StepCard step={1} icon="🧠" title="ML 위치 추정 + 룰 맥락 변수 (박주상 v3)" visible={visibleStep >= 1}>
         <div className="flex flex-wrap gap-1.5">
           {response.inferred_events.map((ev) => (
             <Tag key={ev.event_id} color={ev.source === "ml" ? "purple" : "blue"}>
@@ -141,12 +141,20 @@ export function PipelinePanel({ response, scenarioId }: Props) {
             </Tag>
           ))}
         </div>
-        {response.ml && (
-          <p className="text-[10px] text-text-muted mt-2">
-            {response.ml.model_name} (CV {(response.ml.cv_accuracy * 100).toFixed(1)}%) · {response.ml.dataset}
-          </p>
-        )}
+        <p className="text-[10px] text-text-muted mt-2">
+          ML은 사용자 위치(<code>user_room</code>) 추정만, 단기 맥락은 룰이 결정 (8개 변수)
+        </p>
       </StepCard>
+
+      {/* Privacy-on-Edge 경계선 — 여기까지가 디바이스, 이후는 high-level event */}
+      <div className="relative py-1 my-1">
+        <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-emerald-300" />
+        <div className="relative flex justify-center">
+          <span className="bg-surface-base px-2 text-[10px] font-medium text-emerald-700 tracking-wider">
+            🛡 디바이스(엣지) ─ 위로는 raw 센서 / 아래로는 high-level event만
+          </span>
+        </div>
+      </div>
 
       {/* Step 3: 맥락 종합 */}
       <StepCard step={2} icon="🌐" title="맥락 종합" visible={visibleStep >= 2}>

@@ -103,19 +103,6 @@
       "exclusion_reason": "요리 진행 중 (-40)"
     }
   ],
-  "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
-  "fallback": true,
-  "ml": {
-    "model_name": "RandomForest",
-    "cv_accuracy": 0.8514,
-    "dataset": "CASAS hh106",
-    "event_confidence": [
-      {
-        "event_id": "cooking_active",
-        "ml_label": "cooking_active",
-        "f1": 0.997
-      }
-    ]
-  },
-  "inferred_events": []
+  "explanation": "먼저 거실을 청소하는 이유는 오염 가능성이 높고 사용자가 머무는 공간이기 때문입니다. 요리 중인 상황에서 거실은 음식물이나 조리 과정에서 발생하는 먼지와 찌꺼기가 쉽게 쌓일 수 있어, 청소의 우선순위가 높습니다. 또한, 기본 점수와 요리 진행 중의 추가 점수가 합쳐져 최상위 공간으로 선정되었습니다. 반면, 주방은 요리 진행 중으로 인해 오염이 심각하게 발생할 수 있어 제외되었습니다. 주방은 청소를 하더라도 요리의 흐름을 방해할 수 있으며, 오히려 청소가 방해가 될 수 있는 상황입니다. 따라서, 청소를 지연시키거나 저소음으로 처리하는 것이 적절한 선택입니다.",
+  "fallback": false
 }

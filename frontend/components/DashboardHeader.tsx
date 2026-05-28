@@ -7,19 +7,12 @@ type HealthData = {
   status: string;
   scenarios_loaded: number;
   inference_rules_loaded: number;
-  dataset_validation?: {
-    accuracy: number;
-    segments: number;
-    mapped_rules: number;
-    top_f1: Record<string, number>;
-  } | null;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 export function DashboardHeader() {
   const [health, setHealth] = useState<HealthData | null>(null);
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     fetch(`${API_URL}/api/health`)
@@ -27,8 +20,6 @@ export function DashboardHeader() {
       .then(setHealth)
       .catch(() => {});
   }, []);
-
-  const v = health?.dataset_validation;
 
   return (
     <header className="space-y-4">
@@ -53,9 +44,25 @@ export function DashboardHeader() {
         <ThemeToggle />
       </div>
 
+      {/* 두 축 ribbon */}
+      <div className="flex flex-wrap items-center gap-2 text-[11px]">
+        <span
+          className="px-2.5 py-1.5 rounded-md border border-blue-200 bg-blue-50 text-blue-800 font-medium"
+          title="IoT 멀티센서로 생활 맥락(요리·취침·날씨·손님)을 읽고, 청소 우선순위를 결정합니다."
+        >
+          🧭 맥락 인식
+        </span>
+        <span className="text-gray-400">+</span>
+        <span
+          className="px-2.5 py-1.5 rounded-md border border-emerald-200 bg-emerald-50 text-emerald-800 font-medium"
+          title="모든 추론은 디바이스(엣지)에서 끝나고, 클라우드로는 high-level event만 전송됩니다."
+        >
+          🛡 Privacy-on-Edge
+        </span>
+      </div>
+
       {/* 상태 바 */}
       <div className="flex flex-wrap items-center gap-3 text-[11px]">
-        {/* API 상태 */}
         <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border-default bg-surface-base">
           <span
             className={`w-2 h-2 rounded-full ${
@@ -69,74 +76,13 @@ export function DashboardHeader() {
           </span>
         </div>
 
-        {/* 시나리오 수 */}
         {health && (
           <div className="px-2.5 py-1.5 rounded-md border border-border-default bg-surface-base text-text-muted">
             시나리오 <span className="font-semibold text-text-default">{health.scenarios_loaded}</span>종
             {" · "}추론 규칙 <span className="font-semibold text-text-default">{health.inference_rules_loaded}</span>개
           </div>
         )}
-
-        {/* CASAS 검증 배지 */}
-        {v && (
-          <button
-            onClick={() => setOpen(!open)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-[oklch(75%_0.15_145)]/30 bg-surface-base hover:bg-surface-muted transition-colors"
-          >
-            <span className="text-[oklch(65%_0.12_145)] font-semibold">✓</span>
-            <span className="text-text-muted">
-              CASAS 검증{" "}
-              <span className="font-semibold text-text-default">
-                {(v.accuracy * 100).toFixed(1)}%
-              </span>
-            </span>
-            <span className="text-gray-400">{open ? "▲" : "▼"}</span>
-          </button>
-        )}
       </div>
-
-      {/* CASAS 검증 상세 (펼침) */}
-      {open && v && (
-        <div className="border border-border-default rounded-lg p-4 bg-surface-base text-[12px] space-y-2 animate-[fadeIn_0.2s_ease]">
-          <div className="font-semibold text-text-default">
-            공개 데이터셋 검증 결과
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-text-muted">
-            <div>
-              <div className="text-[10px] uppercase tracking-wider">정확도</div>
-              <div className="text-[18px] font-bold text-text-default">
-                {(v.accuracy * 100).toFixed(1)}%
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-wider">평가 구간</div>
-              <div className="text-[18px] font-bold text-text-default">
-                {v.segments.toLocaleString()}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-wider">매핑 규칙</div>
-              <div className="text-[18px] font-bold text-text-default">
-                {v.mapped_rules}/13
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-wider">Top F1</div>
-              <div className="space-y-0.5 mt-1">
-                {Object.entries(v.top_f1).map(([k, f1]) => (
-                  <div key={k} className="flex justify-between">
-                    <span>{k.replace("user_", "").replace("cooking_", "cook_")}</span>
-                    <span className="font-mono font-semibold text-text-default">{f1.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="text-[10px] text-gray-400 pt-1 border-t border-border-default">
-            출처: CASAS hh106 (Washington State Univ.) · CC BY 4.0 · 202,546 레코드
-          </div>
-        </div>
-      )}
     </header>
   );
 }

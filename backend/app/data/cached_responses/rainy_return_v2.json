@@ -103,24 +103,6 @@
       "exclusion_reason": "취침 2시간 이내 (-20)"
     }
   ],
-  "explanation": "AI 설명을 가져오지 못했습니다. 점수 근거는 아래 표를 참고하세요.",
-  "fallback": true,
-  "ml": {
-    "model_name": "RandomForest",
-    "cv_accuracy": 0.8514,
-    "dataset": "CASAS hh106",
-    "event_confidence": [
-      {
-        "event_id": "user_returned",
-        "ml_label": "user_returned",
-        "f1": 0.995
-      },
-      {
-        "event_id": "pre_sleep_2h",
-        "ml_label": "pre_sleep",
-        "f1": 0.996
-      }
-    ]
-  },
-  "inferred_events": []
+  "explanation": "먼저 현관을 청소하는 이유는 비가 오는 날씨로 인해 오염 가능성이 높기 때문입니다. 비로 인해 외부에서 들어온 물기와 먼지가 쌓일 수 있어, 이를 신속하게 제거하는 것이 중요합니다. 또한, 사용자가 자주 드나드는 공간으로, 청결을 유지하는 것이 필요합니다. 반면, 침실은 취침 시간이 가까워 사용자가 머무는 공간이므로 청소를 제외했습니다. 이 시간대에는 방해가 될 수 있어 편안한 수면 환경을 조성하는 것이 우선입니다. 따라서, 현관은 청소를 통해 즉각적인 청결을 유지하고, 침실은 사용자의 편안함을 고려해 청소를 지연하는 전략을 취했습니다.",
+  "fallback": false
 }

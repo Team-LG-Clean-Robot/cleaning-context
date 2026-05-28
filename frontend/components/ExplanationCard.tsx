@@ -1,5 +1,5 @@
 "use client";
-import type { InferredEventInfo, SimulateResponse } from "@/lib/types";
+import type { SimulateResponse } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
 
 const EVENT_LABEL: Record<string, string> = {
@@ -136,21 +136,16 @@ export function ExplanationCard({ response }: { response: SimulateResponse }) {
           </details>
         )}
 
-        {response.ml && response.ml.event_confidence.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border-default">
-            <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5">
-              ML {response.ml.model_name} · CV {(response.ml.cv_accuracy * 100).toFixed(1)}%
-            </span>
-            {response.ml.event_confidence.map((ec) => (
-              <span key={ec.event_id} className="text-[10px] text-gray-600 bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">
-                {ec.event_id} <span className="font-mono font-medium">{(ec.f1 * 100).toFixed(0)}%</span>
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div className="text-[10px] text-gray-500 pt-2 border-t border-border-default">
-          응답 시간 {response.duration_ms}ms · {response.context_summary}
+        <div className="flex items-center justify-between gap-2 pt-2 border-t border-border-default text-[10px]">
+          <span
+            className="font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5"
+            title="모든 추론은 디바이스 측에서 끝나고, 클라우드로는 high-level event만 전송됩니다."
+          >
+            🛡 Privacy-on-Edge
+          </span>
+          <span className="text-gray-500">
+            응답 시간 {response.duration_ms}ms · {response.context_summary}
+          </span>
         </div>
       </div>
     </section>
