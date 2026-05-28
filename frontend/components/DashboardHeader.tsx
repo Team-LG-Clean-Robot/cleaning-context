@@ -1,29 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 
-type HealthData = {
-  status: string;
-  scenarios_loaded: number;
-  inference_rules_loaded: number;
-};
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
-
 export function DashboardHeader() {
-  const [health, setHealth] = useState<HealthData | null>(null);
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/health`)
-      .then((r) => r.json())
-      .then(setHealth)
-      .catch(() => {});
-  }, []);
-
   return (
     <header className="space-y-4">
-      {/* 상단 바 */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <img
@@ -59,29 +40,6 @@ export function DashboardHeader() {
         >
           🛡 Privacy-on-Edge
         </span>
-      </div>
-
-      {/* 상태 바 */}
-      <div className="flex flex-wrap items-center gap-3 text-[11px]">
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border-default bg-surface-base">
-          <span
-            className={`w-2 h-2 rounded-full ${
-              health?.status === "ok"
-                ? "bg-[oklch(75%_0.15_145)] shadow-[0_0_4px_oklch(75%_0.15_145)]"
-                : "bg-gray-400 animate-pulse"
-            }`}
-          />
-          <span className="text-text-muted font-medium">
-            {health?.status === "ok" ? "서비스 정상" : "연결 중..."}
-          </span>
-        </div>
-
-        {health && (
-          <div className="px-2.5 py-1.5 rounded-md border border-border-default bg-surface-base text-text-muted">
-            시나리오 <span className="font-semibold text-text-default">{health.scenarios_loaded}</span>종
-            {" · "}추론 규칙 <span className="font-semibold text-text-default">{health.inference_rules_loaded}</span>개
-          </div>
-        )}
       </div>
     </header>
   );
