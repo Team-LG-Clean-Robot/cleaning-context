@@ -1,7 +1,7 @@
 # 로보틱 (Robotic) — Flutter 모바일 앱
 
-> LG 가전 리모콘 앱의 "로봇청소기 탭" 메타포로 만든 **explainable physical AI reference product**.
-> 사용자가 시간·이벤트를 일일이 누르지 않아도 IoT 멀티센서(도어락·인덕션·침대 센서·…)로 상황을 추론하고, 그 결정·이유를 모바일에서 직접 만난다.
+> LG 가전 리모콘 앱의 "로봇청소기 탭" 메타포로 만든 **맥락 인식 + Privacy-on-Edge** reference product.
+> 사용자가 시간·이벤트를 일일이 누르지 않아도 IoT 멀티센서(도어락·인덕션·침대 센서·…)로 맥락을 추론하고, 그 결정·이유를 모바일에서 직접 만난다. raw 센서는 디바이스 측에서 끝나고 클라우드로는 high-level event만 보낸다.
 >
 > 백엔드: 같은 레포의 [`backend/`](../backend/) (FastAPI). 같은 API를 [Next.js 웹](../frontend/) 과 공유 — 멀티 클라이언트 구조.
 

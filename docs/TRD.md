@@ -14,7 +14,7 @@
 | 언어 | Python 3.12 | type hints + pydantic v2 |
 | 웹 프레임워크 | FastAPI | async, OpenAPI 자동 생성 |
 | 데이터 검증 | Pydantic v2 | 요청/응답 스키마 |
-| ML | scikit-learn | 이벤트 분류기 (DecisionTree → RandomForest → GB) |
+| ML | scikit-learn | 사용자 위치 추정 분류기 (박주상 v3, `docs/CLEANING_DECISION_ALGORITHM.md`) |
 | 데이터 처리 | pandas, numpy | 공개 IoT 데이터셋 분석 |
 | LLM SDK | openai (≥1.x) via Timely GPT bridge | `gpt-4o-mini` |
 | 환경변수 | python-dotenv | `.env` |

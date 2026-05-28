@@ -57,7 +57,7 @@
 - [x] ML 런타임 의존성 수정 (numpy/scikit-learn/joblib → pyproject.toml) + v2 모델 전환
 - [x] 에러 retry (fetchWithRetry — 5xx/네트워크 에러 시 1.5s 후 1회 재시도)
 - [x] health 엔드포인트 ML 분류기 상태 실측 반영 (하드코딩 False → 실제 로드 체크)
-- [x] 시나리오 모드에서 ML 추론 결과 표시 (이벤트→센서 합성→RandomForest predict→inferred_events)
+- [x] 시나리오 모드에서 룰 기반 추론 결과 표시 (이벤트→센서 합성→inferred_events) — ML v2는 박주상 v3 설계로 폐기, archive/ml-v2/
 
 **빌드 (5/28~29)**:
 - [ ] APK 형식만 갖추기 (발표는 스마트폰 프레임 이미지로 대체)
@@ -74,9 +74,9 @@
 | 모바일 앱 (APK) | mobile/build/.../app-release.apk | 🔄 SDK 설치 후 |
 | 사업계획서 | BUSINESS_PLAN.md + exports/planning-v2/planning.pdf | ✅ + 갱신 예정 |
 | 기술 기획서 | TECHNICAL_PLAN.md | ✅ |
-| ML 모델 v1 | backend/models/event_classifier.joblib | ✅ CASAS 85.1% |
-| ML 모델 v2 | backend/models/event_classifier_v2.joblib | ✅ IoT multi-label 99.3% |
-| 평가 리포트 | backend/reports/ml_metrics_v2.json | ✅ |
+| ML 설계 v3 | docs/CLEANING_DECISION_ALGORITHM.md (박주상) | ✅ 머지 (2026-05-28) |
+| ML 모델 (위치 추정) | 박주상 학습 진행 | 🔄 |
+| ML v1·v2 아카이브 | archive/ml-v2/ (gitignored) | ✅ 폐기 |
 | 데모 영상 | (TBD) | ⬜ |
 
 ## KPI
@@ -84,9 +84,8 @@
 | 카테고리 | 지표 | 목표 | 현재 |
 |---|---|---|---|
 | 기능 | 작동 시나리오 수 | ≥ 4 | ✅ 8 (라이브 확인) |
-| ML | 이벤트 분류기 정확도 | ≥ 75% | ✅ v1 CASAS 85.1% / v2 IoT 99.3% |
-| ML | 5-fold CV mean | ≥ 70% | ✅ v1 85.1% / v2 99.3% |
-| 데이터 | 공개 데이터셋 기반 보정 근거 | ≥ 1건 | ✅ CASAS hh106 (Zenodo CC BY 4.0) |
+| ML | 사용자 위치 추정 정확도 (박주상 v3) | ≥ 75% | 🔄 박주상 학습 중 |
+| 데이터 | 공개 데이터셋 기반 보정 근거 | ≥ 1건 | ✅ CASAS hh106 (v2 아카이브에서 검증 완료) |
 | 응답 | 이벤트 입력 → 설명 출력 | ≤ 5s | ~3s |
 | 일관성 | 동일 입력 우선순위 일치 | 100% | ✅ (Rule-based) |
 | 설명 품질 | 점수 근거 포함 비율 | ≥ 95% | ✅ |

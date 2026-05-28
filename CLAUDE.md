@@ -75,7 +75,7 @@ LG 가전 멘토링 트랙. **맥락 인식 + Privacy-on-Edge** 두 축. IoT 멀
 - **Event Layer** — 해석된 high-level 명제 (`user_returned`, `cooking_done`, `pre_sleep_30min` …). 사용자 명시 입력도 여기로 합류
 - **Rule-based scoring** — 결정론적. 점수 계산은 LLM 금지. (`backend/app/services/scoring.py`)
 - **LLM 설명** — 점수표 → 자연어. 4개 시나리오 응답은 디스크 캐시(`backend/app/data/cached_responses/*.json`) — 발표 중 LLM 장애 대비
-- **6-Layer 호칭**: Spatial · Behavioral · Context · **Sensor (신규)** · Decision · Explainable (자세한 건 `TECHNICAL_PLAN.md` §3)
+- **6-Layer 호칭**: Sensor · Behavioral · Spatial · Context · Decision · Explanation (LLM) — 자세한 건 `TECHNICAL_PLAN.md` §3.3
 
 **Privacy on Edge** — Sensor=raw는 디바이스/엣지, Event=결과만 클라우드. `docs/IOT_DOMAIN.md` §Privacy 참조.
 
@@ -89,7 +89,7 @@ LG 가전 멘토링 트랙. **맥락 인식 + Privacy-on-Edge** 두 축. IoT 멀
 | LLM | OpenAI SDK (Timely GPT bridge) · `gpt-4o-mini` |
 | 웹 프론트 | Next.js 15 (App Router · React 19) · TypeScript strict · Tailwind v4 |
 | 모바일 | Flutter 3 (Riverpod · Dio · go_router) — Android APK 산출 예정 |
-| ML (2주차) | scikit-learn — DecisionTree → RandomForest → GB. KPI 정확도 ≥75% |
+| ML | scikit-learn — 사용자 위치 추정 분류기 (박주상 v3 설계, `docs/CLEANING_DECISION_ALGORITHM.md`). KPI 정확도 ≥75% |
 | 패키지 | pip (backend, venv) · pnpm (frontend) · flutter pub (mobile) |
 | 배포 | Render (백엔드) · Vercel (웹 프론트) — `main` push 시 자동. 모바일은 GitHub Release APK |
 

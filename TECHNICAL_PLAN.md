@@ -32,38 +32,37 @@ LG 로봇청소기를 비롯한 가정용 가전은 이미 자동화 수준에 �
 - 손님이 곧 도착하므로 거실·현관 청소를 서둘러야 한다
 - 아기가 자고 있으므로 저소음 모드가 필요하다
 
-### 2.2 사용자 페인포인트 (팀 가설)
+### 2.2 사용자 페인포인트
 
-> 사용자가 AI 가전의 자율 행동을 신뢰하지 못하는 핵심 이유는 **설명 부재**다. "왜 지금 청소하지?", "왜 저 방을 안 청소했지?" 라는 의문에 답하지 못하면, 사용자는 결국 자율 기능을 끄고 **수동 모드**로 회귀한다. — 본 프로젝트는 이 가설을 멘토링·데모 검증을 통해 확인한다.
+핵심은 **맥락 부재**. 기존 로봇청소기는 시간 스케줄 또는 맵 분할에 머물러 "지금 어디를 왜 청소해야 하는가"를 알지 못한다. 사용자가 매번 손으로 시작·중지·구역 지정을 하는 이유다.
 
 ### 2.3 시장의 빈 자리
 
 | 제품 | 강점 / 한계 |
 |---|---|
-| **LG CodeZero AI** | SLAM·장애물 인식 강점. **상황 맥락 추론·자연어 설명 없음** |
+| **LG CodeZero AI** | SLAM·장애물 인식 강점. **생활 맥락 기반 우선순위 변경 없음** |
 | **삼성 비스포크 제트봇** | 객체 인식 카메라. **이벤트 기반 우선순위 변경 없음** |
 | **로보락 S8 Pro Ultra** | 자동 비움·물걸레. **사용자가 명령 입력 필요** |
 | **에코백스 X2 Omni** | 듀얼 카메라. **시간 예약 중심** |
 
-모든 경쟁사가 **청소 성능·하드웨어 사양**에서 경쟁 중이며, **AI 의사결정의 설명 가능성**은 미개척 영역이다.
+모든 경쟁사가 **청소 성능·하드웨어 사양**에서 경쟁 중이며, **생활 맥락 기반 의사결정**과 **프라이버시 보존 추론**은 미개척 영역이다.
 
 ---
 
 ## 3. 솔루션 개요
 
-### 3.1 포지셔닝 — "ThinQ에 빠진 explainable decision layer"
+### 3.1 포지셔닝 — 두 축
 
-이 프로젝트의 포지션을 한 문장으로 정의한다.
+> **맥락 인식 (context-aware cleaning) + Privacy-on-Edge.**
+> 단순 청소가 아닌 *생활 맥락 기반* 우선순위 결정, raw 센서는 디바이스에 머물고 결과(event)만 클라우드로.
 
-> **사용자 신뢰 격차(autonomy trust gap)를 해소하는, LG ThinQ에 그대로 얹을 수 있는 디바이스 측 explainable decision layer.**
+**축 1. 맥락 인식.** 시간·요리·취침·날씨·손님 일정·재실 여부를 결합해 "지금 어디를 왜 청소해야 하는가"를 결정한다. 스케줄 청소·맵 분할 청소를 넘어선 다음 축이며, 사용자가 매번 손대지 않아도 로봇이 합리적인 우선순위를 잡는다.
 
-세 가지 사실 위에 선다.
+**축 2. Privacy-on-Edge.** ML·rule 추론은 디바이스(엣지)에서 처리하고, 클라우드로는 high-level event(`user_returned`, `cooking_done` 등)만 전송한다. 카메라·오디오·인체 위치 같은 raw 시그널이 외부로 나가지 않으므로 LG 같은 가전 제조사의 brand-trust 차별점이 되고, 개인정보보호법·GDPR 같은 규제와도 정합한다.
 
-1. **문제는 가설이 아니라 관측된 사실이다.** AI 자율 청소를 *원하면서도* 예측 불가능성에 불만이라 결국 수동 모드로 회귀하는 사용자 세그먼트가 명확히 존재한다 (§9 C 세그먼트). 자율성의 병목은 청소 성능이 아니라 **"왜?"에 답하지 못하는 신뢰 격차**다.
-2. **LG는 데이터·하드웨어를 이미 갖고 있다.** ThinQ 플랫폼·CodeZero AI 라인업·각종 센서·이벤트 데이터까지 — 빠진 건 그 데이터로부터 *결정·이유*를 만들어 사용자에게 설명하는 layer뿐이다. 본 프로젝트는 그 layer를 6-Layer 구조 (Sensor → Behavioral → Spatial → Context → Decision → Explainable)로 명세화한 reference implementation이다.
-3. **중앙 허브 시대에도 살아남는다.** Matter·HomeKit·Google Home 같은 표준은 *제어 인터페이스*만 정의한다. 디바이스가 어떤 의사결정을 어떻게 *설명*하는지는 vendor 책임이고, 중앙 허브가 와도 그 explainable API는 디바이스 측에 남는다 (지연·프라이버시·도메인 지식·오프라인 fallback 때문). 따라서 본 layer는 **지금 ThinQ에 붙이는 데 의미가 있고, 미래 Home Agent와도 호환되는** 위치에 있다.
+**(보조) 확장성·설명 가능성.** 새 센서·룰은 JSON만 수정해 30분 내 추가 가능하고, 모든 결정은 점수 breakdown으로 추적 가능하다. LLM 장애 시에도 룰만으로 동작한다.
 
-> **반박 받기.** "그건 LG가 직접 하면 되지 않나?" — 본 프로젝트가 LG 본체를 대체한다는 주장이 아니라, ThinQ 옆에 붙는 *도메인 특화 결정·설명 layer 의 제안*. 멘토링 트랙의 정합한 결과물 형태다.
+> **반박 받기.** ① "맥락 인식은 결국 카메라가 다 본다는 거 아닌가?" → 카메라 없이 IoT 멀티센서 + 외부 API만으로 맥락을 만든다. ② "LG가 직접 하면 되지 않나?" → 본체 대체가 아니라, ThinQ 옆에 붙는 *도메인 특화 결정 layer*의 reference 구현. 멘토링 트랙의 정합한 결과물 형태다.
 
 ### 3.2 핵심 아이디어
 
@@ -73,44 +72,44 @@ LG 로봇청소기를 비롯한 가정용 가전은 이미 자동화 수준에 �
 
 > 기존 5-Layer에 **Sensor Layer**를 맨 앞에 추가. 세부 설계는 [docs/IOT_DOMAIN.md](./docs/IOT_DOMAIN.md).
 
-1. **Sensor Layer (IoT 시그널 입력)** — 도어락·인덕션·냉장고·에어컨·TV·침대 압력·모션·욕실 습도·스마트 스피커 등 집 안의 실 IoT 센서 + 외부 데이터(날씨 API, 캘린더). raw readings는 **디바이스 안에서만** 처리하고 클라우드로 보내지 않음 (개인정보 분리)
-2. **Behavioral Layer (사용자 행동)** — Sensor → Event 추론. 13개 추론 규칙(Rule-based) + ML 분류기(UCI ADL 학습)로 raw 시그널을 high-level 이벤트(귀가·요리·취침·외출·TV 시청 등)로 변환. 사용자 명시 입력도 같은 vocab으로 합류
+1. **Sensor Layer (IoT 시그널 입력)** — 도어락·인덕션·냉장고·에어컨·TV·침대 압력·모션·욕실 습도·스마트 스피커 등 집 안의 실 IoT 센서 + 외부 데이터(날씨 API, 캘린더). raw readings는 **디바이스 안에서만** 처리하고 클라우드로 보내지 않음 (Privacy-on-Edge)
+2. **Behavioral Layer (사용자 위치·행동)** — Sensor → 사용자 위치 추정. 박주상 v3 설계: ML이 `user_room`(현재 사용자 위치)만 예측, 룰은 단기 맥락 변수(`is_post_cooking`, `is_pre_sleep` 등)를 생성. raw 센서는 여기서 끝, 클라우드로 가는 건 high-level event만
 3. **Spatial Layer (공간 이해)** — 집 구조 2D 맵 + 공간별 속성 (오염도, 사용 빈도, 청소 민감도, 소음 민감도, 최근 청소 시각)
-4. **Context Layer (상황 추론)** — 시간·이벤트·공간 상태·날씨·청소 기록을 LLM이 자연어 컨텍스트로 재구성
-5. **Decision Layer (의사결정)** — Rule-based scoring으로 공간별 priority score 계산 → 청소 순서·제외 공간·청소 모드 결정
-6. **Explainable AI Layer (설명 UX)** — LLM이 의사결정 이유를 자연어로 생성 ("왜 이 공간을 먼저?", "왜 이 공간을 제외?")
+4. **Context Layer (상황 추론)** — 시간·이벤트·공간 상태·날씨·청소 기록 결합
+5. **Decision Layer (의사결정)** — Rule-based scoring으로 공간별 priority score 계산 → 청소 순서·제외 공간·청소 모드 결정 (결정론적·재현 가능)
+6. **Explanation Layer (LLM)** — 점수 결과를 자연어로 풀어쓰는 보조 단계. LLM 장애 시 fallback 응답으로 동작 계속
 
 ```
 [IoT 디바이스 — 도어락·인덕션·냉장고·…]
               ↓ raw readings (edge only)
     [1. Sensor Layer]
-              ↓ inference (Rule + ML)
-    [2. Behavioral Layer] ← 사용자 명시 입력도 합류
-              ↓
+              ↓ ML(위치) + Rule(맥락)
+    [2. Behavioral Layer] ← 박주상 v3
+              ↓ high-level event only ────→ (클라우드 경계)
     [3. Spatial Layer (공간 속성 결합)]
               ↓
     [4. Context Layer (시간·날씨·청소 이력 종합)]
               ↓
     [5. Decision Layer (Rule-based scoring)]
               ↓ priorities
-    [6. Explainable Layer (LLM 자연어 해석)]
+    [6. Explanation Layer (LLM)]
 ```
 
 ### 3.4 데이터 기반 보강
 
-가중치·이벤트 매핑은 임의 설정이 아닌, **공개 스마트홈/IoT 데이터셋** (UCI Activities of Daily Living, Kaggle Smart Home Dataset 등)에서 추출한 시간대별 공간 사용 패턴으로 보정한다. 또한 **Sensor → Event 추론 ML 분류기**(scikit-learn 기반)를 학습해, 직접 이벤트를 입력하지 않아도 멀티 IoT 센서 시그널 + 시간·요일로부터 현재 상황을 추정할 수 있게 한다.
+가중치·이벤트 매핑은 임의 설정이 아닌, 공개 스마트홈/IoT 데이터셋에서 추출한 시간대별 공간 사용 패턴으로 보정한다. 박주상이 작성한 [docs/CLEANING_DECISION_ALGORITHM.md](./docs/CLEANING_DECISION_ALGORITHM.md) v3 설계에 따라 ML은 **사용자 위치 추정(`user_room`)** 한 가지에 집중하고, 단기 맥락(요리 직후·취침 직전 등)은 룰이 결정한다.
 
-> **왜 이게 중요한가.** 행사 핵심 키워드인 **"데이터 활용"**과 **"AI 실무 역량"**에 답하는 부분. Rule-based + LLM에 더해 **멀티센서 데이터 분석 + ML 모델 학습**까지 포함하면, 멘토·심사자가 묻는 "실제로 어떤 AI/데이터 작업을 했나요?"에 구체적 답이 가능하다. **LLM zero-shot으로는 raw 센서 시그널을 매번 클라우드로 보내야 하므로 프라이버시·비용 모두 ML 분류기가 우월** (멘토 피드백 반영).
+> **Privacy-on-Edge 측면.** LLM zero-shot으로 raw 센서 시그널을 매번 클라우드로 보내는 구조 대비, 본 구조에서는 ML·rule 추론을 디바이스에서 끝내고 클라우드로는 high-level event만 전송한다. 프라이버시·지연·비용 모두 우월하다.
 
 ### 3.5 AI vs Rule-based — 역할 분리
 
-이 프로젝트의 가장 큰 리스크는 "그냥 GPT 붙인 거 아니냐"라는 비판이다. 이를 방지하기 위해 **AI(LLM)와 Rule-based system의 역할을 명확히 분리**한다.
+세 레이어를 명확히 분리해 "GPT 한 번 호출" 구조와 구별한다.
 
 | 컴포넌트 | 역할 |
 |---|---|
-| **Rule-based Scoring Engine** | 입력: 이벤트 + 공간 상태 + 시간 + 날씨. 결정론적 가중치 계산. 출력: 공간별 priority score. **왜?** 일관성·재현성·디버깅 가능성. "이 점수가 왜 나왔는지" 100% 설명 가능 |
-| **ML 이벤트 분류기** | 입력: 시간·요일·최근 이벤트 시퀀스. 출력: 현재 발생 가능성 높은 이벤트 (귀가/요리/취침 등). scikit-learn 결정트리·랜덤포레스트로 공개 IoT 데이터셋에 학습. 발표 시 정확도·confusion matrix 제시 |
-| **LLM** | 4가지 역할에 한정: ① 상황 요약, ② 청소 전략 추천(자연어), ③ 이유 설명 생성, ④ 누적 패턴 요약(여유 시). **하지 않는 것:** 점수 계산, 최종 판단, 임의 행동 |
+| **ML 사용자 위치 추정** | 입력: 위치성 센서(motion·door_lock·bed·tv·induction·humidity 등). 출력: `user_room` (entrance/living/kitchen/bedroom/bathroom/away) + `location_confidence`. 박주상 v3 설계. 디바이스 측에서 실행, raw 센서가 외부로 나가지 않음 |
+| **Rule-based 맥락 + Scoring** | 입력: `user_room` + 현재 센서 상태 + 외부 변수(weather·calendar·time). 출력: 단기 맥락 변수 8개 + 공간별 priority score. 결정론적·재현 가능. "이 점수가 왜 나왔는지" 100% 설명 가능 |
+| **LLM (보조)** | 결정된 점수표를 자연어로 풀어쓰는 단계. 점수 계산·최종 판단에는 관여하지 않음. 장애 시 fallback 응답으로 동작 계속 |
 
 ---
 
@@ -230,9 +229,11 @@ Python 3.12, FastAPI(async · OpenAPI 자동 생성), Pydantic v2(요청·응답
 
 Next.js 15(App Router · React 19), TypeScript(strict), Tailwind CSS v4(`@theme` 디자인 토큰), Pretendard Variable · JetBrains Mono. 시각화는 외부 차트 라이브러리 없이 inline SVG + Tailwind 클래스로 처리해 의존성을 최소화했다. 패키지 관리는 pnpm.
 
-### 7.3 데이터·ML (예정, 2주차)
+### 7.3 데이터·ML (박주상 v3)
 
-공개 IoT 데이터셋은 UCI Activities of Daily Living을 1순위 후보로 본다. 분석·전처리는 pandas + numpy, 모델은 scikit-learn(DecisionTree → RandomForest 비교)로 시간·요일·이전 이벤트 시퀀스에서 현재 이벤트를 추정하는 분류기를 학습한다. 테스트셋 정확도 75% 이상이 KPI다(§13 참조). 박주상이 별도 plan mode로 진행하며, 학습된 모델은 백엔드에서 `active_events` 자동 주입 모드의 옵션으로 노출할 예정이다.
+ML은 **사용자 위치 추정 한 가지**에 집중한다. 입력은 위치성 IoT 센서(motion·door_lock·bed·tv·induction·humidity·microwave·refrigerator·smart_speaker·air_conditioner) 상태 벡터, 출력은 `user_room` 6-class(entrance/living/kitchen/bedroom/bathroom/away) + `location_confidence`. 분석·전처리는 pandas + numpy, 모델은 scikit-learn. 박주상이 [docs/CLEANING_DECISION_ALGORITHM.md](./docs/CLEANING_DECISION_ALGORITHM.md)에 v3 설계를 명세했고, 그 위에서 학습·평가를 진행한다.
+
+> **v2 아카이브.** 5/26까지 진행된 multi-label 이벤트 분류기(v1 CASAS hh106 85.1%, v2 IoT 99.3%)는 `archive/ml-v2/` 에 보관. 박주상 v3 설계로 ML 역할이 "이벤트 직접 분류" → "사용자 위치 추정"으로 좁혀지면서 폐기됐다.
 
 ### 7.4 배포·운영
 
@@ -319,31 +320,29 @@ day01에서 사용한 Streamlit은 2D heatmap·인터랙션 한계로 미채택.
 
 ## 12. 발표 전략 (8-Slide 흐름)
 
-발표는 **기술 자랑**이 아니라 **서사**다. 다음 8슬라이드 흐름으로 구성한다.
+서사 골격은 **맥락 인식 + Privacy-on-Edge** 두 축. 어느 각도로 찔러도 두 축으로 받아낸다.
 
-서사 골격은 **B(신뢰 격차) → A(LG ThinQ에 빠진 explainable layer) → C(중앙 허브 시대에도 호환)** 의 3단 논리다. 어느 각도에서 찔러도 받을 수 있게 — *현재 사용자 문제 → 지금 LG가 채택 가능한 해법 → 미래 IoT 표준과 정합*.
-
-| # | 슬라이드 | 핵심 메시지 (B/A/C) |
+| # | 슬라이드 | 핵심 메시지 |
 |:-:|---|---|
-| 1 | Hook | "어, 얘 왜 저 방은 안 치우지?" — AI 자율 모드를 켰다가 꺼버린 경험에서 출발 |
-| 2 | 문제 (B) | **신뢰 격차** — 사용자는 AI 자율성을 *원하면서도* "왜?"에 답하지 못해 결국 수동으로 회귀한다. 자율성의 병목은 청소 성능이 아니라 설명 가능성이다 |
-| 3 | 포지셔닝 (A) | "스탠드얼론 청소 AI"가 아니라, **ThinQ에 그대로 얹는 explainable decision layer**. LG는 데이터·하드웨어를 갖고 있고, 빠진 건 결정·이유를 만드는 layer뿐이다 |
-| 4 | 솔루션 구조 | 6-Layer (Sensor·Behavioral·Spatial·Context·Decision·Explainable) + Rule-based vs LLM 역할 분리 — 점수 계산은 결정론적, 설명만 LLM |
-| 5 | 데모 (라이브) | 4개 시나리오 실시간 시연 — 같은 공간이 상황에 따라 우선순위가 어떻게 바뀌는지. 발표의 80%를 결정하는 슬라이드 |
-| 6 | 데이터·ML | 공개 IoT 데이터셋 분석 (시간대별 공간 사용 패턴) + ML 이벤트 분류기 정확도·confusion matrix + 우선순위 변화 heatmap *(§7.3에 따라 2주차 작업 예정)* |
-| 7 | 확장성 (C) | Matter·HomeKit은 *제어 인터페이스*만 정의 — 결정·설명은 vendor 책임. 본 layer는 중앙 허브가 와도 디바이스 측에 남는 explainable API → **지금 ThinQ, 미래 Home Agent 양쪽과 호환** |
-| 8 | Closing | "AI 가전은 자기 행동을 설명할 줄 알아야 한다" — 핵심 메시지 재반복 + Q&A |
+| 1 | Hook | "비 오는 날 귀가했을 때 우리 로봇청소기가 알아서 현관을 먼저 닦으면 어떨까?" — 맥락 인식 청소의 직관적 그림 |
+| 2 | 문제 | **맥락 부재** — 기존 로봇청소기는 스케줄·맵에 머무른다. "지금 어디를 왜" 청소할지를 모른다 |
+| 3 | 포지셔닝 (축 1·2) | **맥락 인식 + Privacy-on-Edge** — IoT 멀티센서로 생활 맥락을 읽고, 모든 추론은 디바이스 측에서. 클라우드로 가는 건 high-level event만 |
+| 4 | 솔루션 구조 | 6-Layer (Sensor·Behavioral·Spatial·Context·Decision·Explanation) + ML(위치)·Rule(맥락·점수)·LLM(설명) 역할 분리 |
+| 5 | 데모 (라이브) | 8개 시나리오 실시간 시연 — 같은 공간이 상황에 따라 우선순위가 어떻게 바뀌는지. 발표의 80%를 결정하는 슬라이드 |
+| 6 | 데이터·ML | 박주상 v3 설계 (ML = 사용자 위치 추정) + 룰 8개 맥락 변수 + 점수 breakdown |
+| 7 | 확장성·신뢰성 | 새 센서·룰 JSON 30분 추가 · LLM 장애 시 룰만으로 동작 · 모든 결정 추적 가능 |
+| 8 | Closing | "가전이 사용자의 상황을 읽고, 그 결과만 클라우드에 보낸다" — 두 축 재반복 + Q&A |
 
 > **발표 황금률.** 5번 데모 슬라이드가 발표의 80%를 결정한다. 이 슬라이드를 위해 나머지 모든 작업이 존재한다.
 
-> **반박 대응 미리 정리.** ① "LG가 직접 하면 되지 않나?" → 본체 대체가 아니라 도메인 특화 layer *제안*, 멘토링 트랙의 정합한 결과물 형태. ② "중앙 허브 오면 다 무의미 아닌가?" → 지연·프라이버시·도메인 지식·오프라인 fallback 때문에 디바이스 측 결정·설명은 남는다 (슬라이드 7). ③ "그냥 GPT 붙인 거?" → 점수 계산은 LLM 금지, Rule-based 엔진이 결정론적으로 계산 (슬라이드 4).
+> **반박 대응 미리 정리.** ① "맥락은 결국 카메라가 다 본다는 거?" → 카메라 없이 IoT 멀티센서 + 외부 API만으로 맥락 추론. ② "Privacy-on-Edge는 마케팅 아닌가?" → 백엔드 API는 high-level event만 받음, raw 센서는 디바이스에서 끝남 (코드로 확인 가능). ③ "그냥 GPT 붙인 거?" → 점수 계산은 LLM 금지, Rule-based 엔진이 결정론적으로 계산 (슬라이드 4).
 
 ---
 
 ## 13. 핵심 메시지
 
-> **Main.** "우리는 로봇청소기를 단순 청소 기계가 아니라, 생활 맥락을 이해하는 가정용 AI Agent의 시작점으로 보았다."
+> **Main.** "로봇청소기는 생활 맥락을 읽어야 한다 — 그리고 그 맥락은 사용자 집 안에서 끝나야 한다."
 
-> **Sub.** "미래의 가전은 사용자의 명령을 수행하는 기계에서, 사용자의 상황을 이해하고 행동을 설명하는 파트너로 진화할 것이다."
+> **Sub.** "맥락 인식으로 청소 우선순위를 결정하되, raw 센서 데이터는 디바이스를 떠나지 않는다."
 
-> **Frame.** "이 프로젝트는 청소 경로 최적화가 아니라, AI 가전의 의사결정 UX를 설계하는 실험이다."
+> **Frame.** "이 프로젝트는 청소 경로 최적화가 아니라, *맥락 인식 + Privacy-on-Edge* 두 축을 가전 도메인에 처음 결합한 reference 구현이다."

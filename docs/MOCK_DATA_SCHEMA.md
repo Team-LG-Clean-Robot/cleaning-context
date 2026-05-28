@@ -203,7 +203,7 @@
 1. `scripts/analyze_iot.py` — 시간대별 공간 사용 빈도 추출 → CSV
 2. `events.json`의 effects 값을 빈도 기반으로 재보정 (경험적 prior → empirical posterior)
 3. 변경된 가중치는 `docs/WEIGHT_CALIBRATION.md`(신규)에 출처·계산 과정 기록
-4. ML 이벤트 분류기 학습은 `scripts/train_event_classifier.py` 별도
+4. ML 위치 추정 분류기 학습은 박주상 v3 (`docs/CLEANING_DECISION_ALGORITHM.md`) 진행
 
 ## 7. 미해결
 
