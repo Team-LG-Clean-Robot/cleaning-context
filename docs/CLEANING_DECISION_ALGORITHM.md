@@ -2,6 +2,8 @@
 
 > 목적: 팀원이 같은 그림을 보고 구현·설명할 수 있도록, `ML 위치 추정 -> Rule 맥락 판별 -> Rule 점수 계산` 구조를 현재 프로젝트 기준으로 고정한다.
 
+> **갱신 이력 (2026-05-29).** §3(점수 계산)·§4(출력 예시)·§5(대표 예시)를 v2 구현(`backend/app/data/*.json`, `rule_version: v2`)의 실측값에 맞춰 동기화했다. **설계 골격(§0~§2: 3단계 파이프라인 · ML=위치 추정 한 가지 · 맥락 변수 모델)은 변경 없음.** 숫자 외에 *설계 의도*가 바뀐 3가지(① `rain` 독립 이벤트화 ② 효과의 다중 방 분산 ③ 신규 이벤트 5종)는 §3.3 하단 주석 참조. — 설계: 박주상 / 구현 정합: 전유성.
+
 ## 0. 한 줄 구조
 
 ```text
@@ -185,8 +187,8 @@ ML이 예측한 `user_room`에 따라, 해당 공간과 인접 맥락 판별에 
 
 예시:
 
-- 결과: `kitchen first, living second, bedroom delayed`
-- 공간별 점수: `kitchen 50, living 25, entrance 30, bedroom -5, bathroom 10`
+- 결과: `kitchen first, entrance second, living delayed`
+- 공간별 점수: `kitchen 63, entrance 22, bathroom 18, bedroom 12, living 5(delayed)`
 - 설명: `요리 직후라 주방 오염 가능성이 높아 주방을 우선 청소합니다.`
 
 ### 3.1 현재 프로젝트의 공간 집합
@@ -195,11 +197,13 @@ ML이 예측한 `user_room`에 따라, 해당 공간과 인접 맥락 판별에 
 
 | room_id | name_ko | base_score | noise_sensitivity |
 |---|---|---:|---:|
-| `entrance` | 현관 | 30 | 2 |
-| `living` | 거실 | 25 | 5 |
-| `kitchen` | 주방 | 20 | 4 |
-| `bedroom` | 침실 | 15 | 9 |
-| `bathroom` | 욕실 | 10 | 3 |
+| `entrance` | 현관 | 22 | 2 |
+| `living` | 거실 | 20 | 5 |
+| `kitchen` | 주방 | 28 | 4 |
+| `bedroom` | 침실 | 12 | 9 |
+| `bathroom` | 욕실 | 18 | 3 |
+
+> v1 설계값(현관30·거실25·주방20·침실15·욕실10)은 특정 방(현관)이 대부분 시나리오에서 1위가 되는 쏠림이 있어, v2에서 ML feature-importance 기준으로 평탄화했다. 6개 데모 시나리오가 5개 방을 고르게 1위로 활용하도록 한 튜닝값이며, 멘토링 후 실데이터로 보강 예정.
 
 ### 3.2 최종 점수식
 
@@ -215,42 +219,47 @@ final_score(room)
 - safety_penalty(room)
 ```
 
-### 3.3 방별 가감점 규칙
+> **구현 일원화.** `scoring.py`는 위 항들을 **이벤트 delta 합 + modifier**로 합쳐 계산한다: `final = base + Σ(활성 이벤트 delta) + Σ(modifier)`. 각 항은 `need`(오염 누적) / `opportunity`(청소 타이밍) 두 축으로 태깅되어 설명 카드에서 그룹으로 보이지만, 합산 결과는 위 분해식과 동일하다.
 
-#### A. 현관
+### 3.3 이벤트별 가감점 규칙
 
-- `is_recent_return_home` -> `+15`
-- `is_recent_return_home and is_raining` -> 추가 `+15`
-- `user_room == entrance` -> `-20` and `mode = delayed`
+> **v2 구현 반영.** 본래 설계는 방별로 맥락 변수(`is_post_cooking` 등) 조건을 나열했으나, 구현(`backend/app/data/events.json`)은 이를 **이벤트 단위 delta**로 표현한다. 맥락 변수와 이벤트는 1:1 대응한다 (`is_post_cooking`↔`cooking_done`, `is_relaxing_in_living`↔`tv_watching` 등). 아래 표가 런타임 ground truth.
 
-#### B. 거실
+각 활성 이벤트가 방별 점수에 더하는 값 (공란 = 0):
 
-- `is_recent_return_home` -> `+10`
-- `is_recent_guest_mode` -> `+25`
-- `is_relaxing_in_living` -> `-15`
-- `user_room == living` -> `-20` and `mode = delayed`
+| event_id (맥락) | 현관 | 거실 | 주방 | 침실 | 욕실 | axis |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|
+| `rain` (비) | +25 | +5 | | | | need |
+| `user_returned` (귀가) | +15 | +5 | | | | need |
+| `cooking_done` (요리 직후) | | +5 | +35 | | | need |
+| `cooking_active` (요리 중) | +5 | +15 | −40 | +5 | +5 | need |
+| `meal_prep` (식사 준비) | | | +15 | | | need |
+| `meal_finished` (식사 종료) | | +15 | +35 | | | need |
+| `recent_shower` (샤워 직후) | | | | | +25 | need |
+| `tv_watching` (거실 휴식) | | −20 | +5 | | | need |
+| `user_left` (외출 중) | +5 | +5 | +5 | +25 | +5 | need |
+| `package_delivery` (택배 도착) | +35 | +10 | | | | need |
+| `guest_arriving_2h` (손님 임박) | +15 | +30 | +10 | −5 | +15 | opportunity |
+| `guest_visit_recent` (최근 손님) | | +10 | | | +10 | opportunity |
+| `pre_sleep_2h` (취침 2h) | | +5 | | −20 | | opportunity |
+| `pre_sleep_30min` (취침 30분) | | +5 | | −40 | +15 | opportunity |
 
-#### C. 주방
+**계산 후 modifier** (`backend/app/data/scoring_rules.json`):
 
-- `is_post_cooking` -> `+30`
-- `fridge_open_count_30m >= 4` -> `+10`
-- `is_cooking_active` -> `-25` and `mode = delayed`
-- `user_room == kitchen` -> `-20` and `mode = delayed`
+| 조건 | 효과 | axis |
+|---|---|---|
+| 사용자 점유 공간 (`user_room == room`) | −20 | opportunity |
+| `pre_sleep_30min` 활성 & `noise_sensitivity ≥ 7` | 추가 −10 | opportunity |
 
-#### D. 침실
+#### 설계 의도 변경점 (박주상 v1 설계 → v2 구현)
 
-- `is_sleeping_or_pre_sleep` -> `-40` and `mode = excluded or quiet`
-- `user_room == bedroom` -> `-20` and `mode = delayed`
+> 아래 3가지는 단순 숫자 조정이 아니라 *설계 의도*가 바뀐 부분이다. 발표 시 참고.
 
-#### E. 욕실
+1. **`rain` 독립 이벤트화** — v1 설계는 "귀가 + 비"가 동시 성립할 때만 현관에 가산(`is_recent_return_home and is_raining → +15`)했다. v2는 `rain`을 **독립 이벤트**로 분리해 귀가 없이도 비 신호만으로 현관 오염을 반영한다 (이벤트 단일 책임 원칙 + 비만 오는 시나리오 표현).
+2. **효과의 다중 방 분산** — v1 설계는 이벤트당 단일 방 효과 위주였다(예: `is_cooking_active → 주방 −25`만). v2는 `cooking_active`·`guest_arriving_2h`·`user_left` 등에서 인접 방까지 소폭 가·감산한다(요리 중 거실로 이동할 가능성 등 현실 반영 + 시나리오별로 5개 방이 고르게 1위가 되도록 튜닝).
+3. **신규 이벤트 5종** — `meal_prep`·`meal_finished`·`guest_visit_recent`·`package_delivery`·`pre_sleep_2h`를 추가했다(택배 도착·식사 후 등 확장 데모 시나리오용). v1 설계의 맥락 변수 8종을 넘어선 확장이다.
 
-- `is_recent_shower` -> `+15`
-- `is_recent_guest_mode` -> `+10`
-- `user_room == bathroom` -> `-15` and `mode = delayed`
-
-#### F. 집이 비었을 때 공통 가점
-
-- `is_home_empty` -> 전 방 `+5`
+> 그 밖의 변경: 욕실 점유 페널티 v1 `−15` → v2 전 방 균일 `−20`. `fridge_open_count_30m` 기반 가산(`+10`)은 v2 미구현(센서 추론 단계로 이관 검토).
 
 ### 3.4 모드 결정 규칙
 
@@ -263,12 +272,16 @@ final_score(room)
 | `delayed` | 우선순위는 있지만 현재 점유 등으로 잠시 지연 |
 | `excluded` | 이번 턴에서는 청소 대상에서 제외 |
 
-| 조건 | mode |
-|---|---|
-| `final_score <= 0` | `excluded` |
-| 현재 점유 중인 방 | `delayed` |
-| `is_sleeping_or_pre_sleep` and `noise_sensitivity >= 7` | `quiet` 또는 `excluded` |
-| 그 외 | `normal` |
+우선순위 순으로 판정한다 (`scoring.py._decide_mode`):
+
+| 우선순위 | 조건 | mode |
+|---|---|---|
+| 1 | `final < 0` | `excluded` (사유 = 최대 음수 항 자동 인용) |
+| 2 | 현재 점유 공간 & `final > 0` | `delayed` (30분 후 재시도) |
+| 3 | `pre_sleep_30min` 활성 & `noise_sensitivity >= 4` & `final > 0` | `quiet` |
+| 4 | 그 외 | `normal` |
+
+> v1 대비 변경: excluded 임계 `<= 0` → `< 0` (점수 0은 normal), quiet 소음 임계 `>= 7` → `>= 4` (취침 임박 시 거실·주방도 저소음 모드). 로봇 청소 큐는 `excluded`·`delayed`를 빼고 `final` 내림차순으로 방문한다.
 
 ---
 
@@ -278,8 +291,8 @@ final_score(room)
 
 ```json
 {
-  "user_room": "kitchen",
-  "location_confidence": 0.81,
+  "user_room": "living",
+  "location_confidence": 0.82,
   "contexts": {
     "is_cooking_active": false,
     "is_post_cooking": true,
@@ -290,13 +303,13 @@ final_score(room)
     "is_home_empty": false
   },
   "room_scores": {
-    "entrance": {"base": 30, "delta": 0, "final": 30, "mode": "normal"},
-    "living": {"base": 25, "delta": 0, "final": 25, "mode": "normal"},
-    "kitchen": {"base": 20, "delta": 30, "final": 50, "mode": "normal"},
-    "bedroom": {"base": 15, "delta": 0, "final": 15, "mode": "normal"},
-    "bathroom": {"base": 10, "delta": 0, "final": 10, "mode": "normal"}
+    "kitchen": {"base": 28, "delta": 35, "final": 63, "mode": "normal"},
+    "entrance": {"base": 22, "delta": 0, "final": 22, "mode": "normal"},
+    "bathroom": {"base": 18, "delta": 0, "final": 18, "mode": "normal"},
+    "bedroom": {"base": 12, "delta": 0, "final": 12, "mode": "normal"},
+    "living": {"base": 20, "delta": -15, "final": 5, "mode": "delayed"}
   },
-  "cleaning_order": ["kitchen", "entrance", "living", "bedroom", "bathroom"]
+  "cleaning_order": ["kitchen", "entrance", "bathroom", "bedroom"]
 }
 ```
 
@@ -310,74 +323,68 @@ final_score(room)
 
 예시:
 
-- 결과: `kitchen first, living second, bedroom delayed`
-- 설명: `요리 직후라 주방 오염 가능성이 높아 주방을 우선 청소합니다. 침실은 현재 사용 가능성이 높아 지연합니다.`
+- 결과: `kitchen first, entrance second, living delayed`
+- 설명: `요리 직후라 주방 오염 가능성이 높아 주방을 우선 청소합니다. 거실은 사용자가 머물러 지연합니다.`
 
 ---
 
 ## 5. 대표 예시 결과
 
-### 예시 1. 비 오는 날 귀가 직후
+> 아래 두 예시는 데모 시나리오(`scenarios.json`의 `rainy_return`·`post_cooking`)와 점수가 1:1 일치한다. `test_scoring.py`의 `EXPECTED_SCORES`로도 검증됨.
+
+### 예시 1. 비 오는 날 귀가 (`rainy_return`)
 
 조건:
 
-- `user_room = entrance`
-- `location_confidence = 0.88`
-- `door_unlocked_recent = true`
-- `is_raining = true`
-
-맥락:
-
-- `is_recent_return_home = true`
+- `current_time = 20:30`, `sleep_time = 23:00`
+- `user_room = living` (귀가 후 거실로 이동해 머무는 중)
+- 활성 이벤트: `rain`, `user_returned`, `pre_sleep_2h`
 
 결과:
 
-- `entrance delayed, living first, kitchen second, bedroom third, bathroom fourth`
+- `entrance first, kitchen second, bathroom third, living delayed, bedroom excluded`
 
 방별 점수:
 
 | 공간 | base | 규칙 | final | mode |
 |---|---:|---|---:|---|
-| 현관 | 30 | `+15 귀가`, `+15 비`, `-20 현재 점유` | 40 | delayed |
-| 거실 | 25 | `+10 귀가` | 35 | normal |
-| 주방 | 20 | 없음 | 20 | normal |
-| 침실 | 15 | 없음 | 15 | normal |
-| 욕실 | 10 | 없음 | 10 | normal |
+| 현관 | 22 | `+25 비`, `+15 귀가` | **62** | normal |
+| 주방 | 28 | 없음 | 28 | normal |
+| 욕실 | 18 | 없음 | 18 | normal |
+| 거실 | 20 | `+5 비`, `+5 귀가`, `+5 취침2h`, `-20 점유` | 15 | delayed |
+| 침실 | 12 | `-20 취침2h` | -8 | excluded |
 
 설명:
 
-- `비 오는 날 귀가 직후라 현관 오염 가능성이 가장 높습니다. 다만 현재 현관이 점유 중이므로 즉시 청소는 지연하고, 사용자가 이동한 뒤 현관을 우선 청소합니다.`
+- `비 오는 날 귀가로 현관 오염 가능성이 가장 높아 현관을 우선 청소합니다. 거실은 사용자가 머무는 중이라 지연하고, 침실은 취침이 가까워 제외합니다.`
 
-### 예시 2. 요리 직후
+> v1 설계 예시는 사용자를 현관에 두어 `현관 delayed · 거실 first`였으나, 데모는 사용자를 거실에 둔다(사용자 위치 아이콘 표시 버그 수정 결과). 핵심 인사이트("비 오는 날 현관 오염이 가장 높다")는 동일하며, 점유 방만 현관→거실로 바뀌어 지연/1순위가 뒤집힌다.
+
+### 예시 2. 요리 직후 (`post_cooking`)
 
 조건:
 
-- `user_room = kitchen`
-- `location_confidence = 0.82`
-- `stove_turned_off_recent = true`
-- `fridge_open_count_30m = 5`
-
-맥락:
-
-- `is_post_cooking = true`
+- `current_time = 19:20`, `sleep_time = 23:00`
+- `user_room = living` (요리 마치고 거실에서 휴식)
+- 활성 이벤트: `cooking_done`
 
 결과:
 
-- `kitchen delayed, entrance first, living second, bedroom third, bathroom fourth`
+- `kitchen first, entrance second, bathroom third, bedroom fourth, living delayed`
 
 방별 점수:
 
 | 공간 | base | 규칙 | final | mode |
 |---|---:|---|---:|---|
-| 현관 | 30 | 없음 | 30 | normal |
-| 거실 | 25 | 없음 | 25 | normal |
-| 주방 | 20 | `+30 요리 직후`, `+10 냉장고 개폐`, `-20 현재 점유` | 40 | delayed |
-| 침실 | 15 | 없음 | 15 | normal |
-| 욕실 | 10 | 없음 | 10 | normal |
+| 주방 | 28 | `+35 요리 직후` | **63** | normal |
+| 현관 | 22 | 없음 | 22 | normal |
+| 욕실 | 18 | 없음 | 18 | normal |
+| 침실 | 12 | 없음 | 12 | normal |
+| 거실 | 20 | `+5 요리 직후`, `-20 점유` | 5 | delayed |
 
 설명:
 
-- `요리 직후라 주방 오염 가능성이 가장 높습니다. 다만 현재 주방이 점유 중이므로 즉시 청소는 지연하고, 사용자가 이동하면 주방을 최우선으로 청소합니다.`
+- `요리 직후라 주방 오염 가능성이 가장 높아 주방을 우선 청소합니다. 거실은 사용자가 머물러 지연합니다.`
 
 ---
 
