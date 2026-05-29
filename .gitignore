@@ -46,3 +46,12 @@ tests/__screenshots__/*-actual.png
 tests/__screenshots__/*-diff.png
 backend/.venv/
 exports/phone-frames/
+
+# macOS
+.DS_Store
+
+# 런타임 시나리오 캐시 (루트 — backend/cache 와 동일 성격, 추적 X)
+/cache/
+
+# 덱 export 압축본 (산출물)
+exports/*.zip
