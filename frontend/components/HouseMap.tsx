@@ -8,6 +8,8 @@ type Props = {
   onRoomClick?: (room: RoomScore) => void;
   paused?: boolean;
   currentTime?: string | null;
+  /** 시나리오 미선택(기본 오염도) 상태 — 로봇 정지 + 먼지 숨김 + 히트맵 base 대비 강화 */
+  staticBase?: boolean;
   /** 청소 진행 상태를 상위로 노출 — 현재 청소 중인 방 + 실시간 점수 */
   onCleaningStateChange?: (s: { room: RoomId | null; scores: RoomScore[] }) => void;
 };
@@ -409,6 +411,10 @@ function buildAriaLabel(rooms?: RoomScore[], userLocation?: RoomId | null): stri
   return `아파트 평면도. ${parts.join(", ")}.${userLocation ? ` 사용자 ${ROOM_LABEL[userLocation]}.` : ""}`;
 }
 
+/* base 점수 범위 — 시나리오 미선택 시 히트맵 대비 정규화에 사용 */
+const BASE_MIN = Math.min(...ROOMS_SEED.map((r) => r.base_score));
+const BASE_MAX = Math.max(...ROOMS_SEED.map((r) => r.base_score));
+
 const LEGEND_STEPS = [96, 90, 84, 78, 72, 66];
 
 function HeatmapLegend({ visible }: { visible: boolean }) {
@@ -483,7 +489,7 @@ function useDisplayScores(
 }
 
 /* ── 메인 ── */
-export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, currentTime, onCleaningStateChange }: Props) {
+export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, currentTime, staticBase = false, onCleaningStateChange }: Props) {
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -496,11 +502,15 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
   );
   const dustPool = useMemo(() => generateDustPool(roomIds), [roomIds]);
   const activeIds = useMemo(() => (rooms ? activeDustIds(dustPool, rooms) : new Set<string>()), [dustPool, rooms]);
-  const dust = useMemo(() => dustPool.filter((d) => activeIds.has(d.id)), [dustPool, activeIds]);
+  // 시나리오 미선택(기본 오염도) 상태에서는 청소 대상(먼지)을 표시하지 않음 — 로봇도 정지
+  const dust = useMemo(
+    () => (staticBase ? [] : dustPool.filter((d) => activeIds.has(d.id))),
+    [dustPool, activeIds, staticBase],
+  );
 
   const [hiddenDust, setHiddenDustRaw] = useState<Set<string>>(new Set());
   const { pos: robotPos, durationMs, cleaningRoom } = useRobotMotion(
-    hasScenario ? rooms! : null, dust, hiddenDust, paused,
+    hasScenario && !staticBase ? rooms! : null, dust, hiddenDust, paused,
   );
   // dust removal feeds into hiddenDust — robot contact based
   const hiddenFromHook = useDustRemoval(dust, robotPos, paused);
@@ -540,7 +550,12 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
           let fill: string;
           if (!showOverlay) fill = "transparent";
           else if (mode === "excluded") fill = "url(#hatch)";
-          else {
+          else if (staticBase) {
+            // 기본 오염도 상태 — base 점수 범위(12~28)는 좁아 gamma 매핑 시 전부 투명에 수렴.
+            // min/max 정규화로 전체 alpha 대역을 써서 방별 구분을 강화.
+            const norm = BASE_MAX > BASE_MIN ? (score - BASE_MIN) / (BASE_MAX - BASE_MIN) : 0.5;
+            fill = `rgba(20, 20, 25, ${0.15 + norm * 0.5})`;
+          } else {
             const t = Math.min(Math.max(score, 0), 80) / 80;
             const eased = Math.pow(t, 2.2);
             fill = `rgba(20, 20, 25, ${0.04 + eased * 0.5})`;

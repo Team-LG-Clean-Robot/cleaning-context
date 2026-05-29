@@ -419,6 +419,7 @@ export function Simulator() {
               onRoomClick={effectiveResponse ? setDetailRoom : undefined}
               paused={isTimeline && !timeline.playing}
               currentTime={currentTime}
+              staticBase={!effectiveResponse || effectiveResponse.scenario_id === "__base__"}
               onCleaningStateChange={handleCleaningState}
             />
           </div>
