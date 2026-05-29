@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280">
-<title>시장조사 ② 경쟁 함정</title>
+<title>왜 만드는가 — 풀려는 문제</title>
 <link href="assets/fonts/pretendard.css" rel="stylesheet">
 <style>
 :root {
@@ -11,24 +11,41 @@
   --text-primary: oklch(0.12 0 0); --text-secondary: oklch(0.55 0 0); --text-muted: oklch(0.70 0 0); --text-sub: oklch(0.30 0 0);
   --accent-start: oklch(0.12 0 0); --accent-end: oklch(0.42 0 0); --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end)); --accent-soft: oklch(0.95 0 0); --accent-border: oklch(0.80 0 0);
   --nav-bg: oklch(0.99 0 0 / 0.95); --nav-border: oklch(0.85 0 0); --nav-accent: oklch(0.12 0 0); --nav-hover: oklch(0.42 0 0); --nav-disabled: oklch(0.80 0 0);
-  --font-main: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif; --font-mono: 'JetBrains Mono', monospace;
+  --font-main: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif; --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --alert: oklch(0.55 0.21 27); --alert-soft: oklch(0.96 0.03 27); --alert-border: oklch(0.82 0.10 27);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: var(--bg-primary); font-family: var(--font-main); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding-bottom: 50px; }
-.container { width: 1280px; padding: 40px 80px; display: flex; flex-direction: column; align-items: center; }
+.container { width: 1280px; padding: 36px 80px; display: flex; flex-direction: column; align-items: center; }
 .title { font-size: 42px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 6px; line-height: 1.3; }
-.deck-meta { font-size: 13px; color: var(--text-secondary); text-align:center; margin-bottom: 28px; }
-.share { width: 100%; max-width: 920px; }
-.bar { display: flex; height: 56px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-card); }
-.seg { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; }
-.seg.cn { background: var(--accent-start); }
-.seg.kr { background: var(--text-muted); }
-.seg.etc { background: var(--border-card); color: var(--text-secondary); }
-.legend { display: flex; gap: 18px; margin-top: 12px; font-size: 13px; color: var(--text-secondary); justify-content: center; }
-.detail { margin-top: 18px; font-size: 14px; color: var(--text-sub); text-align: center; }
-.detail b { color: var(--text-primary); }
-.insight { margin-top: 26px; background: var(--accent-soft); border: 1px solid var(--accent-border); border-radius: 14px; padding: 22px 28px; max-width: 920px; text-align: center; font-size: 18px; font-weight: 700; }
-.insight span { color: var(--text-secondary); font-weight: 500; font-size: 15px; display: block; margin-top: 6px; }
+.deck-meta { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 22px; }
+.lead { font-size: 22px; font-weight: 700; color: var(--text-sub); text-align: center; max-width: 960px; line-height: 1.5; margin-bottom: 40px; }
+.lead b { color: var(--text-primary); font-weight: 800; }
+
+/* 하루 타임라인 */
+.rail { width: 100%; max-width: 1040px; }
+.times { display: grid; grid-template-columns: repeat(4, 1fr); }
+.times .t { text-align: center; font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.02em; }
+.dots-wrap { position: relative; height: 16px; margin: 11px 0 16px; }
+.dots-line { position: absolute; top: 50%; left: 12.5%; right: 12.5%; height: 2px; background: var(--border-card); transform: translateY(-50%); }
+.dots { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); height: 100%; }
+.dots .d { justify-self: center; align-self: center; width: 14px; height: 14px; border-radius: 50%; background: var(--accent-start); border: 3px solid var(--bg-primary); }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+.card .sit { font-size: 17px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
+.card .miss { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 800; color: var(--text-sub); margin-bottom: 10px; }
+.card .x { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--text-muted); color: var(--text-muted); font-size: 11px; font-weight: 900; flex-shrink: 0; }
+.card .why { font-size: 13px; color: var(--text-secondary); line-height: 1.5; min-height: 39px; }
+.card.alert { background: var(--alert-soft); border-color: var(--alert-border); }
+.card.alert .miss { color: var(--alert); }
+.card.alert .x { border-color: var(--alert); color: var(--alert); }
+
+.verdict { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.verdict .q { font-size: 24px; font-weight: 800; color: var(--text-primary); text-align: center; line-height: 1.4; }
+.verdict .q .dim { color: var(--text-muted); font-weight: 700; }
+.verdict .bridge { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-start); color: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
+.verdict .answer { background: var(--accent-start); color: var(--bg-primary); font-size: 19px; font-weight: 800; padding: 15px 32px; border-radius: 999px; text-align: center; }
+.verdict .answer b { color: #fff; }
 .slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 .slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
 .slide-nav a { text-decoration: none; font-size: 14px; font-weight: 700; color: var(--nav-accent); transition: color 0.2s; }
@@ -41,22 +58,54 @@ body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { anima
 </head>
 <body>
 <div class="container">
-  <h1 class="title">시장의 함정 — 중국 4사 70%</h1>
-  <div class="deck-meta">서비스 · 시장 · 조현서</div>
-  <div class="share">
-    <div class="bar">
-      <div class="seg cn" style="width:70%">중국 4사 70%+</div>
-      <div class="seg kr" style="width:20%">삼성+LG 20%</div>
-      <div class="seg etc" style="width:10%">기타</div>
+  <h1 class="title">로봇청소기는 '상황'을 모른다</h1>
+  <div class="deck-meta">왜 만드는가?</div>
+  <p class="lead">강력해진 청소 성능에도 불구, <b>여전히 사람이 </b>필요하다.</p>
+
+  <div class="rail">
+    <div class="times">
+      <div class="t">18:00</div>
+      <div class="t">19:30</div>
+      <div class="t">21:00</div>
+      <div class="t">23:00</div>
     </div>
-    <div class="legend">
-      <span>로보락 45–50% · 드리미 12% · 에코백스·모바 10%</span>
+    <div class="dots-wrap">
+      <div class="dots-line"></div>
+      <div class="dots">
+        <div class="d"></div>
+        <div class="d"></div>
+        <div class="d"></div>
+        <div class="d"></div>
+      </div>
     </div>
-    <div class="detail">로보락 한국 매출 <b>2020년 291억 → 2024년 3,000억+</b> (4년간 약 10배)</div>
+    <div class="cards">
+      <div class="card">
+        <div class="sit">귀가 직후</div>
+        <div class="miss"><span class="x">✕</span>지나친다</div>
+        <div class="why">현관·동선에 먼지가 떨어져도<br>먼저 치우지 않는다</div>
+      </div>
+      <div class="card">
+        <div class="sit">요리 직후</div>
+        <div class="miss"><span class="x">✕</span>모른다</div>
+        <div class="why">주방에 음식물이 떨어져도<br> 먼저 움직이지 않는다</div>
+      </div>
+      <div class="card">
+        <div class="sit">손님 방문</div>
+        <div class="miss"><span class="x">✕</span>신경쓰지 않는다</div>
+        <div class="why">급한 순간에도<br>평소대로 움직인다</div>
+      </div>
+      <div class="card alert">
+        <div class="sit">취침 직전</div>
+        <div class="miss"><span class="x">✕</span>시끄럽다</div>
+        <div class="why">야심한 시간, 침실이라도<br> 소리내며 청소한다</div>
+      </div>
+    </div>
   </div>
-  <div class="insight">
-    H/W 가격경쟁은 한국 제조사도 이미 패배.
-    <span>진입 가능한 축은 <b>SW · 구독 · 서비스 차별화</b> — Lumos의 맥락 인식 + Privacy-on-Edge</span>
+
+  <div class="verdict">
+    <div class="q">강력한 청소기는 많아도, <span class="dim">스스로 판단하는</span> 청소기는 없다.</div>
+    <div class="bridge">↓</div>
+    <div class="answer">그래서 우리는 상황을 읽고 먼저 움직이는 <b>'에이전트 두뇌'</b>를 만든다</div>
   </div>
 </div>
 
