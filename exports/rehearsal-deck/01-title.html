@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280">
-<title>무빙홈 — 제목</title>
+<title>Lumos — 제목</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
 <style>
 :root {
@@ -18,10 +18,12 @@
 body { background: var(--bg-primary); font-family: var(--font-main); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding-bottom: 50px; }
 .container { width: 1280px; padding: 44px 80px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .brand { font-size: 18px; font-weight: 800; letter-spacing: 0.2em; color: var(--text-secondary); margin-bottom: 18px; }
-.title { font-size: 60px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; margin-bottom: 22px; }
-.axes { display: flex; gap: 12px; margin-bottom: 40px; }
-.pill { background: var(--accent-soft); border: 1px solid var(--accent-border); border-radius: 999px; padding: 8px 20px; font-size: 15px; font-weight: 700; }
-.meta { font-size: 15px; color: var(--text-secondary); }
+.brand .lg { color: var(--text-primary); }
+.title { font-size: 60px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; margin-bottom: 38px; }
+.meta { font-size: 15px; color: var(--text-secondary); margin-bottom: 28px; }
+.team { font-size: 17px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.02em; }
+.team .lead::after { content: "·팀장"; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-left: 1px; }
+.team .sep { color: var(--text-secondary); font-weight: 400; margin: 0 10px; }
 .slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 .slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
 .slide-nav a { text-decoration: none; font-size: 14px; font-weight: 700; color: var(--nav-accent); transition: color 0.2s; }
@@ -35,13 +37,10 @@ body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { anima
 </head>
 <body>
 <div class="container">
-  <div class="brand">MOVINGHOME · 팀 럭키 금성</div>
-  <h1 class="title">무빙홈<br>집의 맥락을 읽는 로봇청소기</h1>
-  <div class="axes">
-    <span class="pill">맥락 인식</span>
-    <span class="pill">Privacy-on-Edge</span>
-  </div>
+  <div class="brand"><span class="lg">LG</span> · 팀 럭키 금성</div>
+  <h1 class="title">Lumos<br>집의 맥락을 읽는 로봇청소기</h1>
   <p class="meta">LG 가전 멘토링 · 성균관대 RISE · 2026.05.30</p>
+  <div class="team"><span class="lead">전유성</span><span class="sep">·</span>김준성<span class="sep">·</span>박주상<span class="sep">·</span>조현서</div>
 </div>
 <nav class="slide-nav">
   <div class="slide-nav-inner">
