@@ -147,3 +147,79 @@ export function FlowIcon({ className = "" }: IconProps) {
     </svg>
   );
 }
+
+/* ── 하루 시뮬레이션 키프레임 상황 아이콘 ── */
+export function BedIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M3 18v-9" />
+      <path d="M3 14h13a4 4 0 0 1 4 4v0M3 18h18" />
+      <path d="M7 14v-1.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V14" />
+    </svg>
+  );
+}
+
+export function DoorIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17" />
+      <path d="M4 21h16" />
+      <circle cx="14.5" cy="12" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function PackageIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z" />
+      <path d="M4 7.5l8 4.5 8-4.5M12 12v9" />
+    </svg>
+  );
+}
+
+export function HomeIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M4 11l8-7 8 7" />
+      <path d="M6 9.5V20h12V9.5" />
+      <path d="M10 20v-5h4v5" />
+    </svg>
+  );
+}
+
+export function CookIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M5 11h14v4a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" />
+      <path d="M3 11h18" />
+      <path d="M9.5 7c0-1 .8-1.3.8-2.5M14.5 7c0-1 .8-1.3.8-2.5" />
+    </svg>
+  );
+}
+
+export function CheckCircleIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.5 12l2.5 2.5 4.5-5" />
+    </svg>
+  );
+}
+
+export function RainIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M7 15a4 4 0 0 1 0-8 5 5 0 0 1 9.5-1.5A3.5 3.5 0 0 1 17 15z" />
+      <path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5" />
+    </svg>
+  );
+}
+
+export function DropletIcon({ className = "" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z" />
+    </svg>
+  );
+}

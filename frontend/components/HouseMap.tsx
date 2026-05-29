@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ROOMS_SEED, ROOM_LABEL, type Mode, type RoomBbox, type RoomId, type RoomScore } from "@/lib/types";
+import { PlayIcon, PauseIcon } from "./icons";
 
 type Props = {
   rooms?: RoomScore[];
@@ -12,6 +13,16 @@ type Props = {
   staticBase?: boolean;
   /** 청소 진행 상태를 상위로 노출 — 현재 청소 중인 방 + 실시간 점수 */
   onCleaningStateChange?: (s: { room: RoomId | null; scores: RoomScore[] }) => void;
+  /** 재생 중 여부 — 컨트롤 가능 모드(시나리오 선택)에서 로봇 진행 제어 */
+  playing?: boolean;
+  /** 전달되면 재생·정지 버튼을 노출하고, false일 때 로봇을 정지(현재 위치 유지) */
+  onPlayingChange?: (playing: boolean) => void;
+  /** 하루 시뮬레이션 모드 — 먼지 청소 모델 대신 로봇이 현재 최우선 공간으로 이동 */
+  timeline?: boolean;
+  /** 타임라인 현재 키프레임 인덱스 — 바뀔 때만 로봇 재타게팅(연속 보간 틱마다 리셋 방지) */
+  activeKeyframeIndex?: number;
+  /** 재생 배속 — 로봇 이동·청소 시간을 1/speed로 스케일 (타임라인 배속과 동기화) */
+  speed?: number;
 };
 type Pt = { x: number; y: number };
 
@@ -166,6 +177,8 @@ function useRobotMotion(
   allDust: Dust[],
   hiddenDust: Set<string>,
   paused: boolean,
+  motionKey?: number,
+  speed: number = 1,
 ): RobotOut {
   const IDLE: Pt = { x: 309, y: 220 };
   const [pos, setPos] = useState<Pt>(IDLE);
@@ -189,6 +202,8 @@ function useRobotMotion(
   posRef.current = pos;
   // track which room is being cleaned to avoid re-triggering
   const activeTarget = useRef<RoomId | null>(null);
+  // 진행 중인 이동 구간 — 정지 시 보간된 실제 위치로 고정해 순간이동 방지
+  const segmentRef = useRef<{ from: Pt; to: Pt; start: number; dur: number } | null>(null);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach(clearTimeout);
@@ -213,6 +228,20 @@ function useRobotMotion(
       return;
     }
 
+    // 정지 상태: 진행 중이던 구간의 보간된 실제 위치로 고정(순간이동 방지) 후 새 이동을 예약하지 않음.
+    // 재생(paused=false)으로 전환되면 effect가 재실행돼 그 위치·진행 상태에서 이어서 스케줄.
+    if (paused) {
+      const seg = segmentRef.current;
+      if (seg && seg.dur > 0) {
+        const t = Math.min(Math.max((performance.now() - seg.start) / seg.dur, 0), 1);
+        setPos({ x: seg.from.x + (seg.to.x - seg.from.x) * t, y: seg.from.y + (seg.to.y - seg.from.y) * t });
+      }
+      setDurationMs(0);
+      return;
+    }
+
+    const spd = speed > 0 ? speed : 1;
+
     function scheduleRoom() {
       if (cancelledRef.current) return;
       const next = pickNextRoom(roomScoresRef.current!, dustRef.current, hiddenRef.current);
@@ -232,13 +261,14 @@ function useRobotMotion(
       setCleaningRoom(null);
 
       for (const wp of travelPts) {
-        const ms = msFor(prev, wp);
+        const ms = msFor(prev, wp) / spd;
         const w = wp;
         timers.current.push(setTimeout(() => {
           if (cancelledRef.current || pausedRef.current) return;
+          segmentRef.current = { from: posRef.current, to: w, start: performance.now(), dur: ms };
           setDurationMs(ms); setPos(w);
         }, delay));
-        delay += ms + 40;
+        delay += ms + 40 / spd;
         prev = wp;
       }
 
@@ -250,13 +280,14 @@ function useRobotMotion(
       }, delay));
 
       for (const cp of cleanPts) {
-        const ms = msFor(prev, cp);
+        const ms = msFor(prev, cp) / spd;
         const c = cp;
         timers.current.push(setTimeout(() => {
           if (cancelledRef.current || pausedRef.current) return;
+          segmentRef.current = { from: posRef.current, to: c, start: performance.now(), dur: ms };
           setDurationMs(ms); setPos(c);
         }, delay));
-        delay += ms + 30;
+        delay += ms + 30 / spd;
         prev = cp;
       }
 
@@ -267,13 +298,13 @@ function useRobotMotion(
         setCleaningRoom(null);
         activeTarget.current = null;
         scheduleRoom();
-      }, delay + 120));
+      }, delay + 120 / spd));
     }
 
-    timers.current.push(setTimeout(scheduleRoom, 200));
+    timers.current.push(setTimeout(scheduleRoom, 200 / spd));
     return () => clearTimers();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasRooms, roomScores]);
+  }, [hasRooms, motionKey ?? roomScores, paused, speed]);
 
   // Pause/resume: when paused, clear timers. But we can't easily resume mid-path,
   // so we just stop transitions. The robot freezes in place.
@@ -489,9 +520,13 @@ function useDisplayScores(
 }
 
 /* ── 메인 ── */
-export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, currentTime, staticBase = false, onCleaningStateChange }: Props) {
+export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, currentTime, staticBase = false, onCleaningStateChange, playing = false, onPlayingChange, timeline = false, activeKeyframeIndex, speed = 1 }: Props) {
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
+
+  // 컨트롤 가능 모드(onPlayingChange 전달 시): 재생 중이 아니면 로봇 정지.
+  const controllable = onPlayingChange !== undefined;
+  const effectivePaused = paused || (controllable && !playing);
 
   const hasScenario = rooms && rooms.length > 0;
   const roomIds = useMemo(
@@ -502,18 +537,20 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
   );
   const dustPool = useMemo(() => generateDustPool(roomIds), [roomIds]);
   const activeIds = useMemo(() => (rooms ? activeDustIds(dustPool, rooms) : new Set<string>()), [dustPool, rooms]);
-  // 시나리오 미선택(기본 오염도) 상태에서는 청소 대상(먼지)을 표시하지 않음 — 로봇도 정지
+  // 시나리오 미선택(기본 오염도) 상태에서는 청소 대상(먼지)을 표시하지 않음 — 로봇도 정지.
+  // 하루 시뮬레이션은 점수가 연속 변해 먼지 청소 모델과 안 맞으므로 먼지를 끄고 로봇은 최우선 공간으로 이동.
   const dust = useMemo(
-    () => (staticBase ? [] : dustPool.filter((d) => activeIds.has(d.id))),
-    [dustPool, activeIds, staticBase],
+    () => (staticBase || timeline ? [] : dustPool.filter((d) => activeIds.has(d.id))),
+    [dustPool, activeIds, staticBase, timeline],
   );
 
   const [hiddenDust, setHiddenDustRaw] = useState<Set<string>>(new Set());
   const { pos: robotPos, durationMs, cleaningRoom } = useRobotMotion(
-    hasScenario && !staticBase ? rooms! : null, dust, hiddenDust, paused,
+    hasScenario && !staticBase ? rooms! : null, dust, hiddenDust, effectivePaused,
+    timeline ? activeKeyframeIndex : undefined, speed,
   );
   // dust removal feeds into hiddenDust — robot contact based
-  const hiddenFromHook = useDustRemoval(dust, robotPos, paused);
+  const hiddenFromHook = useDustRemoval(dust, robotPos, effectivePaused);
   // sync hook output → state (avoid infinite loop by checking identity)
   const hiddenRef = useRef(hiddenDust);
   useEffect(() => {
@@ -623,6 +660,18 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
         </svg>
         {showOverlay ? "히트맵 숨기기" : "히트맵 보기"}
       </button>
+
+      {controllable && (
+        <button
+          type="button"
+          onClick={() => onPlayingChange?.(!playing)}
+          aria-label={playing ? "시뮬레이션 정지" : "시뮬레이션 재생"}
+          className="absolute top-14 left-3 flex items-center gap-1.5 rounded-lg bg-white/80 backdrop-blur-sm border border-border-default px-2.5 py-1.5 text-[11px] font-medium text-gray-600 shadow-sm transition-colors hover:bg-white/95"
+        >
+          {playing ? <PauseIcon className="w-3 h-3" /> : <PlayIcon className="w-3 h-3" />}
+          {playing ? "정지" : "재생"}
+        </button>
+      )}
 
       <HeatmapLegend visible={showOverlay} />
     </div>

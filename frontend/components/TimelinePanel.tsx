@@ -38,8 +38,14 @@ export function TimelinePanel({
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = logRef.current?.children[activeKeyframeIndex] as HTMLElement | undefined;
-    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // 컨테이너 내부에서만 스크롤 — 페이지(window)는 건드리지 않음(강제 스크롤 방지)
+    const container = logRef.current;
+    const el = container?.children[activeKeyframeIndex] as HTMLElement | undefined;
+    if (!container || !el) return;
+    const cRect = container.getBoundingClientRect();
+    const eRect = el.getBoundingClientRect();
+    if (eRect.top < cRect.top) container.scrollTop -= cRect.top - eRect.top;
+    else if (eRect.bottom > cRect.bottom) container.scrollTop += eRect.bottom - cRect.bottom;
   }, [activeKeyframeIndex]);
 
   const minStart = keyframes[0].minuteOfDay;

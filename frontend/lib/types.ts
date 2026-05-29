@@ -104,7 +104,7 @@ export const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 export type TimelineKeyframe = {
   time: string;
   minuteOfDay: number;
-  icon: string;
+  icon: string; // 상황 아이콘 키 (KF_ICON 매핑) — sleep·wake·leave·package·return·cook·cook-done·rain·shower·bedtime
   description: string;
   robotAction: string;
   request: CustomRequest;

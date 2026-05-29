@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import {
   RequestSequencer,
   fetchEvents,
@@ -17,9 +17,23 @@ import type {
   RoomScore,
   ScenarioMeta,
   SimulateResponse,
+  TimelineKeyframe,
 } from "@/lib/types";
 import { ROOM_LABEL, ROOMS_SEED } from "@/lib/types";
-import { ClockIcon, MoonIcon, PinIcon } from "./icons";
+import {
+  BedIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  CookIcon,
+  DoorIcon,
+  DropletIcon,
+  HomeIcon,
+  MoonIcon,
+  PackageIcon,
+  PinIcon,
+  RainIcon,
+  SunIcon,
+} from "./icons";
 import STATIC_SCENARIOS from "@/lib/static-scenarios.json";
 import STATIC_EVENTS from "@/lib/static-events.json";
 import STATIC_RESPONSES from "@/lib/static-responses.json";
@@ -141,6 +155,103 @@ function DecisionHero({
       )}
       <div className="mt-5 pt-4 border-t border-border-default flex-1">
         <PriorityList rooms={ranked} />
+      </div>
+    </div>
+  );
+}
+
+// 키프레임 상황 → SVG 아이콘 (이모지 대체)
+const KF_ICON: Record<string, ComponentType<{ className?: string }>> = {
+  sleep: BedIcon,
+  wake: SunIcon,
+  leave: DoorIcon,
+  package: PackageIcon,
+  return: HomeIcon,
+  cook: CookIcon,
+  "cook-done": CheckCircleIcon,
+  rain: RainIcon,
+  shower: DropletIcon,
+  bedtime: MoonIcon,
+};
+
+// 하루 시뮬레이션 — 데모 카드 좌측 세로 레일. 시간대별 상황을 나열하고 현재 시점을 강조.
+const SPEEDS: (1 | 2 | 4)[] = [1, 2, 4];
+
+function TimelineRail({
+  keyframes,
+  activeIndex,
+  speed,
+  onSpeedChange,
+  onSeek,
+}: {
+  keyframes: TimelineKeyframe[];
+  activeIndex: number;
+  speed: 1 | 2 | 4;
+  onSpeedChange: (s: 1 | 2 | 4) => void;
+  onSeek: (minute: number) => void;
+}) {
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // 컨테이너 내부에서만 스크롤 — 페이지(window)는 건드리지 않음(강제 스크롤 방지)
+    const container = listRef.current;
+    const el = container?.children[activeIndex] as HTMLElement | undefined;
+    if (!container || !el) return;
+    const cRect = container.getBoundingClientRect();
+    const eRect = el.getBoundingClientRect();
+    if (eRect.top < cRect.top) container.scrollTop -= cRect.top - eRect.top;
+    else if (eRect.bottom > cRect.bottom) container.scrollTop += eRect.bottom - cRect.bottom;
+  }, [activeIndex]);
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between gap-2 mb-2 px-1">
+        <span className="text-[11px] uppercase tracking-[0.14em] text-gray-500 font-semibold">
+          하루 흐름
+        </span>
+        <div className="flex gap-1">
+          {SPEEDS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => onSpeedChange(s)}
+              className={`px-1.5 py-0.5 rounded text-[10px] font-medium border transition-colors ${
+                speed === s
+                  ? "bg-accent-500 text-white border-accent-500"
+                  : "bg-surface-base text-text-muted border-border-default hover:bg-border-default/40"
+              }`}
+            >
+              {s}x
+            </button>
+          ))}
+        </div>
+      </div>
+      <div ref={listRef} className="flex-1 lg:max-h-[420px] overflow-y-auto space-y-1 pr-1">
+        {keyframes.map((kf, i) => {
+          const isActive = i === activeIndex;
+          const isPast = i < activeIndex;
+          const Icon = KF_ICON[kf.icon] ?? ClockIcon;
+          return (
+            <button
+              type="button"
+              key={i}
+              onClick={() => onSeek(kf.minuteOfDay)}
+              className={`w-full text-left flex flex-col gap-0.5 px-2.5 py-2 rounded-lg border transition-all duration-200 ${
+                isActive
+                  ? "bg-accent-500/5 border-accent-500/30 shadow-sm"
+                  : isPast
+                    ? "bg-surface-base border-transparent opacity-55"
+                    : "bg-surface-muted border-transparent opacity-40"
+              }`}
+            >
+              <span className={`font-mono text-[10px] font-medium ${isActive ? "text-accent-500" : "text-text-muted"}`}>
+                {kf.time}
+              </span>
+              <span className={`text-[12px] leading-snug flex items-center gap-1.5 ${isActive ? "text-text-default font-medium" : "text-text-muted"}`}>
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span>{kf.description}</span>
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -310,6 +421,8 @@ export function Simulator() {
     scores: [],
   });
   const lastRoomRef = useRef<RoomId | null>(null);
+  // 시나리오 선택 시 기본 정지 — 사용자가 재생을 눌러야 로봇이 움직인다
+  const [presetPlaying, setPresetPlaying] = useState(false);
   const handleCleaningState = useCallback(
     (s: { room: RoomId | null; scores: RoomScore[] }) => {
       if (s.room) lastRoomRef.current = s.room;
@@ -342,6 +455,7 @@ export function Simulator() {
   useEffect(() => {
     lastRoomRef.current = null;
     setLive({ room: null, scores: [] });
+    setPresetPlaying(false);
   }, [scenarioKey]);
 
   const currentRoom = live.room ?? lastRoomRef.current;
@@ -410,7 +524,18 @@ export function Simulator() {
 
       {/* ── 1. HERO: 청소 결정 + 지도 ── */}
       <section className="bg-white border border-border-default rounded-2xl shadow-sm overflow-hidden">
-        <div className="grid lg:grid-cols-[1.55fr_1fr]">
+        <div className={`grid ${isTimeline ? "lg:grid-cols-[168px_1.4fr_1fr]" : "lg:grid-cols-[1.55fr_1fr]"}`}>
+          {isTimeline && (
+            <div className="p-3 sm:p-4 border-b border-border-default lg:border-b-0 lg:border-r">
+              <TimelineRail
+                keyframes={timeline.keyframes}
+                activeIndex={timeline.activeKeyframeIndex}
+                speed={timeline.speed}
+                onSpeedChange={timeline.setSpeed}
+                onSeek={timeline.seek}
+              />
+            </div>
+          )}
           <div className="p-3 sm:p-4 border-b border-border-default lg:border-b-0 lg:border-r">
             <HouseMap
               rooms={effectiveResponse?.rooms}
@@ -420,6 +545,17 @@ export function Simulator() {
               currentTime={currentTime}
               staticBase={!effectiveResponse || effectiveResponse.scenario_id === "__base__"}
               onCleaningStateChange={handleCleaningState}
+              playing={isTimeline ? timeline.playing : presetPlaying}
+              onPlayingChange={
+                isTimeline
+                  ? (p: boolean) => (p ? timeline.play() : timeline.pause())
+                  : (state.mode === "preset" || state.mode === "pipeline") && state.selectedId
+                    ? setPresetPlaying
+                    : undefined
+              }
+              timeline={isTimeline}
+              activeKeyframeIndex={timeline.activeKeyframeIndex}
+              speed={isTimeline ? timeline.speed : 1}
             />
           </div>
           <div className="p-5 sm:p-7">
