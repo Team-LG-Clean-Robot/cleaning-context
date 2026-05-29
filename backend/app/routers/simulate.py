@@ -224,10 +224,14 @@ def _custom_from_sensors(
     explicit_events = list(override.active_events) if override else []
     merged_events = list(dict.fromkeys(explicit_events + sensor_event_ids))
 
-    # user_location: override 우선, 없으면 motion_sensor 힌트
+    # user_location: override 우선, 없으면 ML 위치 추정 (confidence fallback 포함)
     user_location = override.user_location if override and override.user_location else None
     if user_location is None:
-        user_location = engine.user_location_hint(req.sensor_readings)
+        from app.data_loader import load_location_estimator
+
+        est = load_location_estimator().estimate(req.sensor_readings, current_time)
+        # away 는 방이 아니므로 점유 페널티 대상에서 제외 (user_location=None 처리)
+        user_location = est.user_room if est.user_room in load_rooms() else None
 
     gap_rooms = list(override.gap_rooms) if override else []
     custom = CustomContext(

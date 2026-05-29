@@ -78,8 +78,10 @@
 - [x] 데모 UX 재설계 — HERO 결정카드(지도+현재 위치+우선순위) 세로 흐름 + 초기 base 상태 진입 + 사이트 전반 이모지→인라인 SVG 아이콘 (`components/icons.tsx`)
 - [x] 스코어링 정합 — base_score v2(22/20/28/12/18) 프론트·백엔드·문서 일치 + 프론트 enrich 제거 → 정적/라이브 점수 1:1 (pytest 53/53)
 - [x] 설계 문서(`CLEANING_DECISION_ALGORITHM.md`) v2 동기화 — 박주상 설계 골격(§0~§2) 보존 + §3~5 실측값·변경점 주석 (박주상 사전 동의)
-- [ ] 박주상 ML 위치 추정 결과(정확도·confusion matrix) hand-off + 슬라이드 두 축 개념 공유
-- [ ] 발표 슬라이드 8장 제작 (Why → Vision → Reality → Inside, Need×Opportunity 1슬라이드 포함) — `docs/PRESENTATION.md` 기반
+- [x] ML 위치 추정 구현 — `backend/app/ml/` CASAS hh106 RandomForest (98.9% / CV 99.0%). ⚠️ 작업 트리 미커밋 (전유성 본인 작업, 별도 커밋 필요)
+- [x] 리허설 발표 덱 16장 제작·배포 — `exports/rehearsal-deck/` (mono HTML, 4파트). 팀원 각자 본인 파트 슬라이드 수정 → 전유성 취합 예정
+- [x] 사업기획서 main 통합 — PR #10 머지 (`exports/사업기획서/`, 김준성)
+- [ ] 전유성 본인 파트 슬라이드(09~11) 다듬기 — 다음 세션
 - [ ] 데모 백업 영상 녹화 (rainy_return → 방 클릭 → 점수 설명서 → 청소 후 residual)
 
 **빌드 (5/28~29)**:

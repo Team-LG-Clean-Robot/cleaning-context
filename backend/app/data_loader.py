@@ -38,3 +38,14 @@ def load_inference_engine():
     from app.services.sensor_inference import SensorInferenceEngine
 
     return SensorInferenceEngine(DATA_DIR / "sensor_inference_rules.json")
+
+
+@lru_cache
+def load_location_estimator():
+    """v3 — ML 사용자 위치 추정기 (CASAS hh106 학습).
+
+    모델 부재/손상 시에도 휴리스틱으로 동작. docs/CLEANING_DECISION_ALGORITHM.md §1.
+    """
+    from app.ml.estimator import LocationEstimator
+
+    return LocationEstimator()

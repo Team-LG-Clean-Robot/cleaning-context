@@ -3,7 +3,13 @@ import time
 from fastapi import APIRouter
 
 from app.config import get_settings
-from app.data_loader import load_events, load_inference_engine, load_rooms, load_scenarios
+from app.data_loader import (
+    load_events,
+    load_inference_engine,
+    load_location_estimator,
+    load_rooms,
+    load_scenarios,
+)
 
 router = APIRouter()
 
@@ -14,6 +20,8 @@ _COLD_START_WINDOW_SEC = 30
 @router.get("/health")
 def health() -> dict:
     uptime_sec = time.monotonic() - _BOOT_TS
+    est = load_location_estimator()
+    metrics = est.metrics
     return {
         "status": "ok",
         "llm_available": bool(get_settings().timely_api_key),
@@ -23,4 +31,8 @@ def health() -> dict:
         "cold_start": uptime_sec < _COLD_START_WINDOW_SEC,
         "uptime_sec": int(uptime_sec),
         "inference_rules_loaded": len(load_inference_engine().rules),
+        # v3 — ML 위치 추정기 실측 상태
+        "location_model_loaded": est.model_loaded,
+        "location_model_version": est.model_version,
+        "location_cv_accuracy": metrics.get("cv5_accuracy_mean"),
     }

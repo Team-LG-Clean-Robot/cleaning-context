@@ -61,6 +61,12 @@ class InferResponse(BaseModel):
         default_factory=list, description="confidence desc 정렬"
     )
     user_location_hint: str | None = Field(
-        None, description="motion_sensor 기반 사용자 위치 추정 (room_id)"
+        None, description="추정된 사용자 위치 (room_id). ML 또는 motion 휴리스틱"
+    )
+    location_confidence: float | None = Field(
+        None, ge=0.0, le=1.0, description="위치 추정 신뢰도 (ML predict_proba max)"
+    )
+    location_source: InferSource | Literal["heuristic", "away", "none"] = Field(
+        "heuristic", description="위치 추정 출처: ml | heuristic | away | none"
     )
     model_version: str | None = Field(None, description="ML 사용 시 모델 버전")

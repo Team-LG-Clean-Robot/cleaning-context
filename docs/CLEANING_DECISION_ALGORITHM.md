@@ -24,6 +24,8 @@
 
 ## 1. 1단계: ML 위치 추정
 
+> **구현 완료 (2026-05-29).** `backend/app/ml/` — CASAS hh106 학습 RandomForest(holdout 98.9% / 5-fold CV 99.0%). feature(`features.py`)는 CASAS·런타임 공통, 추정기(`estimator.py`)는 §1.3 confidence fallback 적용. 학습: `scripts/train_location_model.py`. 단일 거주자 위치라 정확도가 본질적으로 높으며, ML 실효 가치는 confidence 보정 + 이질 센서 융합이다.
+
 ### 1.1 ML의 역할
 
 ML의 역할은 오직 하나다.

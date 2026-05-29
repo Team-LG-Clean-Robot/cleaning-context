@@ -1,0 +1,78 @@
+{
+  "model": "RandomForest(n_estimators=200, max_depth=14, balanced)",
+  "version": "loc-rf-v3-20260529",
+  "dataset": "CASAS hh106 (WSU, Zenodo CC BY 4.0, record 15708568)",
+  "task": "user location estimation (5-class room)",
+  "n_samples": 60000,
+  "n_features": 12,
+  "feature_names": [
+    "act_entrance",
+    "act_living",
+    "act_kitchen",
+    "act_bedroom",
+    "act_bathroom",
+    "recency_entrance",
+    "recency_living",
+    "recency_kitchen",
+    "recency_bedroom",
+    "recency_bathroom",
+    "hour_sin",
+    "hour_cos"
+  ],
+  "test_accuracy": 0.9892,
+  "cv5_accuracy_mean": 0.9905,
+  "cv5_accuracy_std": 0.0008,
+  "per_class": {
+    "bathroom": {
+      "precision": 1.0,
+      "recall": 0.997,
+      "f1-score": 0.998,
+      "support": 594.0
+    },
+    "bedroom": {
+      "precision": 0.998,
+      "recall": 0.997,
+      "f1-score": 0.998,
+      "support": 1080.0
+    },
+    "entrance": {
+      "precision": 0.989,
+      "recall": 1.0,
+      "f1-score": 0.995,
+      "support": 181.0
+    },
+    "kitchen": {
+      "precision": 0.992,
+      "recall": 0.983,
+      "f1-score": 0.987,
+      "support": 4935.0
+    },
+    "living": {
+      "precision": 0.984,
+      "recall": 0.993,
+      "f1-score": 0.988,
+      "support": 5210.0
+    },
+    "macro avg": {
+      "precision": 0.993,
+      "recall": 0.994,
+      "f1-score": 0.993,
+      "support": 12000.0
+    },
+    "weighted avg": {
+      "precision": 0.989,
+      "recall": 0.989,
+      "f1-score": 0.989,
+      "support": 12000.0
+    }
+  },
+  "room_distribution": {
+    "bathroom": 4912,
+    "bedroom": 8876,
+    "entrance": 1496,
+    "kitchen": 40904,
+    "living": 42997
+  },
+  "trained_at": "2026-05-29 20:04",
+  "kpi_pass": true
+}
