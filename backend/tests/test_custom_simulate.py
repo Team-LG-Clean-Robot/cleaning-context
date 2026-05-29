@@ -23,11 +23,11 @@ def test_custom_matches_rainy_return():
     body = res.json()
     assert body["scenario_id"] == "__custom__"
     by_room = {r["room_id"]: r for r in body["rooms"]}
-    assert by_room["entrance"]["final"] == 65
+    assert by_room["entrance"]["final"] == 62
     assert by_room["entrance"]["mode"] == "normal"
-    assert by_room["living"]["final"] == 40
-    assert by_room["kitchen"]["final"] == 20
-    assert by_room["bedroom"]["final"] == -15
+    assert by_room["living"]["final"] == 35
+    assert by_room["kitchen"]["final"] == 28
+    assert by_room["bedroom"]["final"] == -8
     assert by_room["bedroom"]["mode"] == "excluded"
 
 
@@ -47,8 +47,8 @@ def test_custom_empty_events_returns_base():
     assert res.status_code == 200
     body = res.json()
     by_room = {r["room_id"]: r for r in body["rooms"]}
-    assert by_room["entrance"]["final"] == 30
-    assert by_room["bedroom"]["final"] == 15
+    assert by_room["entrance"]["final"] == 22
+    assert by_room["bedroom"]["final"] == 12
     assert all(r["mode"] == "normal" for r in body["rooms"])
 
 

@@ -1,6 +1,7 @@
 "use client";
 import type { EventMeta, ScenarioMeta } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
+import { ClockIcon, MoonIcon, PinIcon } from "./icons";
 
 type Props = {
   scenarios: ScenarioMeta[];
@@ -26,7 +27,7 @@ export function ScenarioPanel({
   }
   const eventLabel = new Map(events.map((e) => [e.id, e.name_ko]));
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       {scenarios.map((s) => {
         const active = s.id === selectedId;
         const chips = s.active_events.slice(0, MAX_CHIPS);
@@ -59,13 +60,24 @@ export function ScenarioPanel({
               </div>
             )}
             <div
-              className={`text-[12px] mt-1.5 ${
+              className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] mt-1.5 ${
                 active ? "text-white/80" : "text-gray-500"
               }`}
             >
-              🕒 {s.current_time} · 😴 취침 {s.sleep_time}
-              {s.user_location &&
-                ` · 📍 ${ROOM_LABEL[s.user_location]}`}
+              <span className="inline-flex items-center gap-1">
+                <ClockIcon className="w-3 h-3" />
+                {s.current_time}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <MoonIcon className="w-3 h-3" />
+                취침 {s.sleep_time}
+              </span>
+              {s.user_location && (
+                <span className="inline-flex items-center gap-1">
+                  <PinIcon className="w-3 h-3" />
+                  {ROOM_LABEL[s.user_location]}
+                </span>
+              )}
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2.5">
               {chips.map((eid) => (

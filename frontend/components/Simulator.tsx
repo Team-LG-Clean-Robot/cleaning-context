@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   RequestSequencer,
   fetchEvents,
@@ -13,11 +13,13 @@ import { getSensorStates, toSensorReadings } from "@/lib/sensor-mock";
 import type {
   CustomRequest,
   EventMeta,
+  RoomId,
   RoomScore,
   ScenarioMeta,
   SimulateResponse,
 } from "@/lib/types";
-import { ROOM_LABEL } from "@/lib/types";
+import { ROOM_LABEL, ROOMS_SEED } from "@/lib/types";
+import { ClockIcon, MoonIcon, PinIcon } from "./icons";
 import STATIC_SCENARIOS from "@/lib/static-scenarios.json";
 import STATIC_EVENTS from "@/lib/static-events.json";
 import STATIC_RESPONSES from "@/lib/static-responses.json";
@@ -47,78 +49,100 @@ type State = {
   error: string | null;
 };
 
-function ContextSummary({
-  mode,
-  selected,
-  customDraft,
-  events,
+function DecisionHero({
+  response,
+  currentRoom,
+  liveScores,
+  active,
+  chips,
+  timeStr,
+  sleepStr,
+  locLabel,
 }: {
-  mode: ModeTab;
-  selected: ScenarioMeta | undefined;
-  customDraft: CustomRequest;
-  events: EventMeta[];
+  response: SimulateResponse | null;
+  currentRoom: RoomId | null;
+  liveScores: RoomScore[];
+  active: boolean;
+  chips: string[];
+  timeStr: string | null;
+  sleepStr: string | null;
+  locLabel: string | null;
 }) {
-  const eventLabel = new Map(events.map((e) => [e.id, e.name_ko]));
-  const title = mode === "preset" ? selected?.name_ko ?? "시나리오" : "직접 입력";
-  const ct = mode === "preset" ? selected?.current_time : customDraft.current_time;
-  const st = mode === "preset" ? selected?.sleep_time : customDraft.sleep_time;
-  const loc = mode === "preset" ? selected?.user_location : customDraft.user_location;
-  const evs = mode === "preset" ? selected?.active_events ?? [] : customDraft.active_events;
-  if (!ct) return null;
+  if (!response) {
+    return (
+      <div className="flex h-full flex-col justify-center gap-2">
+        <div className="text-[11px] uppercase tracking-[0.14em] text-gray-500 font-semibold">
+          현재 위치
+        </div>
+        <p className="text-[15px] text-text-muted leading-relaxed">
+          맥락을 입력하면 청소 위치와 우선순위가 여기에 표시됩니다.
+        </p>
+      </div>
+    );
+  }
+  const scores = liveScores.length ? liveScores : response.rooms;
+  const ranked = [...scores].sort((a, b) => b.final - a.final);
+  const top = ranked.find((r) => r.mode !== "excluded") ?? ranked[0];
+  const room = currentRoom ?? top.room_id;
+  const excluded = ranked.filter((r) => r.mode === "excluded");
   return (
-    <section
-      aria-label="입력 컨텍스트"
-      className="bg-surface-muted border border-border-default rounded-lg p-3"
-    >
-      <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-[11px] uppercase tracking-wider font-semibold text-gray-500">
-          입력 컨텍스트
-        </h3>
-        <span className="text-[12px] font-medium text-text-default">{title}</span>
+    <div className="flex h-full flex-col">
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] uppercase tracking-[0.14em] text-gray-500 font-semibold">
+          현재 위치
+        </span>
+        {active && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-text-muted">
+            <span className="w-1.5 h-1.5 rounded-full bg-text-default animate-pulse" />
+            청소 중
+          </span>
+        )}
       </div>
-      <div className="text-[12px] text-text-muted mt-1.5">
-        🕒 {ct} · 😴 취침 {st}
-        {loc && ` · 📍 ${ROOM_LABEL[loc]}`}
-      </div>
-      {evs.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {evs.map((eid) => (
+      <h2 className="text-[34px] sm:text-[40px] font-bold leading-none tracking-tight mt-2">
+        {ROOM_LABEL[room]}
+      </h2>
+      {timeStr && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-text-muted mt-3">
+          <span className="inline-flex items-center gap-1">
+            <ClockIcon className="w-3.5 h-3.5" />
+            {timeStr}
+          </span>
+          {sleepStr && (
+            <span className="inline-flex items-center gap-1">
+              <MoonIcon className="w-3.5 h-3.5" />
+              취침 {sleepStr}
+            </span>
+          )}
+          {locLabel && (
+            <span className="inline-flex items-center gap-1">
+              <PinIcon className="w-3.5 h-3.5" />
+              {locLabel}
+            </span>
+          )}
+        </div>
+      )}
+      {chips.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-2.5">
+          {chips.map((c) => (
             <span
-              key={eid}
-              className="px-2 py-0.5 rounded-md text-[11px] bg-white border border-border-default text-text-default"
+              key={c}
+              className="px-2 py-0.5 rounded-md text-[11px] bg-surface-base border border-border-default text-text-default"
             >
-              {eventLabel.get(eid) ?? eid}
+              {c}
             </span>
           ))}
         </div>
       )}
-    </section>
-  );
-}
-
-function SamplePreview() {
-  return (
-    <section
-      aria-label="AI 설명 미리보기"
-      className="relative bg-surface-base border border-dashed border-border-default rounded-xl p-5"
-    >
-      <span className="absolute top-3 right-3 text-[10px] uppercase tracking-wider text-gray-500 bg-white border border-border-default rounded px-1.5 py-0.5">
-        미리보기
-      </span>
-      <div className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">
-        AI 설명 예시 · 비 오는 날 귀가
+      {excluded.length > 0 && (
+        <div className="text-[12px] text-gray-500 mt-2.5">
+          {ROOM_LABEL[excluded[0].room_id]}
+          {excluded.length > 1 ? ` 외 ${excluded.length - 1}곳` : ""} 제외
+        </div>
+      )}
+      <div className="mt-5 pt-4 border-t border-border-default flex-1">
+        <PriorityList rooms={ranked} />
       </div>
-      <p className="text-[14px] text-text-default leading-relaxed">
-        오늘은 비가 와서 현관 오염 가능성이 높고, 사용자가 방금 귀가했기 때문에{" "}
-        <strong className="font-semibold">현관을 우선 청소</strong>합니다. 사용자가 거실로
-        이동할 가능성이 높아 거실도 보조 청소합니다.{" "}
-        <strong className="font-semibold">침실은 취침 시간(23:00)이 가까워</strong> 소음을
-        줄이기 위해 제외했습니다.
-      </p>
-      <div className="text-[11px] text-gray-500 mt-3">
-        좌측에서 시나리오를 선택하면 실제 응답이 표시됩니다.
-      </div>
-    </section>
+    </div>
   );
 }
 
@@ -130,7 +154,28 @@ const DEFAULT_CUSTOM: CustomRequest = {
   gap_rooms: [],
 };
 
-const DEFAULT_SCENARIO_ID = "rainy_return";
+// 맥락 입력이 없을 때의 기본 상태 — 공간별 기본 오염도 점수만. 로봇은 이 순서로 청소.
+const BASE_RESPONSE: SimulateResponse = {
+  scenario_id: "__base__",
+  context_summary: "생활 맥락 입력 없음 · 공간별 기본 오염도 기준",
+  rooms: [...ROOMS_SEED]
+    .map((r) => ({
+      room_id: r.id,
+      base: r.base_score,
+      breakdown: [
+        { source: "base", label_ko: "기본 점수", delta: r.base_score, axis: "need" as const },
+      ],
+      final: r.base_score,
+      mode: "normal" as const,
+      exclusion_reason: null,
+    }))
+    .sort((a, b) => b.final - a.final),
+  explanation:
+    "현재 입력된 생활 맥락이 없습니다. 공간별 기본 오염도 점수 순서로 청소 우선순위를 정합니다. 시나리오를 선택하면 맥락이 반영된 우선순위로 바뀝니다.",
+  fallback: false,
+  duration_ms: 0,
+  inferred_events: [],
+};
 
 const staticResponseMap = STATIC_RESPONSES as Record<string, Omit<SimulateResponse, "duration_ms">>;
 
@@ -185,15 +230,6 @@ export function Simulator() {
     }
     init();
     return () => ctrl.abort();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Auto-select default ambient scenario on mount — matches click flow
-  useEffect(() => {
-    const cached = staticResponseMap[DEFAULT_SCENARIO_ID];
-    if (!cached) return;
-    const response: SimulateResponse = { ...cached, duration_ms: 0 };
-    setState((s) => ({ ...s, selectedId: DEFAULT_SCENARIO_ID, response, loading: false, error: null }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -268,9 +304,28 @@ export function Simulator() {
 
   const [detailRoom, setDetailRoom] = useState<RoomScore | null>(null);
 
+  // 데모 청소 진행 상태 — HouseMap이 전달, 우측 카드가 실시간 반영
+  const [live, setLive] = useState<{ room: RoomId | null; scores: RoomScore[] }>({
+    room: null,
+    scores: [],
+  });
+  const lastRoomRef = useRef<RoomId | null>(null);
+  const handleCleaningState = useCallback(
+    (s: { room: RoomId | null; scores: RoomScore[] }) => {
+      if (s.room) lastRoomRef.current = s.room;
+      setLive(s);
+    },
+    [],
+  );
+
   const selected = state.scenarios.find((s) => s.id === state.selectedId);
   const isTimeline = state.mode === "timeline";
-  const effectiveResponse = isTimeline ? timeline.currentResponse : state.response;
+  // preset 모드에서 아무 시나리오도 선택 안 됐으면 기본 점수 상태(BASE_RESPONSE) 표시
+  const presetBase =
+    (state.mode === "preset" || state.mode === "pipeline") && !state.selectedId;
+  const effectiveResponse = isTimeline
+    ? timeline.currentResponse
+    : state.response ?? (presetBase ? BASE_RESPONSE : null);
   const userLocation = isTimeline
     ? timeline.currentUserLocation
     : (state.mode === "preset" || state.mode === "pipeline")
@@ -281,6 +336,16 @@ export function Simulator() {
     : (state.mode === "preset" || state.mode === "pipeline")
       ? selected?.current_time ?? null
       : state.customDraft.current_time;
+
+  // 시나리오/응답이 바뀌면 청소 진행 상태 리셋
+  const scenarioKey = effectiveResponse?.scenario_id ?? null;
+  useEffect(() => {
+    lastRoomRef.current = null;
+    setLive({ room: null, scores: [] });
+  }, [scenarioKey]);
+
+  const currentRoom = live.room ?? lastRoomRef.current;
+  const liveScores = live.scores.length ? live.scores : effectiveResponse?.rooms ?? [];
 
 
   if (coldStart && state.scenarios.length === 0) {
@@ -293,54 +358,100 @@ export function Simulator() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-    {detailRoom && (
-      <RoomDetail room={detailRoom} onClose={() => setDetailRoom(null)} />
-    )}
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-      <div className="lg:col-span-3 space-y-4">
-        <HouseMap
-          rooms={effectiveResponse?.rooms}
-          userLocation={userLocation}
-          onRoomClick={effectiveResponse ? setDetailRoom : undefined}
-          paused={isTimeline && !timeline.playing}
-          currentTime={currentTime}
-        />
-        <SensorDashboard
-          scenarioId={isTimeline ? null : (state.response?.scenario_id ?? state.selectedId)}
-          overrideSensors={isTimeline ? timeline.currentSensors : undefined}
-        />
-      </div>
-      <div className="lg:col-span-2 space-y-4">
-        <div
-          role="tablist"
-          aria-label="입력 모드"
-          className="bg-surface-base border border-border-default rounded-lg p-1 flex gap-1 w-fit"
+  const eventLabelMap = new Map(state.events.map((e) => [e.id, e.name_ko]));
+  const ctxEvents = isTimeline
+    ? []
+    : state.mode === "preset" || state.mode === "pipeline"
+      ? selected?.active_events ?? []
+      : state.customDraft.active_events;
+  const ctxChips = ctxEvents.map((id) => eventLabelMap.get(id) ?? id);
+  const sleepTime = isTimeline
+    ? null
+    : state.mode === "preset" || state.mode === "pipeline"
+      ? selected?.sleep_time ?? null
+      : state.customDraft.sleep_time;
+
+  const modeTabs = (
+    <div
+      role="tablist"
+      aria-label="입력 모드"
+      className="bg-surface-base border border-border-default rounded-lg p-1 flex flex-wrap gap-1 w-fit"
+    >
+      {(
+        [
+          { id: "preset", label: "시나리오 선택" },
+          { id: "custom", label: "직접 입력" },
+          { id: "timeline", label: "하루 시뮬레이션" },
+          { id: "pipeline", label: "파이프라인" },
+        ] as const
+      ).map((t) => (
+        <button
+          key={t.id}
+          role="tab"
+          aria-selected={state.mode === t.id}
+          onClick={() => switchMode(t.id)}
+          className={`px-4 py-2 text-[13px] font-medium rounded-md transition
+            ${
+              state.mode === t.id
+                ? "bg-white shadow-sm text-text-default"
+                : "text-gray-500 hover:text-text-default"
+            }`}
         >
-          {(
-            [
-              { id: "preset", label: "시나리오 선택" },
-              { id: "custom", label: "직접 입력" },
-              { id: "timeline", label: "하루 시뮬레이션" },
-              { id: "pipeline", label: "파이프라인" },
-            ] as const
-          ).map((t) => (
-            <button
-              key={t.id}
-              role="tab"
-              aria-selected={state.mode === t.id}
-              onClick={() => switchMode(t.id)}
-              className={`px-4 py-2 text-[13px] font-medium rounded-md transition
-                ${
-                  state.mode === t.id
-                    ? "bg-white shadow-sm text-text-default"
-                    : "text-gray-500 hover:text-text-default"
-                }`}
-            >
-              {t.label}
-            </button>
-          ))}
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="space-y-8">
+      {detailRoom && (
+        <RoomDetail room={detailRoom} onClose={() => setDetailRoom(null)} />
+      )}
+
+      {/* ── 1. HERO: 청소 결정 + 지도 ── */}
+      <section className="bg-white border border-border-default rounded-2xl shadow-sm overflow-hidden">
+        <div className="grid lg:grid-cols-[1.55fr_1fr]">
+          <div className="p-3 sm:p-4 border-b border-border-default lg:border-b-0 lg:border-r">
+            <HouseMap
+              rooms={effectiveResponse?.rooms}
+              userLocation={userLocation}
+              onRoomClick={effectiveResponse ? setDetailRoom : undefined}
+              paused={isTimeline && !timeline.playing}
+              currentTime={currentTime}
+              onCleaningStateChange={handleCleaningState}
+            />
+          </div>
+          <div className="p-5 sm:p-7">
+            {state.loading && !isTimeline ? (
+              <LoadingSkeleton />
+            ) : (
+              <DecisionHero
+                response={effectiveResponse}
+                currentRoom={currentRoom}
+                liveScores={liveScores}
+                active={!!live.room}
+                chips={ctxChips}
+                timeStr={currentTime}
+                sleepStr={sleepTime}
+                locLabel={userLocation ? ROOM_LABEL[userLocation] : null}
+              />
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 2. IoT 센서 모니터링 ── */}
+      <SensorDashboard
+        scenarioId={isTimeline ? null : (state.response?.scenario_id ?? state.selectedId)}
+        overrideSensors={isTimeline ? timeline.currentSensors : undefined}
+      />
+
+      {/* ── 3. 맥락 입력 · 데모 조작 ── */}
+      <section className="space-y-4">
+        <div className="flex items-baseline justify-between gap-3 flex-wrap">
+          <h2 className="text-[18px] font-bold tracking-tight">맥락 입력 · 데모 조작</h2>
+          {modeTabs}
         </div>
 
         {state.mode === "preset" ? (
@@ -383,10 +494,7 @@ export function Simulator() {
               loading={state.loading}
               onSelect={handlePresetSelect}
             />
-            <PipelinePanel
-              response={state.response}
-              scenarioId={state.selectedId}
-            />
+            <PipelinePanel response={state.response} scenarioId={state.selectedId} />
           </>
         ) : null}
 
@@ -405,50 +513,22 @@ export function Simulator() {
             )}
           </div>
         )}
+      </section>
 
-        {state.loading && !isTimeline && <LoadingSkeleton />}
-
-        {!isTimeline && !state.response && !state.loading && (
-          state.mode === "preset" ? (
-            <SamplePreview />
-          ) : (
-            <div className="border-2 border-dashed border-border-default rounded-xl p-8 text-center text-gray-500">
-              <div className="text-2xl mb-2" aria-hidden>
-                ←
-              </div>
-              <p className="text-[13px] text-text-muted">
-                이벤트·시간·위치를 입력하고 '시뮬레이션 실행'을 누르세요.
-              </p>
-            </div>
-          )
-        )}
-
-        {effectiveResponse && (isTimeline || !state.loading) && state.mode !== "pipeline" && (
-          <>
-            {!isTimeline && (
-              <ContextSummary
-                mode={state.mode}
-                selected={selected}
-                customDraft={state.customDraft}
-                events={state.events}
-              />
-            )}
-            <PriorityList rooms={effectiveResponse.rooms} />
-          </>
-        )}
-      </div>
-    </div>
-
-    {/* 최하단 통합 카드: AI 설명 + 후속 질문 */}
-    {effectiveResponse && (isTimeline || !state.loading) && state.mode !== "pipeline" && (
-      <div className="bg-white border border-border-default rounded-xl shadow-sm divide-y divide-border-default overflow-hidden">
-        <ExplanationCard response={effectiveResponse} />
-        <AskPanel
-          key={effectiveResponse?.scenario_id ?? "general"}
-          response={effectiveResponse}
-        />
-      </div>
-    )}
+      {/* ── 4. AI 설명 + 후속 질문 (최하단 — 파고드는 영역) ── */}
+      {effectiveResponse && (isTimeline || !state.loading) && (
+        <div className="bg-white border border-border-default rounded-2xl shadow-sm divide-y divide-border-default overflow-hidden">
+          <ExplanationCard
+            response={effectiveResponse}
+            currentRoom={currentRoom}
+            liveScores={liveScores}
+          />
+          <AskPanel
+            key={effectiveResponse?.scenario_id ?? "general"}
+            response={effectiveResponse}
+          />
+        </div>
+      )}
     </div>
   );
 }

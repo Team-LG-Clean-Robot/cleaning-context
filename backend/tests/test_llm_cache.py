@@ -7,6 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.config import get_settings
+from app.data_loader import load_rules
 from app.main import app
 from app.services import cache, llm_explainer
 
@@ -26,8 +27,9 @@ def test_cache_roundtrip():
 
 
 def test_cache_key_includes_rule_version():
+    version = load_rules()["rule_version"]
     key = cache.cache_key("rainy_return")
-    assert key.endswith("_v1")
+    assert key == f"rainy_return_{version}"
 
 
 def test_llm_fallback_when_no_key(monkeypatch):

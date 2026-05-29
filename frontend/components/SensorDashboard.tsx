@@ -117,7 +117,7 @@ export function SensorDashboard({ scenarioId, overrideSensors }: Props) {
           활성 {activeCount}/12
         </span>
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
         {sensors.map((s) => {
           const history = historyRef.current.get(s.id) ?? [];
           const showChart = s.active && s.noiseRange > 0 && history.length > 2;

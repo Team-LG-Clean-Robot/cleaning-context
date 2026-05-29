@@ -18,21 +18,9 @@
             "label_ko": "취침 30분 이내",
             "delta": 15,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 40,
+        "final": 33,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -45,21 +33,9 @@
             "label_ko": "기본 점수",
             "delta": 28,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 35,
+        "final": 28,
         "mode": "quiet",
         "exclusion_reason": "취침 임박 — 저소음 모드"
       },
@@ -72,21 +48,9 @@
             "label_ko": "기본 점수",
             "delta": 22,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 32,
+        "final": 22,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -105,21 +69,9 @@
             "label_ko": "취침 30분 이내",
             "delta": 5,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 31,
+        "final": 25,
         "mode": "quiet",
         "exclusion_reason": "취침 임박 — 저소음 모드"
       },
@@ -150,21 +102,9 @@
             "label_ko": "소음 민감도×취침 임박",
             "delta": -10,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": -57,
+        "final": -58,
         "mode": "excluded",
         "exclusion_reason": "취침 30분 이내 (-40)"
       }
@@ -192,21 +132,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 40,
+        "final": 33,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -225,21 +153,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 25,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 38,
+        "final": 37,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -258,21 +174,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 37,
+        "final": 27,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -291,21 +195,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 31,
+        "final": 25,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -324,21 +216,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 30,
+        "final": 23,
         "mode": "normal",
         "exclusion_reason": null
       }
@@ -366,21 +246,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 40,
+        "final": 33,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -399,21 +267,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 25,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 38,
+        "final": 37,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -432,21 +288,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 37,
+        "final": 27,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -465,21 +309,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 31,
+        "final": 25,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -498,21 +330,9 @@
             "label_ko": "사용자 외출 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 30,
+        "final": 23,
         "mode": "normal",
         "exclusion_reason": null
       }
@@ -540,21 +360,9 @@
             "label_ko": "사용자 귀가",
             "delta": 15,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 47,
+        "final": 37,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -567,21 +375,9 @@
             "label_ko": "기본 점수",
             "delta": 28,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 35,
+        "final": 28,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -594,21 +390,9 @@
             "label_ko": "기본 점수",
             "delta": 18,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 25,
+        "final": 18,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -621,21 +405,9 @@
             "label_ko": "기본 점수",
             "delta": 12,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 13,
+        "final": 12,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -660,21 +432,9 @@
             "label_ko": "사용자 머무름",
             "delta": -20,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 11,
+        "final": 5,
         "mode": "delayed",
         "exclusion_reason": "30분 후 재시도"
       }
@@ -702,21 +462,9 @@
             "label_ko": "요리 진행 중",
             "delta": 15,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 41,
+        "final": 35,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -735,21 +483,9 @@
             "label_ko": "요리 진행 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 37,
+        "final": 27,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -768,21 +504,9 @@
             "label_ko": "요리 진행 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 30,
+        "final": 23,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -801,21 +525,9 @@
             "label_ko": "요리 진행 중",
             "delta": 5,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 18,
+        "final": 17,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -840,21 +552,9 @@
             "label_ko": "사용자 머무름",
             "delta": -20,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": -25,
+        "final": -32,
         "mode": "excluded",
         "exclusion_reason": "요리 진행 중 (-40)"
       }
@@ -882,21 +582,9 @@
             "label_ko": "요리 완료",
             "delta": 35,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 70,
+        "final": 63,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -909,21 +597,9 @@
             "label_ko": "기본 점수",
             "delta": 22,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 32,
+        "final": 22,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -936,21 +612,9 @@
             "label_ko": "기본 점수",
             "delta": 18,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 25,
+        "final": 18,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -963,21 +627,9 @@
             "label_ko": "기본 점수",
             "delta": 12,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 13,
+        "final": 12,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1002,21 +654,9 @@
             "label_ko": "사용자 머무름",
             "delta": -20,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 11,
+        "final": 5,
         "mode": "delayed",
         "exclusion_reason": "30분 후 재시도"
       }
@@ -1044,21 +684,9 @@
             "label_ko": "손님 방문 임박",
             "delta": 30,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 56,
+        "final": 50,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1077,21 +705,9 @@
             "label_ko": "손님 방문 임박",
             "delta": 15,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 47,
+        "final": 37,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1110,21 +726,9 @@
             "label_ko": "손님 방문 임박",
             "delta": 10,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 45,
+        "final": 38,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1143,21 +747,9 @@
             "label_ko": "손님 방문 임박",
             "delta": 15,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 40,
+        "final": 33,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1176,21 +768,9 @@
             "label_ko": "손님 방문 임박",
             "delta": -5,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 8,
+        "final": 7,
         "mode": "normal",
         "exclusion_reason": null
       }
@@ -1212,21 +792,9 @@
             "label_ko": "기본 점수",
             "delta": 28,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 35,
+        "final": 28,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1239,21 +807,9 @@
             "label_ko": "기본 점수",
             "delta": 22,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 32,
+        "final": 22,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1266,21 +822,9 @@
             "label_ko": "기본 점수",
             "delta": 18,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 1,
-            "axis": "opportunity"
           }
         ],
-        "final": 25,
+        "final": 18,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1293,21 +837,9 @@
             "label_ko": "기본 점수",
             "delta": 12,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 13,
+        "final": 12,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1326,21 +858,9 @@
             "label_ko": "사용자 머무름",
             "delta": -20,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 2,
-            "axis": "opportunity"
           }
         ],
-        "final": 6,
+        "final": 0,
         "mode": "normal",
         "exclusion_reason": null
       }
@@ -1362,21 +882,9 @@
             "label_ko": "기본 점수",
             "delta": 28,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 0,
-            "axis": "opportunity"
           }
         ],
-        "final": 33,
+        "final": 28,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1389,21 +897,9 @@
             "label_ko": "기본 점수",
             "delta": 22,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 0,
-            "axis": "opportunity"
           }
         ],
-        "final": 30,
+        "final": 22,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1416,21 +912,9 @@
             "label_ko": "기본 점수",
             "delta": 18,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": 0,
-            "axis": "opportunity"
           }
         ],
-        "final": 24,
+        "final": 18,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1455,21 +939,9 @@
             "label_ko": "사용자 머무름",
             "delta": -20,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 8,
+        "final": 5,
         "mode": "delayed",
         "exclusion_reason": "30분 후 재시도"
       },
@@ -1488,21 +960,9 @@
             "label_ko": "취침 2시간 이내",
             "delta": -20,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -3,
-            "axis": "opportunity"
           }
         ],
-        "final": -9,
+        "final": -8,
         "mode": "excluded",
         "exclusion_reason": "취침 2시간 이내 (-20)"
       }
@@ -1530,21 +990,9 @@
             "label_ko": "취침 30분 이내",
             "delta": 15,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 6,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -2,
-            "axis": "opportunity"
           }
         ],
-        "final": 37,
+        "final": 33,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1557,21 +1005,9 @@
             "label_ko": "기본 점수",
             "delta": 28,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 5,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -2,
-            "axis": "opportunity"
           }
         ],
-        "final": 31,
+        "final": 28,
         "mode": "quiet",
         "exclusion_reason": "취침 임박 — 저소음 모드"
       },
@@ -1584,21 +1020,9 @@
             "label_ko": "기본 점수",
             "delta": 22,
             "axis": "need"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 8,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -1,
-            "axis": "opportunity"
           }
         ],
-        "final": 29,
+        "final": 22,
         "mode": "normal",
         "exclusion_reason": null
       },
@@ -1617,21 +1041,9 @@
             "label_ko": "취침 30분 이내",
             "delta": 5,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 4,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -3,
-            "axis": "opportunity"
           }
         ],
-        "final": 26,
+        "final": 25,
         "mode": "quiet",
         "exclusion_reason": "취침 임박 — 저소음 모드"
       },
@@ -1662,21 +1074,9 @@
             "label_ko": "소음 민감도×취침 임박",
             "delta": -10,
             "axis": "opportunity"
-          },
-          {
-            "source": "cleanup_recency",
-            "label_ko": "지난 청소 후 누적",
-            "delta": 2,
-            "axis": "need"
-          },
-          {
-            "source": "time_of_day_fit",
-            "label_ko": "시간대 적합도",
-            "delta": -6,
-            "axis": "opportunity"
           }
         ],
-        "final": -62,
+        "final": -58,
         "mode": "excluded",
         "exclusion_reason": "취침 30분 이내 (-40)"
       }

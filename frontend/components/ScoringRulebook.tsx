@@ -57,11 +57,11 @@ export function ScoringRulebook({ onClose }: Props) {
           <Table
             headers={["방", "점수", "근거"]}
             rows={[
-              ["현관", "30", "외부 출입 통로 — 가장 더러워지기 쉽고 첫 인상 중요"],
-              ["거실", "25", "가족 공용 공간 — 일상 활동 집중"],
-              ["주방", "20", "위생 중요 + 청소 빈도 높음"],
-              ["침실", "15", "정적 공간 — 먼지 누적 느림"],
-              ["욕실", "10", "작은 면적 + 별도 청소 루틴 가정"],
+              ["주방", "28", "위생 민감 + 조리 오염 잦음 — 최상위"],
+              ["현관", "22", "외부 출입 통로 — 흙·물기 유입 쉬움"],
+              ["거실", "20", "가족 공용 공간 — 일상 활동 집중"],
+              ["욕실", "18", "습기·물때 — 정기 관리 필요"],
+              ["침실", "12", "정적 공간 — 먼지 누적 느림"],
             ]}
           />
         </Section>
@@ -72,11 +72,11 @@ export function ScoringRulebook({ onClose }: Props) {
             headers={["이벤트", "영향 방 · delta", "근거"]}
             rows={[
               ["rain", "현관 +25 / 거실 +5", "비 묻은 신발·우산 — 현관 직접, 거실 부수"],
-              ["user_returned", "현관 +15", "외부에서 방금 진입"],
-              ["cooking_done", "주방 +35", "요리 직후 음식 부스러기·기름"],
-              ["cooking_active", "주방 +30", "진행 중 — done보다 약간 낮음"],
+              ["user_returned", "현관 +15 / 거실 +5", "외부에서 방금 진입"],
+              ["cooking_done", "주방 +35 / 거실 +5", "요리 직후 음식 부스러기·기름"],
+              ["cooking_active", "주방 −40 / 거실 +15", "조리 중 — 주방 회피, 동선 거실로"],
               ["recent_shower", "욕실 +25", "습기·머리카락 직접"],
-              ["cleanup_recency", "방별 +2~+8 (baseline)", "지난 청소 후 누적 — 트래픽 비례"],
+              ["package_delivery", "현관 +35 / 거실 +10", "배송 출입 — 현관 동선 오염"],
             ]}
           />
         </Section>
@@ -86,12 +86,11 @@ export function ScoringRulebook({ onClose }: Props) {
           <Table
             headers={["신호", "영향", "근거"]}
             rows={[
-              ["guest_arriving_2h", "거실 +25 / 현관 +20 / 침실 −10", "캘린더 — 사전 정리 invitation, 침실은 비공개"],
-              ["pre_sleep_30min", "침실 −40", "취침 임박 — 소음 강 회피"],
+              ["guest_arriving_2h", "거실 +30 / 현관 +15 / 욕실 +15 / 침실 −5", "캘린더 — 사전 정리 invitation, 침실은 비공개"],
+              ["pre_sleep_30min", "침실 −40 / 욕실 +15", "취침 임박 — 침실 소음 회피"],
               ["pre_sleep_2h", "침실 −20 / 거실 +5", "취침 전 거실 정리는 권장"],
-              ["user_occupancy", "사용자 위치 방 −20", "ML 위치 추정 → 방해 회피"],
+              ["user_occupancy", "사용자 위치 방 −20", "사용자 위치 추정 → 방해 회피 (지연)"],
               ["noise_sleep_extra", "−10 (조건부)", "취침 임박 + 소음 민감 방(침실)"],
-              ["time_of_day_fit", "방별 ±0~±6 (baseline)", "취침까지 잔여 시간 기반"],
             ]}
           />
         </Section>
@@ -100,9 +99,8 @@ export function ScoringRulebook({ onClose }: Props) {
         <Section title="5. 값 결정 원리">
           <ul className="text-[13px] text-text-default leading-relaxed space-y-1.5 pl-4 list-disc marker:text-text-muted">
             <li>강한 신호 (cooking_done, pre_sleep_30min): <strong>30~40</strong> — base_score 단위와 동급</li>
-            <li>약한·부수 신호 (rain 거실, user_returned 거실): <strong>5~10</strong></li>
+            <li>약한·부수 신호 (rain 거실, user_returned 거실): <strong>5~15</strong></li>
             <li>modifier (user_occupancy, noise_sleep): <strong>−10 ~ −20</strong></li>
-            <li>baseline (cleanup_recency, time_of_day_fit): <strong>±10 이내</strong></li>
           </ul>
         </Section>
 

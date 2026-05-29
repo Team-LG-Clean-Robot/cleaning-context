@@ -8,6 +8,8 @@ type Props = {
   onRoomClick?: (room: RoomScore) => void;
   paused?: boolean;
   currentTime?: string | null;
+  /** 청소 진행 상태를 상위로 노출 — 현재 청소 중인 방 + 실시간 점수 */
+  onCleaningStateChange?: (s: { room: RoomId | null; scores: RoomScore[] }) => void;
 };
 type Pt = { x: number; y: number };
 
@@ -125,7 +127,7 @@ function generateDustPool(roomIds: RoomId[]): Dust[] {
 
 function activeDustIds(pool: Dust[], roomScores: RoomScore[]): Set<string> {
   const ranked = roomScores
-    .filter((r) => r.mode !== "excluded" && r.final > 0)
+    .filter((r) => r.mode !== "excluded" && r.mode !== "delayed" && r.final > 0)
     .sort((a, b) => b.final - a.final);
   const active = new Set<string>();
   for (let rank = 0; rank < ranked.length; rank++) {
@@ -145,7 +147,8 @@ function pickNextRoom(
 ): RoomId | null {
   let best: { id: RoomId; score: number } | null = null;
   for (const r of roomScores) {
-    if (r.mode === "excluded") continue;
+    // excluded(점수<0) + delayed(사용자 점유) 둘 다 지금은 청소 안 함
+    if (r.mode === "excluded" || r.mode === "delayed") continue;
     const total = dust.filter((d) => d.roomId === r.room_id).length;
     const removed = dust.filter((d) => d.roomId === r.room_id && hidden.has(d.id)).length;
     if (total > 0 && removed >= total) continue;
@@ -262,7 +265,7 @@ function useRobotMotion(
         setCleaningRoom(null);
         activeTarget.current = null;
         scheduleRoom();
-      }, delay + 300));
+      }, delay + 120));
     }
 
     timers.current.push(setTimeout(scheduleRoom, 200));
@@ -339,24 +342,22 @@ function PersonIcon({ x, y }: { x: number; y: number }) {
 }
 
 /* ── 로봇 아이콘 ── */
-function RobotIcon({ x, y, durationMs = 0, cleaning = false }: { x: number; y: number; durationMs?: number; cleaning?: boolean }) {
+function RobotIcon({ x, y, durationMs = 0 }: { x: number; y: number; durationMs?: number }) {
   return (
     <g style={{ transform: `translate(${x}px, ${y}px)`, transition: durationMs > 0 ? `transform ${durationMs}ms linear` : "none" }}>
-      <g style={cleaning ? { animation: "robot-orbit 1.8s linear infinite" } : undefined}>
-        <circle cx={0} cy={0} r={18} fill="none" stroke="oklch(50% 0.12 250)" strokeWidth={1.2} opacity={0.3}>
-          <animate attributeName="r" values="18;25;18" dur="2.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
-        </circle>
-        <ellipse cx={1} cy={2} rx={13} ry={12} fill="rgba(0,0,0,0.08)" />
-        <circle cx={0} cy={0} r={13} fill="#f8f8f8" stroke="#bbb" strokeWidth={1.2} />
-        <circle cx={0} cy={0} r={11} fill="none" stroke="#ddd" strokeWidth={0.6} />
-        <circle cx={0} cy={-3} r={4} fill="#eee" stroke="#ccc" strokeWidth={0.6} />
-        <rect x={-2.5} y={-12.5} width={5} height={2.5} rx={1} fill="#444" />
-        <circle cx={0} cy={5} r={1.5} fill="#e53935">
-          <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" />
-        </circle>
-        <text x={0} y={24} textAnchor="middle" style={{ font: "600 8px var(--font-sans)", fill: "#666" }}>청소기</text>
-      </g>
+      <circle cx={0} cy={0} r={18} fill="none" stroke="oklch(45% 0 0)" strokeWidth={1.2} opacity={0.3}>
+        <animate attributeName="r" values="18;25;18" dur="2.5s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
+      </circle>
+      <ellipse cx={1} cy={2} rx={13} ry={12} fill="rgba(0,0,0,0.08)" />
+      <circle cx={0} cy={0} r={13} fill="#f8f8f8" stroke="#bbb" strokeWidth={1.2} />
+      <circle cx={0} cy={0} r={11} fill="none" stroke="#ddd" strokeWidth={0.6} />
+      <circle cx={0} cy={-3} r={4} fill="#eee" stroke="#ccc" strokeWidth={0.6} />
+      <rect x={-2.5} y={-12.5} width={5} height={2.5} rx={1} fill="#444" />
+      <circle cx={0} cy={5} r={1.5} fill="#e53935">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" />
+      </circle>
+      <text x={0} y={24} textAnchor="middle" style={{ font: "600 8px var(--font-sans)", fill: "#666" }}>청소기</text>
     </g>
   );
 }
@@ -482,7 +483,7 @@ function useDisplayScores(
 }
 
 /* ── 메인 ── */
-export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, currentTime }: Props) {
+export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, currentTime, onCleaningStateChange }: Props) {
   const [hoveredRoom, setHoveredRoom] = useState<RoomId | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -498,7 +499,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
   const dust = useMemo(() => dustPool.filter((d) => activeIds.has(d.id)), [dustPool, activeIds]);
 
   const [hiddenDust, setHiddenDustRaw] = useState<Set<string>>(new Set());
-  const { pos: robotPos, durationMs, cleaning } = useRobotMotion(
+  const { pos: robotPos, durationMs, cleaningRoom } = useRobotMotion(
     hasScenario ? rooms! : null, dust, hiddenDust, paused,
   );
   // dust removal feeds into hiddenDust — robot contact based
@@ -514,6 +515,11 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
   const displayScores = useDisplayScores(rooms, dust, hiddenDust);
   const scoreMap = new Map(displayScores?.map((r) => [r.room_id, r]) ?? []);
 
+  // 청소 진행 상태(현재 방 + 실시간 점수)를 상위로 전달 — 우측 카드 인터랙티브 갱신
+  useEffect(() => {
+    onCleaningStateChange?.({ room: cleaningRoom, scores: displayScores ?? [] });
+  }, [cleaningRoom, displayScores, onCleaningStateChange]);
+
   return (
     <div className="relative">
       <svg viewBox="0 0 600 400" role="img" aria-label={buildAriaLabel(displayScores, userLocation)}
@@ -523,16 +529,6 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
             <path d="M0 6 L6 0" stroke="rgba(120,120,120,0.5)" strokeWidth="1" />
           </pattern>
         </defs>
-        <style>{`
-          @keyframes robot-orbit {
-            0%   { transform: translate(0, 0); }
-            25%  { transform: translate(6px, 4px); }
-            50%  { transform: translate(0, 8px); }
-            75%  { transform: translate(-6px, 4px); }
-            100% { transform: translate(0, 0); }
-          }
-        `}</style>
-
         <image href="/floorplan-bg.png" x={0} y={0} width={600} height={400} preserveAspectRatio="xMidYMid slice" />
 
         {/* 히트맵 오버레이 — 감소된 점수 반영 */}
@@ -547,11 +543,11 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
           else {
             const t = Math.min(Math.max(score, 0), 80) / 80;
             const eased = Math.pow(t, 2.2);
-            fill = `rgba(20, 50, 100, ${0.05 + eased * 0.6})`;
+            fill = `rgba(20, 20, 25, ${0.04 + eased * 0.5})`;
           }
           return (
             <RoomShape key={room.id} room={room} fill={fill}
-              stroke={showOverlay && isHovered ? "oklch(40% 0.15 250)" : "transparent"}
+              stroke={showOverlay && isHovered ? "oklch(35% 0 0)" : "transparent"}
               strokeWidth={isHovered && showOverlay ? 2.5 : 0}
               style={{ transition: "fill 0.6s ease, stroke 0.2s ease", cursor: onRoomClick ? "pointer" : "default" }}
               onMouseEnter={() => setHoveredRoom(room.id)} onMouseLeave={() => setHoveredRoom(null)}
@@ -586,7 +582,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
           return <PersonIcon x={c.x + 30} y={c.y - 20} />;
         })()}
 
-        <RobotIcon x={robotPos.x} y={robotPos.y} durationMs={durationMs} cleaning={cleaning} />
+        <RobotIcon x={robotPos.x} y={robotPos.y} durationMs={durationMs} />
       </svg>
 
       {currentTime && (

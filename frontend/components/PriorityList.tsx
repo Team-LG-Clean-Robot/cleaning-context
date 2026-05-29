@@ -3,18 +3,23 @@ import { ROOM_LABEL } from "@/lib/types";
 import { MODE_BADGE } from "@/lib/colors";
 
 export function PriorityList({ rooms }: { rooms: RoomScore[] }) {
+  // 순번은 실제 청소 대상(normal/quiet)에만 매긴다. 지연·제외는 청소 큐에서 빠지므로 "—".
+  let cleanRank = 0;
   return (
-    <div className="bg-white border border-border-default rounded-xl p-4 shadow-sm">
-      <h2 className="text-[16px] font-semibold mb-3">청소 우선순위</h2>
+    <div>
+      <h2 className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
+        청소 우선순위
+      </h2>
       <ul className="space-y-1.5">
-        {rooms.map((r, i) => {
+        {rooms.map((r) => {
           const badge = MODE_BADGE[r.mode];
-          const rank = r.mode === "excluded" ? "—" : String(i + 1);
+          const deferred = r.mode === "excluded" || r.mode === "delayed";
+          const rank = deferred ? "—" : String(++cleanRank);
           return (
             <li
               key={r.room_id}
               className={`flex items-start justify-between gap-3 p-2 rounded-md hover:bg-surface-base transition
-                ${r.mode === "excluded" ? "opacity-70" : ""}`}
+                ${deferred ? "opacity-70" : ""}`}
             >
               <div className="min-w-0 flex items-baseline gap-2.5">
                 <span className="inline-flex items-center justify-center w-5 h-5 text-[11px] font-semibold tabular-nums text-text-muted bg-surface-muted border border-border-default rounded-full shrink-0">
@@ -33,7 +38,7 @@ export function PriorityList({ rooms }: { rooms: RoomScore[] }) {
                       {r.final}점
                     </span>
                   </div>
-                  {r.exclusion_reason && r.mode === "excluded" && (
+                  {r.exclusion_reason && deferred && (
                     <div className="text-[11px] text-gray-500 mt-0.5">
                       {r.exclusion_reason}
                     </div>

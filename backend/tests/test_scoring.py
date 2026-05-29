@@ -16,7 +16,7 @@ from app.services.scoring import compute_scores
 EXPECTED_SCORES: dict[str, dict[str, tuple[int, str]]] = {
     "rainy_return": {
         "entrance": (62, "normal"),
-        "living": (35, "normal"),
+        "living": (15, "delayed"),  # 사용자가 거실 점유 → -20 occupancy, delayed
         "kitchen": (28, "normal"),
         "bathroom": (18, "normal"),
         "bedroom": (-8, "excluded"),

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { TimelineKeyframe } from "@/lib/types";
+import { PauseIcon, PlayIcon, RobotIcon } from "./icons";
 
 type Props = {
   currentMinute: number;
@@ -80,10 +81,10 @@ export function TimelinePanel({
           onClick={onTogglePlay}
           className="w-10 h-10 flex items-center justify-center rounded-lg
                      bg-accent-500 text-white hover:bg-accent-600
-                     transition-colors text-[18px]"
+                     transition-colors"
           aria-label={playing ? "일시정지" : "재생"}
         >
-          {playing ? "⏸" : "▶"}
+          {playing ? <PauseIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
         </button>
         <span className="font-mono text-[28px] font-bold text-text-default tabular-nums tracking-tight min-w-[5ch]">
           {currentTimeStr}
@@ -182,13 +183,13 @@ export function TimelinePanel({
               >
                 {kf.time}
               </span>
-              <span className="text-[14px] shrink-0 pt-px">{kf.icon}</span>
               <div className="min-w-0 flex-1">
                 <div className={`text-[12px] font-medium ${isActive ? "text-text-default" : "text-text-muted"}`}>
                   {kf.description}
                 </div>
-                <div className="text-[11px] text-text-muted mt-0.5 truncate">
-                  🤖 {kf.robotAction}
+                <div className="flex items-center gap-1 text-[11px] text-text-muted mt-0.5 truncate">
+                  <RobotIcon className="w-3.5 h-3.5 shrink-0" />
+                  {kf.robotAction}
                 </div>
               </div>
             </button>

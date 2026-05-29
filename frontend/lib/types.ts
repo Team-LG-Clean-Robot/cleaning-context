@@ -92,11 +92,11 @@ export type RoomBbox = {
 
 // 도면 이미지 배경 기반. viewBox 600×400. 벽선 픽셀 분석 기반 좌표.
 export const ROOMS_SEED: RoomBbox[] = [
-  { id: "kitchen",  name_ko: "주방", base_score: 20, bbox: { x: 197, y: 44, w: 161, h: 130 } },
-  { id: "bedroom",  name_ko: "침실", base_score: 15, bbox: { x: 366, y: 44, w: 146, h: 200 } },
-  { id: "living",   name_ko: "거실", base_score: 25, bbox: { x: 90, y: 120, w: 172, h: 220 }, polygon: "90,120 195,120 195,176 262,176 262,340 90,340", center: { x: 170, y: 265 } },
-  { id: "entrance", name_ko: "현관", base_score: 30, bbox: { x: 265, y: 176, w: 88, h: 164 } },
-  { id: "bathroom", name_ko: "욕실", base_score: 10, bbox: { x: 358, y: 246, w: 132, h: 98 } },
+  { id: "kitchen",  name_ko: "주방", base_score: 28, bbox: { x: 197, y: 44, w: 161, h: 130 } },
+  { id: "bedroom",  name_ko: "침실", base_score: 12, bbox: { x: 366, y: 44, w: 146, h: 200 } },
+  { id: "living",   name_ko: "거실", base_score: 20, bbox: { x: 90, y: 120, w: 172, h: 220 }, polygon: "90,120 195,120 195,176 262,176 262,340 90,340", center: { x: 170, y: 265 } },
+  { id: "entrance", name_ko: "현관", base_score: 22, bbox: { x: 265, y: 176, w: 88, h: 164 } },
+  { id: "bathroom", name_ko: "욕실", base_score: 18, bbox: { x: 358, y: 246, w: 132, h: 98 } },
 ];
 
 export const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;

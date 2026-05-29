@@ -1,5 +1,5 @@
 "use client";
-import type { ScoreContribution, SimulateResponse } from "@/lib/types";
+import type { RoomId, RoomScore, ScoreContribution, SimulateResponse } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
 
 function BreakdownAxis({
@@ -51,9 +51,22 @@ const EVENT_LABEL: Record<string, string> = {
   meal_prep: "식사 준비",
 };
 
-export function ExplanationCard({ response }: { response: SimulateResponse }) {
-  const top = response.rooms[0];
-  const excluded = response.rooms.filter((r) => r.mode === "excluded");
+export function ExplanationCard({
+  response,
+  currentRoom,
+  liveScores,
+}: {
+  response: SimulateResponse;
+  currentRoom?: RoomId | null;
+  liveScores?: RoomScore[];
+}) {
+  const scores = liveScores && liveScores.length ? liveScores : response.rooms;
+  const ranked = [...scores].sort((a, b) => b.final - a.final);
+  const top =
+    (currentRoom ? scores.find((r) => r.room_id === currentRoom) : undefined) ??
+    ranked.find((r) => r.mode !== "excluded") ??
+    ranked[0];
+  const excluded = ranked.filter((r) => r.mode === "excluded");
 
   return (
     <section className="p-5 relative">
@@ -87,7 +100,7 @@ export function ExplanationCard({ response }: { response: SimulateResponse }) {
                            border border-border-default rounded-lg px-4 py-2
                            text-[13px] font-medium inline-flex items-center gap-1 select-none"
               >
-                왜 {ROOM_LABEL[top.room_id]}부터?
+                왜 {ROOM_LABEL[top.room_id]}?
                 <span className="text-gray-500 group-open:hidden">▾</span>
                 <span className="text-gray-500 hidden group-open:inline">▴</span>
               </summary>
@@ -168,13 +181,7 @@ export function ExplanationCard({ response }: { response: SimulateResponse }) {
           </details>
         )}
 
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-border-default text-[10px]">
-          <span
-            className="font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5"
-            title="모든 추론은 디바이스 측에서 끝나고, 클라우드로는 high-level event만 전송됩니다."
-          >
-            🛡 Privacy-on-Edge
-          </span>
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-border-default text-[10px]">
           <span className="text-gray-500">
             응답 시간 {response.duration_ms}ms · {response.context_summary}
           </span>

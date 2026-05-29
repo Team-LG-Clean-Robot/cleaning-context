@@ -5,7 +5,7 @@
     "description": "사용자가 비 오는 저녁 귀가, 취침 2시간 후",
     "current_time": "20:30",
     "sleep_time": "23:00",
-    "user_location": null,
+    "user_location": "living",
     "active_events": [
       "rain",
       "user_returned",

@@ -5,6 +5,7 @@ import type { RoomScore, ScoreContribution } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
 import { MODE_BADGE } from "@/lib/colors";
 import { ScoringRulebook } from "./ScoringRulebook";
+import { BookIcon } from "./icons";
 
 function AxisBlock({
   title, rows, sum,
@@ -121,7 +122,7 @@ export function RoomDetail({ room, onClose }: Props) {
           onClick={() => setShowRulebook(true)}
           className="w-full py-2 text-[13px] font-medium text-text-default bg-surface-muted hover:bg-border-default/40 border border-border-default rounded-lg transition-colors flex items-center justify-center gap-1.5"
         >
-          <span aria-hidden>📖</span>
+          <BookIcon className="w-4 h-4" />
           점수 설명서
         </button>
 

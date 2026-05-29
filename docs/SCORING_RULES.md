@@ -58,106 +58,92 @@ final_score(room) = base_score(room)
 
 ## 2. Base score (공간별 기본 우선순위)
 
+> ⚠️ **v2 재설계 반영 (현행값).** 아래 표는 `backend/app/data/rooms.json`의 런타임 ground truth와 일치한다. 이전 v1 값(현관30·거실25·주방20·침실15·욕실10)은 폐기. 단 §3 event delta 표와 §6 worked example은 **아직 v1 수치라 일부 어긋날 수 있음** — 항상 `backend/app/data/*.json`이 단일 진실.
+
 | 공간 | base_score | noise_sensitivity (0-10) |
 |---|:-:|:-:|
-| 현관 (entrance) | 30 | 2 |
-| 거실 (living) | 25 | 5 |
-| 주방 (kitchen) | 20 | 4 |
-| 침실 (bedroom) | 15 | 9 |
-| 욕실 (bathroom) | 10 | 3 |
+| 현관 (entrance) | 22 | 2 |
+| 거실 (living) | 20 | 5 |
+| 주방 (kitchen) | 28 | 4 |
+| 침실 (bedroom) | 12 | 9 |
+| 욕실 (bathroom) | 18 | 3 |
 
-> **근거.** TECHNICAL_PLAN.md §4 시나리오 표에서 "기본" 컬럼 직접 인용. 욕실은 PLANNING 표에 없어 보수적으로 추가 (낮은 base).
+> **근거.** v2에서 ML feature-importance 기반으로 재조정 (6개 시나리오가 5개 방을 골고루 1위로 활용하도록 설계). 정밀 측정이 아닌 가설값이며 멘토링 후 보강 예정.
 
 ## 3. Event effects (이벤트 → 공간별 점수 가산)
 
+> 현행값 (`backend/app/data/events.json`). 8개 데모 시나리오에 쓰이는 이벤트만 발췌 — 전체 14종은 events.json 참조. axis는 모두 **Need** (dirt accumulation), 단 취침·점유는 §4 modifier에서 Opportunity로 처리.
+
 | event_id | 이름 | 현관 | 거실 | 주방 | 침실 | 욕실 |
 |---|---|:-:|:-:|:-:|:-:|:-:|
-| `rain` | 비 | +20 | +5 | 0 | 0 | 0 |
-| `user_returned` | 사용자 귀가 | +15 | +10 | 0 | 0 | 0 |
-| `cooking_done` | 요리 완료 | 0 | 0 | +30 | 0 | 0 |
-| `guest_arriving_2h` | 손님 방문 임박 (2h 이내) | +20 | +25 | +5 | -10 | +10 |
-| `pre_sleep_30min` | 취침 30분 이내 | -5 | -15 | -5 | -30 | -5 |
-| `cleanup_gap_2d` | 마지막 청소 2일+ 경과 | +10 | +15 | +10 | +5 | +5 |
+| `rain` | 비 | +25 | +5 | 0 | 0 | 0 |
+| `user_returned` | 사용자 귀가 | +15 | +5 | 0 | 0 | 0 |
+| `cooking_done` | 요리 완료 | 0 | +5 | +35 | 0 | 0 |
+| `cooking_active` | 요리 진행 중 | +5 | +15 | -40 | +5 | +5 |
+| `guest_arriving_2h` | 손님 방문 임박 | +15 | +30 | +10 | -5 | +15 |
+| `pre_sleep_2h` | 취침 2시간 이내 | 0 | +5 | 0 | -20 | 0 |
+| `pre_sleep_30min` | 취침 30분 이내 | 0 | +5 | 0 | -40 | +15 |
+| `user_left` | 사용자 외출 중 | +5 | +5 | +5 | +25 | +5 |
+| `package_delivery` | 택배 도착 | +35 | +10 | 0 | 0 | 0 |
+| `meal_finished` | 식사 종료 추정 | 0 | +15 | +35 | 0 | 0 |
 
-> **근거.** TECHNICAL_PLAN.md §4 시나리오 1~4 표의 가중치를 이벤트 단위로 분리. 표에 없는 셀은 0.
+## 4. Modifier (점수 계산 후 가산 — `scoring_rules.json`)
 
-## 4. Time / occupancy modifier
+| 조건 | 효과 | axis |
+|---|---|---|
+| 사용자가 머무는 공간 (`user_location == room.id`) | -20 | opportunity |
+| `noise_sensitivity ≥ 7` AND `pre_sleep_30min` 활성 | -10 추가 | opportunity |
 
-| 조건 | 효과 |
-|---|---|
-| 사용자가 머무는 공간 (`user_location == room.id`) | -20 (청소 지연) |
-| `noise_sensitivity ≥ 7` AND `pre_sleep_30min` 활성 | -20 추가 (침실 강조) |
-| `last_cleaned_hours ≥ 48` | +10 (cleanup_gap_2d 미적용 시에만) |
+> `rooms.json`의 `last_cleaned_hours`는 현재 엔진 미사용 (프론트 enrich `cleanup_recency`로 시도했다가 제거 — 정적/라이브 일치 위해).
 
 ## 5. 모드 결정 규칙 (점수 계산 후)
 
 | 조건 | mode |
 |---|---|
 | `final < 0` | `excluded` (사유: 점수표 dominant 페널티 항목 인용) |
-| 사용자 점유 공간이고 `final > 0` | `delayed` (예: "30분 후 재시도") |
+| 사용자 점유 공간이고 `final > 0` | `delayed` ("30분 후 재시도") |
 | `pre_sleep_30min` 활성 AND room.noise_sensitivity ≥ 4 AND `final > 0` | `quiet` |
 | 그 외 | `normal` |
 
-## 6. 시나리오별 검증 (golden test 입력)
+> 로봇 청소 큐는 `excluded`·`delayed`를 제외하고 `final` 내림차순으로 방문한다 (점수가 높아도 사용자 점유 방은 건너뜀).
 
-이 표가 단위 테스트 fixture가 된다. 결과가 TECHNICAL_PLAN.md §4 표와 일치해야 함.
+## 6. 시나리오별 검증 (golden test fixture)
 
-### 시나리오 1. 비 오는 날 귀가 (20:30, 비, 귀가, 취침 23:00, 현관 청소 2일 경과)
+`test_scoring.py`의 `EXPECTED_SCORES`와 1:1 일치. base(§2) + event(§3) + modifier(§4) 합산.
 
-`active_events = ["rain", "user_returned", "cleanup_gap_2d"]` (현관에만 cleanup_gap)
-취침까지 2.5h → `pre_sleep_30min` 비활성. 침실은 -30 페널티 별도 적용? PLANNING은 -30 표시.
+### 1. 비 오는 날 귀가 — 20:30, 취침 23:00, 사용자 거실
+`rain · user_returned · pre_sleep_2h`, `user_location=living`
+- 현관: 22 + 25 + 15 = **62** (normal)
+- 주방: 28 = **28** (normal) · 욕실: 18 = **18** (normal)
+- 거실: 20 + 5 + 5 + 5 − 20(점유) = **15** (delayed)
+- 침실: 12 − 20 = **−8** (excluded)
 
-→ **룰 보강.** `pre_sleep_2h` 이벤트 추가:
+### 2. 요리 직후 — 19:20, 사용자 거실
+`cooking_done`, `user_location=living`
+- 주방: 28 + 35 = **63** (normal) · 현관 22 · 욕실 18 · 침실 12 (normal)
+- 거실: 20 + 5 − 20(점유) = **5** (delayed)
 
-| event_id | 이름 | 현관 | 거실 | 주방 | 침실 | 욕실 |
-|---|---|:-:|:-:|:-:|:-:|:-:|
-| `pre_sleep_2h` | 취침 2시간 이내 | 0 | 0 | 0 | -30 | 0 |
+### 3. 손님 방문 예정 — 17:00
+`guest_arriving_2h`
+- 거실 20+30=**50** · 주방 28+10=**38** · 현관 22+15=**37** · 욕실 18+15=**33** · 침실 12−5=**7** (모두 normal)
 
-활성 이벤트 재계산:
-- 현관: 30 + 20(rain) + 15(returned) = **65** ✓
-- 거실: 25 + 5 + 10 = **40** ✓
-- 주방: 20 ✓
-- 침실: 15 + (-30) = **-15** → excluded ✓
+### 4. 아침 외출 직후 — 07:00
+`user_left`
+- 침실 12+25=**37** · 주방 28+5=**33** · 현관 22+5=**27** · 거실 20+5=**25** · 욕실 18+5=**23** (모두 normal)
 
-### 시나리오 2. 요리 직후 (19:20, 요리, 사용자 거실)
+### 5. 요리 중 — 19:00, 사용자 주방
+`cooking_active`, `user_location=kitchen`
+- 거실 20+15=**35** · 현관 22+5=**27** · 욕실 18+5=**23** · 침실 12+5=**17** (normal)
+- 주방: 28 − 40 − 20(점유) = **−32** (excluded)
 
-`active = ["cooking_done"]`, `user_location = "living"`
+### 6. 취침 직전 — 22:50, 사용자 침실 (모드 검증 `test_pre_sleep_modes`)
+`pre_sleep_30min`, `user_location=bedroom`
+- 욕실: 18 + 15 = 33 (noise 3 < 4 → **normal**)
+- 주방: 28 (noise 4 ≥ 4 → **quiet**) · 거실: 20 + 5 = 25 (noise 5 → **quiet**)
+- 현관: 22 (**normal**)
+- 침실: 12 − 40 − 20(점유) − 10(소음×취침) = **−58** (excluded)
 
-- 주방: 20 + 30 = **50** ✓
-- 거실: 25 + 0 - 20(occupancy) = **5** → delayed ✓
-- 현관: 30 ✓
-- 침실: 15 ✓
-
-### 시나리오 3. 취침 직전 (22:50, 사용자 침실, 취침 23:00)
-
-`active = ["pre_sleep_30min"]`, `user_location = "bedroom"`
-
-- 침실: 15 + (-30) + (-20 noise×sleep) + (-20 occupancy)... PLANNING은 -35.
-  → 룰 정리: `pre_sleep_30min` 침실 -30 + noise add -20 = -50? PLANNING은 -35.
-  → **재정의.** noise add를 -10으로 하향:
-
-| 조건 | 효과 |
-|---|---|
-| `noise_sensitivity ≥ 7` AND `pre_sleep_30min` | 추가 -10 (occupancy modifier 별도) |
-
-- 침실: 15 - 30 - 10 = -25? PLANNING은 -35. occupancy -20까지 더하면 -45. PLANNING 표는 occupancy 컬럼이 없고 "취침 -30, 소음 -20" 두 컬럼으로 -35.
-  → **PLANNING이 단순화된 표시이고 실제 룰은 별도 정의가 가능.** 본 문서는 룰을 자체 일관성으로 두고, 시나리오 3의 침실 final = `-25 (excluded)`로 정의. PLANNING의 `-35`는 발표 자료 시각화용 reference value.
-
-→ **결정.** 시나리오 표는 "느낌"이고, 룰 테이블이 ground truth. 두 값이 일치하지 않을 수 있음을 TECHNICAL_PLAN.md에 각주로 추가하는 것은 다음 문서 보강 작업.
-
-- 거실: 25 - 15(pre_sleep -15) - 0(noise<7) = 10? PLANNING -10(노이즈) 추가 → 0.
-  → 룰 보강: `pre_sleep_30min` 거실 -15는 위 표에 이미 있음. noise add는 ≥7만. 거실 noise=5 → noise add 미적용. → 거실 final = 25 - 15 = 10. PLANNING은 0(excluded). 차이 허용.
-
-### 시나리오 4. 손님 방문 (17:00, 19:00 방문, 거실 3일·현관 2일 경과)
-
-`active = ["guest_arriving_2h", "cleanup_gap_2d"(거실+현관)]`
-
-- 거실: 25 + 25 + 15 = **65** ✓
-- 현관: 30 + 20 + 10 = **60** ✓
-- 주방: 20 + 5 = **25** ✓
-- 침실: 15 - 10 = **5** ✓
-
-→ 시나리오 1·2·4는 일치. 3은 의도적으로 자체 일관성 우선.
+> 6개 시나리오가 5개 방을 모두 한 번씩 1위로 활용하도록 base/delta를 v2에서 재설계.
 
 ## 7. JSON 직렬화 형태
 
@@ -166,14 +152,17 @@ final_score(room) = base_score(room)
 ```json
 {
   "rooms": [
-    {"id": "entrance", "name_ko": "현관", "base_score": 30, "noise_sensitivity": 2},
-    ...
+    {"id": "entrance", "name_ko": "현관", "base_score": 22, "noise_sensitivity": 2},
+    {"id": "kitchen",  "name_ko": "주방", "base_score": 28, "noise_sensitivity": 4},
+    {"id": "living",   "name_ko": "거실", "base_score": 20, "noise_sensitivity": 5},
+    {"id": "bathroom", "name_ko": "욕실", "base_score": 18, "noise_sensitivity": 3},
+    {"id": "bedroom",  "name_ko": "침실", "base_score": 12, "noise_sensitivity": 9}
   ],
   "events": [
     {
       "id": "rain", "name_ko": "비",
       "effects": [
-        {"room_id": "entrance", "delta": 20},
+        {"room_id": "entrance", "delta": 25},
         {"room_id": "living", "delta": 5}
       ]
     },
@@ -190,6 +179,6 @@ final_score(room) = base_score(room)
 
 ## 8. 추가 작업 필요
 
-- 시나리오 3의 PLANNING vs 룰 차이를 TECHNICAL_PLAN.md에 각주로 표기 (또는 룰을 PLANNING에 맞춰 재조정)
-- 욕실의 base_score·이벤트 효과는 가설값. 멘토링 후 보강
+- base_score·이벤트 delta는 v2 가설값. 멘토링 후 실데이터로 보강
+- `last_cleaned_hours` 기반 cleanup 가산을 정식 룰로 도입할지 검토 (현재 미사용)
 - ML 이벤트 분류기가 활성화되면, classifier 출력을 active_events에 자동 주입하는 경로 정의

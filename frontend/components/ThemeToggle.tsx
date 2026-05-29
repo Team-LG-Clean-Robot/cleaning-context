@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MoonIcon, SunIcon } from "./icons";
 
 type Theme = "light" | "dark";
 
@@ -31,7 +32,7 @@ export function ThemeToggle() {
       title={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border-default rounded-sm text-[13px] text-text-muted hover:text-text-default hover:border-text-muted transition-colors whitespace-nowrap"
     >
-      <span aria-hidden>{isDark ? "☀" : "☾"}</span>
+      {isDark ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
       <span>{isDark ? "Light" : "Dark"}</span>
     </button>
   );

@@ -4,6 +4,16 @@ import type { SimulateResponse } from "@/lib/types";
 import { ROOM_LABEL } from "@/lib/types";
 import type { SensorState } from "@/lib/sensor-mock";
 import { getSensorStates } from "@/lib/sensor-mock";
+import { SensorIcon } from "./SensorIcon";
+import {
+  AntennaIcon,
+  ChartIcon,
+  ChatIcon,
+  ChipIcon,
+  FlowIcon,
+  GlobeIcon,
+  ShieldIcon,
+} from "./icons";
 
 type Props = {
   response: SimulateResponse | null;
@@ -38,7 +48,7 @@ function StepCard({
   children,
 }: {
   step: number;
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   visible: boolean;
   children: React.ReactNode;
@@ -61,7 +71,7 @@ function StepCard({
         <span className={`w-6 h-6 rounded-full text-[11px] font-bold flex items-center justify-center transition-colors duration-500 ${
           visible ? "bg-accent-500 text-white" : "bg-gray-200 text-gray-400"
         }`}>{step + 1}</span>
-        <span className="text-[13px]">{icon}</span>
+        <span className="text-text-muted">{icon}</span>
         <span className="text-[13px] font-semibold text-text-default">{title}</span>
       </div>
       <div className={`transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}>
@@ -95,7 +105,7 @@ export function PipelinePanel({ response, scenarioId }: Props) {
   if (!response) {
     return (
       <section className="border-2 border-dashed border-border-default rounded-xl p-8 text-center text-gray-500">
-        <div className="text-2xl mb-2">⚙️</div>
+        <FlowIcon className="w-7 h-7 mx-auto mb-2 text-gray-400" />
         <p className="text-[13px] text-text-muted">
           시나리오를 선택하면 백엔드 파이프라인이 시각화됩니다.
         </p>
@@ -114,11 +124,11 @@ export function PipelinePanel({ response, scenarioId }: Props) {
       </div>
 
       {/* Step 1: 센서 입력 */}
-      <StepCard step={0} icon="📡" title="IoT 센서 데이터 수집" visible={visibleStep >= 0}>
+      <StepCard step={0} icon={<AntennaIcon className="w-4 h-4" />} title="IoT 센서 데이터 수집" visible={visibleStep >= 0}>
         <div className="flex flex-wrap gap-1.5">
           {activeSensors.length > 0 ? activeSensors.map((s) => (
             <Tag key={s.id} color="blue">
-              {s.icon} {s.name_ko}: {s.label}
+              <SensorIcon sensorId={s.id} className="w-3 h-3" /> {s.name_ko}: {s.label}
             </Tag>
           )) : (
             <span className="text-[11px] text-text-muted">센서 대기 중</span>
@@ -132,7 +142,7 @@ export function PipelinePanel({ response, scenarioId }: Props) {
       </StepCard>
 
       {/* Step 2: ML 사용자 위치 추정 + 룰 맥락 (박주상 v3) */}
-      <StepCard step={1} icon="🧠" title="ML 위치 추정 + 룰 맥락 변수 (박주상 v3)" visible={visibleStep >= 1}>
+      <StepCard step={1} icon={<ChipIcon className="w-4 h-4" />} title="ML 위치 추정 + 룰 맥락 변수 (박주상 v3)" visible={visibleStep >= 1}>
         <div className="flex flex-wrap gap-1.5">
           {response.inferred_events.map((ev) => (
             <Tag key={ev.event_id} color={ev.source === "ml" ? "purple" : "blue"}>
@@ -150,21 +160,22 @@ export function PipelinePanel({ response, scenarioId }: Props) {
       <div className="relative py-1 my-1">
         <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-emerald-300" />
         <div className="relative flex justify-center">
-          <span className="bg-surface-base px-2 text-[10px] font-medium text-emerald-700 tracking-wider">
-            🛡 디바이스(엣지) ─ 위로는 raw 센서 / 아래로는 high-level event만
+          <span className="inline-flex items-center gap-1 bg-surface-base px-2 text-[10px] font-medium text-emerald-700 tracking-wider">
+            <ShieldIcon className="w-3 h-3" />
+            디바이스(엣지) ─ 위로는 raw 센서 / 아래로는 high-level event만
           </span>
         </div>
       </div>
 
       {/* Step 3: 맥락 종합 */}
-      <StepCard step={2} icon="🌐" title="맥락 종합" visible={visibleStep >= 2}>
+      <StepCard step={2} icon={<GlobeIcon className="w-4 h-4" />} title="맥락 종합" visible={visibleStep >= 2}>
         <p className="text-[12px] text-text-default leading-relaxed">
           {response.context_summary}
         </p>
       </StepCard>
 
       {/* Step 4: 점수 계산 */}
-      <StepCard step={3} icon="📊" title="공간별 청소 우선순위 계산" visible={visibleStep >= 3}>
+      <StepCard step={3} icon={<ChartIcon className="w-4 h-4" />} title="공간별 청소 우선순위 계산" visible={visibleStep >= 3}>
         <div className="space-y-2">
           {sorted.map((r, i) => {
             const pct = Math.max(0, Math.min(100, (r.final / (topRoom?.final || 1)) * 100));
@@ -206,7 +217,7 @@ export function PipelinePanel({ response, scenarioId }: Props) {
       </StepCard>
 
       {/* Step 5: AI 설명 */}
-      <StepCard step={4} icon="💬" title="AI 자연어 설명 생성" visible={visibleStep >= 4}>
+      <StepCard step={4} icon={<ChatIcon className="w-4 h-4" />} title="AI 자연어 설명 생성" visible={visibleStep >= 4}>
         <p className="text-[12px] text-text-default leading-relaxed">
           {response.explanation}
         </p>
