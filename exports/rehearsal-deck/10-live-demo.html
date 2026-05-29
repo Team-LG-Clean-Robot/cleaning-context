@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>라이브 데모</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: oklch(0.99 0 0); --bg-card: oklch(0.97 0 0); --surface-raised: #ffffff; --border-card: oklch(0.85 0 0);
+  --text-primary: oklch(0.12 0 0); --text-secondary: oklch(0.55 0 0); --text-muted: oklch(0.70 0 0);
+  --accent-start: oklch(0.12 0 0); --accent-end: oklch(0.42 0 0); --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end)); --shadow-accent: oklch(0.12 0 0 / 0.12);
+  --nav-bg: oklch(0.99 0 0 / 0.95); --nav-border: oklch(0.85 0 0); --nav-accent: oklch(0.12 0 0); --nav-hover: oklch(0.42 0 0); --nav-disabled: oklch(0.80 0 0);
+  --font-main: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif; --font-mono: 'JetBrains Mono', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); font-family: var(--font-main); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding-bottom: 50px; }
+.container { width: 1280px; padding: 26px 80px; display: flex; flex-direction: column; align-items: center; }
+.title { font-size: 38px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 4px; line-height: 1.3; }
+.deck-meta { font-size: 13px; color: var(--text-secondary); text-align:center; margin-bottom: 14px; }
+.embed-section { width: 100%; max-width: 1120px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.embed-bar { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 16px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-card); font-size: 13px; color: var(--text-secondary); font-family: var(--font-mono); }
+.embed-dot { width: 10px; height: 10px; border-radius: 50%; background: #d11; flex-shrink: 0; }
+.embed-open { margin-left: auto; color: var(--accent-start); text-decoration: none; font-weight: 700; }
+.embed-frame { width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-card); background: var(--surface-raised); box-shadow: 0 8px 32px var(--shadow-accent); }
+.embed-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+.demo-flow { font-size: 13px; color: var(--text-secondary); text-align: center; }
+.demo-flow b { color: var(--accent-start); }
+.backup { font-size: 12px; color: var(--text-muted); }
+.slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
+.slide-nav a { text-decoration: none; font-size: 14px; font-weight: 700; color: var(--nav-accent); transition: color 0.2s; }
+.slide-nav a:hover { color: var(--nav-hover); }
+.slide-nav .nav-center a { color: var(--text-secondary); font-size: 13px; font-weight: 400; }
+body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { animation: fadeOut 0.3s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="title">🔴 라이브 데모</h1>
+  <div class="deck-meta">데모 · 설계 · 전유성 — 발표의 클라이맥스</div>
+  <div class="embed-section">
+    <div class="embed-bar">
+      <span class="embed-dot"></span>
+      <span>robot-cleaner.askewly.com</span>
+      <a class="embed-open" href="https://robot-cleaner.askewly.com/" target="_blank" rel="noopener">새 탭 ↗</a>
+    </div>
+    <div class="embed-frame">
+      <iframe src="https://robot-cleaner.askewly.com/" title="라이브 데모" loading="lazy"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+    <p class="demo-flow">시연: <b>비 오는 날 귀가</b> → 현관 1순위 → 방 클릭(점수 설명서) → 청소 진행 → <b>파이프라인 탭</b></p>
+    <p class="backup">백업: 콜드스타트 시 새 탭 전환, 안 되면 녹화 영상 (발표 10분 전 /api/health 웜업)</p>
+  </div>
+</div>
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="09-design.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">10 / 16</a></div>
+    <div class="nav-right"><a href="11-scoring-axes.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('11-scoring-axes.html');
+  if (e.key === 'ArrowLeft') navigateTo('09-design.html');
+});
+</script>
+</body>
+</html>

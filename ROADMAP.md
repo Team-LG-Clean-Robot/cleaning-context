@@ -1,7 +1,7 @@
 # ROADMAP — 생활 맥락 로봇청소기 시뮬레이터
 
-> **마지막 업데이트**: 2026-05-28
-> **현재 위치**: 3주차 — 프론트 완성 + 백엔드 분리 + 서비스·문서 정리 ✅ + 발표 준비 (D-2)
+> **마지막 업데이트**: 2026-05-29
+> **현재 위치**: 3주차 — 프론트 완성 + 백엔드 분리 + 서비스·문서 정리 + 스코어링/설계문서 정합 ✅ + 발표 준비 (D-1)
 > **최종 발표**: 2026-05-30 (토)
 > 사업성 트랙은 [BUSINESS_PLAN.md](./BUSINESS_PLAN.md), 기술 트랙은 [TECHNICAL_PLAN.md](./TECHNICAL_PLAN.md), 모바일·IoT 도메인은 [docs/IOT_DOMAIN.md](./docs/IOT_DOMAIN.md) 참조.
 
@@ -64,24 +64,41 @@
 - [x] 백엔드 분리 — 정적 JSON 번들 (시나리오 8종 + 타임라인 10 키프레임, cold start 제거)
 - [x] 백엔드 파이프라인 시각화 탭 (5단계 순차 reveal)
 - [x] 타임라인 일시정지 시 로봇 정지 + 먼지 위치 안정화
+- [x] 두 축 산식 (Need × Opportunity) 적용 — ScoreContribution.axis 필드 + ExplanationCard/RoomDetail 두 박스 시각화
+- [x] ~~baseline 항목 2종 (cleanup_recency·time_of_day_fit)~~ → **v2 정합 시 제거** (5/29): 프론트 enrich가 백엔드 룰값과 어긋나 정적/라이브 점수 불일치 유발. 현재 점수 = base + 이벤트 delta + modifier 순수 합
+- [x] 청소 완료 시 score → base × 0.2 + opportunity (0 아닌 residual)
+- [x] 로봇 closure 버그 fix (scheduleRoom의 stale pos 텔레포트) + 먼지 제거 robot reach 18px 기반
+- [x] 점수 설명서 모달 (ScoringRulebook) — RoomDetail에서 📖 버튼으로 호출
+- [x] 기본 시나리오 post_cooking → rainy_return (richer signals)
+- [x] PRESENTATION.md 발표 순서 (Why → Vision → Reality → Inside, 5~7분/인) + ML 프레이밍 ("ambient 추정기")
+- [x] SCORING_RULES.md 두 축 산식 재서술 + 입력→축 매핑 표
+- [x] 헤더 정리 (다크모드·두 축 뱃지 제거), 디지털 시계 (무채색 우측 상단)
+
+**정합·발표 준비 (5/29)**:
+- [x] 데모 UX 재설계 — HERO 결정카드(지도+현재 위치+우선순위) 세로 흐름 + 초기 base 상태 진입 + 사이트 전반 이모지→인라인 SVG 아이콘 (`components/icons.tsx`)
+- [x] 스코어링 정합 — base_score v2(22/20/28/12/18) 프론트·백엔드·문서 일치 + 프론트 enrich 제거 → 정적/라이브 점수 1:1 (pytest 53/53)
+- [x] 설계 문서(`CLEANING_DECISION_ALGORITHM.md`) v2 동기화 — 박주상 설계 골격(§0~§2) 보존 + §3~5 실측값·변경점 주석 (박주상 사전 동의)
+- [ ] 박주상 ML 위치 추정 결과(정확도·confusion matrix) hand-off + 슬라이드 두 축 개념 공유
+- [ ] 발표 슬라이드 8장 제작 (Why → Vision → Reality → Inside, Need×Opportunity 1슬라이드 포함) — `docs/PRESENTATION.md` 기반
+- [ ] 데모 백업 영상 녹화 (rainy_return → 방 클릭 → 점수 설명서 → 청소 후 residual)
 
 **빌드 (5/28~29)**:
 - [ ] APK 형식만 갖추기 (발표는 스마트폰 프레임 이미지로 대체)
 
 **발표 (5/29~30)** — 팀장 본인 작업:
-- [ ] **5/30 (토) 최종 발표**
+- [ ] **5/30 최종 발표**
 
 ## 산출물 목록
 
 | 종류 | 산출물 | 상태 |
 |---|---|---|
 | 웹 시뮬레이터 | https://robot-cleaner.askewly.com | ✅ 라이브 (8 시나리오 + 타임라인) |
-| 백엔드 API | https://cleaning-context-backend.onrender.com | ✅ 라이브 (50 pytest, 8 시나리오) |
+| 백엔드 API | https://cleaning-context-backend.onrender.com | ✅ 라이브 (61 pytest, 8 시나리오, ML 위치추정) |
 | 모바일 앱 (APK) | mobile/build/.../app-release.apk | 🔄 SDK 설치 후 |
 | 사업계획서 | BUSINESS_PLAN.md + exports/planning-v2/planning.pdf | ✅ + 갱신 예정 |
 | 기술 기획서 | TECHNICAL_PLAN.md | ✅ |
 | ML 설계 v3 | docs/CLEANING_DECISION_ALGORITHM.md (박주상) | ✅ 머지 (2026-05-28) |
-| ML 모델 (위치 추정) | 박주상 학습 진행 | 🔄 |
+| ML 모델 (위치 추정) | backend/app/ml/ (CASAS hh106 학습 RandomForest) | ✅ test 98.9% / CV 99.0% |
 | ML v1·v2 아카이브 | archive/ml-v2/ (gitignored) | ✅ 폐기 |
 | 데모 영상 | (TBD) | ⬜ |
 
@@ -90,7 +107,7 @@
 | 카테고리 | 지표 | 목표 | 현재 |
 |---|---|---|---|
 | 기능 | 작동 시나리오 수 | ≥ 4 | ✅ 8 (라이브 확인) |
-| ML | 사용자 위치 추정 정확도 (박주상 v3) | ≥ 75% | 🔄 박주상 학습 중 |
+| ML | 사용자 위치 추정 정확도 (박주상 v3) | ≥ 75% | ✅ 98.9% / 5-fold CV 99.0% (CASAS hh106) |
 | 데이터 | 공개 데이터셋 기반 보정 근거 | ≥ 1건 | ✅ CASAS hh106 (v2 아카이브에서 검증 완료) |
 | 응답 | 이벤트 입력 → 설명 출력 | ≤ 5s | ~3s |
 | 일관성 | 동일 입력 우선순위 일치 | 100% | ✅ (Rule-based) |
