@@ -91,8 +91,8 @@ function buildCleanPath(room: RoomId, allDust: Dust[], hidden: Set<string>): Pt[
   return CLEAN_ANCHORS[room] ?? [];
 }
 
-const ROBOT_SPEED = 60;
-const MIN_MS = 400;
+const ROBOT_SPEED = 30;
+const MIN_MS = 800;
 function msFor(a: Pt, b: Pt): number { return Math.max(MIN_MS, (dist(a, b) / ROBOT_SPEED) * 1000); }
 
 /* ── 먼지 파티클 ── */

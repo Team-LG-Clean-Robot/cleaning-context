@@ -379,10 +379,9 @@ export function Simulator() {
     >
       {(
         [
-          { id: "preset", label: "시나리오 선택" },
-          { id: "custom", label: "직접 입력" },
-          { id: "timeline", label: "하루 시뮬레이션" },
           { id: "pipeline", label: "파이프라인" },
+          { id: "preset", label: "시나리오 선택" },
+          { id: "timeline", label: "하루 시뮬레이션" },
         ] as const
       ).map((t) => (
         <button
@@ -451,7 +450,7 @@ export function Simulator() {
       {/* ── 3. 맥락 입력 · 데모 조작 ── */}
       <section className="space-y-4">
         <div className="flex items-baseline justify-between gap-3 flex-wrap">
-          <h2 className="text-[18px] font-bold tracking-tight">맥락 입력 · 데모 조작</h2>
+          <h2 className="text-[18px] font-bold tracking-tight">시뮬레이션</h2>
           {modeTabs}
         </div>
 
@@ -495,7 +494,7 @@ export function Simulator() {
               loading={state.loading}
               onSelect={handlePresetSelect}
             />
-            <PipelinePanel response={state.response} scenarioId={state.selectedId} />
+            <PipelinePanel response={state.response} scenarioId={state.selectedId} events={state.events} />
           </>
         ) : null}
 
