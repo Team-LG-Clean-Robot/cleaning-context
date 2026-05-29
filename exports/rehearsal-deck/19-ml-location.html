@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>ML 위치 추정 — 입력과 검증</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: oklch(0.99 0 0); --bg-card: oklch(0.97 0 0); --surface-raised: #ffffff; --border-card: oklch(0.85 0 0);
+  --text-primary: oklch(0.12 0 0); --text-secondary: oklch(0.55 0 0); --text-muted: oklch(0.70 0 0); --text-sub: oklch(0.30 0 0);
+  --accent-start: oklch(0.12 0 0); --accent-end: oklch(0.42 0 0); --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end)); --accent-soft: oklch(0.95 0 0); --accent-border: oklch(0.80 0 0);
+  --nav-bg: oklch(0.99 0 0 / 0.95); --nav-border: oklch(0.85 0 0); --nav-accent: oklch(0.12 0 0); --nav-hover: oklch(0.42 0 0); --nav-disabled: oklch(0.80 0 0);
+  --font-main: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); font-family: var(--font-main); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding-bottom: 50px; }
+.container { width: 1280px; padding: 36px 80px; display: flex; flex-direction: column; align-items: center; }
+.title { font-size: 42px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 6px; line-height: 1.3; }
+.deck-meta { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 28px; }
+.content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; }
+.info-box { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 28px; }
+.info-box h3 { font-size: 19px; font-weight: 800; margin-bottom: 18px; border-bottom: 2px solid var(--accent-border); padding-bottom: 12px; }
+.sensor-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sensor-item { font-size: 14px; background: var(--surface-raised); padding: 10px 16px; border-radius: 12px; border: 1px solid var(--border-card); }
+.correction-rules { margin-top: 24px; width: 100%; }
+.rule-card { background: var(--surface-raised); border: 1px solid var(--border-card); border-left: 4px solid var(--accent-start); padding: 18px 28px; border-radius: 0 14px 14px 0; margin-bottom: 14px; font-size: 14px; line-height: 1.6; color: var(--text-sub); }
+.rule-card b { color: var(--accent-start); }
+/* 이모지 대체 인라인 CSS 아이콘 (currentColor 상속) */
+.ic { display: inline-block; position: relative; width: 0.95em; height: 0.95em; vertical-align: -0.12em; margin-right: 0.4em; }
+.ic-signal i { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
+.ic-signal .arc { border: 0.1em solid currentColor; border-bottom: none; border-radius: 50% 50% 0 0; }
+.ic-signal .a1 { width: 0.4em; height: 0.24em; }
+.ic-signal .a2 { width: 0.82em; height: 0.5em; }
+.ic-signal .dot { width: 0.18em; height: 0.18em; background: currentColor; border-radius: 50%; }
+.ic-target { border: 0.12em solid currentColor; border-radius: 50%; }
+.ic-target::before { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 0.5em; height: 0.5em; border: 0.1em solid currentColor; border-radius: 50%; }
+.ic-target::after { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 0.22em; height: 0.22em; background: currentColor; border-radius: 50%; }
+.ic-search::before { content: ''; position: absolute; left: 0; top: 0; width: 0.66em; height: 0.66em; border: 0.12em solid currentColor; border-radius: 50%; }
+.ic-search::after { content: ''; position: absolute; left: 0.52em; top: 0.5em; width: 0.34em; height: 0.12em; background: currentColor; border-radius: 0.06em; transform: rotate(45deg); transform-origin: left center; }
+.slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
+.slide-nav a { text-decoration: none; font-size: 14px; font-weight: 700; color: var(--nav-accent); transition: color 0.2s; }
+.slide-nav a:hover { color: var(--nav-hover); }
+.slide-nav .nav-center a { color: var(--text-secondary); font-size: 13px; font-weight: 400; }
+body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { animation: fadeOut 0.3s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="title">Step 1 · ML 기반 사용자 위치 추정</h1>
+  <div class="deck-meta">ML · 박주상</div>
+  <div class="content-grid">
+    <div class="info-box">
+      <h3><span class="ic ic-signal"><i class="arc a2"></i><i class="arc a1"></i><i class="dot"></i></span>ML 입력 센서 집합</h3>
+      <ul class="sensor-list">
+        <li class="sensor-item">motion_sensor</li>
+        <li class="sensor-item">door_lock</li>
+        <li class="sensor-item">bed_sensor</li>
+        <li class="sensor-item">tv (living)</li>
+        <li class="sensor-item">humidity (bath)</li>
+        <li class="sensor-item">induction (kitchen)</li>
+        <li class="sensor-item">microwave</li>
+        <li class="sensor-item">smart_speaker</li>
+      </ul>
+      <p style="margin-top: 18px; font-size: 13px; color: var(--text-secondary);">※ 외부 데이터(날씨, 일정)는 위치 추정 단계에서 제외</p>
+    </div>
+    <div class="info-box">
+      <h3><span class="ic ic-target"></span>ML 출력 및 신뢰도</h3>
+      <div class="rule-card" style="margin-bottom:14px;">
+        <b>user_room</b>: entrance, living, kitchen, bedroom, bathroom, away
+      </div>
+      <div class="rule-card" style="margin-bottom:0;">
+        <b>location_confidence</b>: 해당 위치 예측의 수치적 신뢰도 (0.0~1.0)
+      </div>
+    </div>
+  </div>
+  <div class="correction-rules">
+    <div class="rule-card">
+      <b><span class="ic ic-search"></span>ML 모델 기술 검증 (CASAS Dataset)</b><br>
+      가전 및 홈 센서 데이터만으로 사용자 위치 추정이 가능함을 확인하기 위해 CASAS 스마트홈 데이터를 활용해 검증했습니다.
+      <b>RandomForestClassifier</b> 기준 <b>macro F1 0.9994</b>로, [센서 → 위치 추정 → Rule 맥락 판별] 아키텍처의 타당성을 입증했습니다.
+    </div>
+    <div class="rule-card" style="margin-bottom:0;">
+      <b><span class="ic ic-target"></span>신뢰도 보정:</b> Confidence 0.60 미만 시 최근 motion_sensor 기록을 우선 사용하며, 모션 부재 시 <b>away</b>로 Fallback 처리
+    </div>
+  </div>
+</div>
+
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="18-pipeline.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">19 / 27</a></div>
+    <div class="nav-right"><a href="20-context-rules.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('20-context-rules.html');
+  if (e.key === 'ArrowLeft') navigateTo('18-pipeline.html');
+});
+</script>
+</body>
+</html>

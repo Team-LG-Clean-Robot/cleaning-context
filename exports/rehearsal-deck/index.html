@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280">
 <title>Lumos — 집의 맥락을 읽는 로봇청소기 (리허설 덱)</title>
-<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
 <style>
 :root {
   --bg-primary: oklch(0.99 0 0); --bg-card: oklch(0.97 0 0); --surface-raised: #ffffff;
@@ -27,7 +27,7 @@ body { background: var(--bg-primary); font-family: var(--font-main); color: var(
 .card:hover { transform: translateY(-3px); border-color: var(--accent-start); box-shadow: 0 8px 32px var(--shadow-accent); }
 .card .card-num { font-size: 24px; font-weight: 900; color: var(--accent-start); }
 .card .card-title { font-size: 13px; font-weight: 700; color: var(--text-sub); }
-.card .card-file { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+.card .card-file { font-size: 10px; color: var(--text-muted); font-family: var(--font-main); }
 .card .badge-interactive { position: absolute; top: 10px; right: 10px; font-size: 14px; opacity: 0.7; filter: grayscale(1); }
 .card.real { border-color: var(--accent-start); background: var(--surface-raised); }
 body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { animation: fadeOut 0.3s ease forwards; }
@@ -38,7 +38,7 @@ body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { anima
 <body>
 <div class="container">
   <h1 class="page-title">Lumos — 집의 맥락을 읽는 로봇청소기</h1>
-  <p class="page-subtitle">리허설 덱 · 16 슬라이드 · mono · 🎛️ 인터랙티브 · 클릭하여 이동</p>
+  <p class="page-subtitle">리허설 덱 · 27 슬라이드 · mono · 🎛️ 인터랙티브 · 클릭하여 이동</p>
 
   <div class="section">
     <div class="section-header"><span class="num-range">01–02</span> 인트로 <span class="owner">공통</span></div>
@@ -52,43 +52,54 @@ body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { anima
     <div class="section-header"><span class="num-range">03–05</span> 서비스 · 시장 <span class="owner">조현서</span></div>
     <div class="grid">
       <a class="card" href="03-service-video.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">03</span><span class="card-title">서비스 소개 + 영상</span><span class="card-file">03-service-video.html</span><span class="badge-interactive">🎛️</span></a>
-      <a class="card" href="04-market-1.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">04</span><span class="card-title">시장조사 ① 규모·성장</span><span class="card-file">04-market-1.html</span><span class="badge-interactive">🎛️</span></a>
+      <a class="card" href="04-market-1.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">04</span><span class="card-title">Lumos란? (서비스 소개)</span><span class="card-file">04-market-1.html</span></a>
       <a class="card" href="05-market-2.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">05</span><span class="card-title">시장조사 ② 경쟁 함정</span><span class="card-file">05-market-2.html</span></a>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-header"><span class="num-range">06–08</span> 사업성 · 재무 <span class="owner">김준성</span></div>
+    <div class="section-header"><span class="num-range">06–14</span> 사업성 · 재무 <span class="owner">김준성</span></div>
     <div class="grid">
-      <a class="card" href="06-finance-model.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">06</span><span class="card-title">수익 모델</span><span class="card-file">06-finance-model.html</span></a>
-      <a class="card" href="07-finance-unit.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">07</span><span class="card-title">시장·단위경제</span><span class="card-file">07-finance-unit.html</span></a>
-      <a class="card" href="08-finance-pnl.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">08</span><span class="card-title">3년 손익</span><span class="card-file">08-finance-pnl.html</span><span class="badge-interactive">🎛️</span></a>
+      <a class="card" href="06-finance-overview.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">06</span><span class="card-title">사업성 — 결론 먼저 (IRR ~32%)</span><span class="card-file">06-finance-overview.html</span></a>
+      <a class="card" href="07-finance-irobot.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">07</span><span class="card-title">iRobot 타임라인 (75%→파산)</span><span class="card-file">07-finance-irobot.html</span><span class="badge-interactive">🎛️</span></a>
+      <a class="card" href="08-finance-share.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">08</span><span class="card-title">iRobot 이탈 → LG 점유율</span><span class="card-file">08-finance-share.html</span></a>
+      <a class="card" href="09-finance-demand.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">09</span><span class="card-title">AI 수요 +30.6%</span><span class="card-file">09-finance-demand.html</span><span class="badge-interactive">🎛️</span></a>
+      <a class="card" href="10-finance-pricing.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">10</span><span class="card-title">가격 포지셔닝 (−$530)</span><span class="card-file">10-finance-pricing.html</span></a>
+      <a class="card" href="11-finance-revenue.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">11</span><span class="card-title">매출 $22M→$223M</span><span class="card-file">11-finance-revenue.html</span><span class="badge-interactive">🎛️</span></a>
+      <a class="card" href="12-finance-bundle.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">12</span><span class="card-title">IoT 번들 (센서)</span><span class="card-file">12-finance-bundle.html</span></a>
+      <a class="card" href="13-finance-fcf.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">13</span><span class="card-title">FCF · Y4 흑자전환</span><span class="card-file">13-finance-fcf.html</span><span class="badge-interactive">🎛️</span></a>
+      <a class="card" href="14-finance-irr.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">14</span><span class="card-title">IRR 결론</span><span class="card-file">14-finance-irr.html</span></a>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-header"><span class="num-range">09–11</span> 데모 · 설계 <span class="owner">전유성 (본인)</span></div>
+    <div class="section-header"><span class="num-range">15–17</span> 데모 · 설계 <span class="owner">전유성 (본인)</span></div>
     <div class="grid">
-      <a class="card real" href="09-design.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">09</span><span class="card-title">알고리즘 설계 개괄</span><span class="card-file">09-design.html</span></a>
-      <a class="card real" href="10-live-demo.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">10</span><span class="card-title">🔴 라이브 데모</span><span class="card-file">10-live-demo.html</span><span class="badge-interactive">🎛️</span></a>
-      <a class="card real" href="11-scoring-axes.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">11</span><span class="card-title">Need × Opportunity</span><span class="card-file">11-scoring-axes.html</span></a>
+      <a class="card real" href="15-design.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">15</span><span class="card-title">알고리즘 설계 개괄</span><span class="card-file">15-design.html</span></a>
+      <a class="card real" href="16-live-demo.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">16</span><span class="card-title">🔴 라이브 데모</span><span class="card-file">16-live-demo.html</span><span class="badge-interactive">🎛️</span></a>
+      <a class="card real" href="17-scoring-axes.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">17</span><span class="card-title">Need × Opportunity</span><span class="card-file">17-scoring-axes.html</span></a>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-header"><span class="num-range">12–15</span> ML <span class="owner">박주상</span></div>
+    <div class="section-header"><span class="num-range">18–24</span> 알고리즘 · ML <span class="owner">박주상</span></div>
     <div class="grid">
-      <a class="card" href="12-ml-role.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">12</span><span class="card-title">ML 역할 (위치 추정)</span><span class="card-file">12-ml-role.html</span></a>
-      <a class="card" href="13-ml-results.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">13</span><span class="card-title">학습 결과 98.9%</span><span class="card-file">13-ml-results.html</span><span class="badge-interactive">🎛️</span></a>
-      <a class="card" href="14-ml-ambient.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">14</span><span class="card-title">왜 ML (ambient)</span><span class="card-file">14-ml-ambient.html</span></a>
-      <a class="card" href="15-ml-reliability.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">15</span><span class="card-title">신뢰성</span><span class="card-file">15-ml-reliability.html</span></a>
+      <a class="card" href="18-pipeline.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">18</span><span class="card-title">3단계 파이프라인</span><span class="card-file">18-pipeline.html</span></a>
+      <a class="card" href="19-ml-location.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">19</span><span class="card-title">ML 위치 추정 · CASAS</span><span class="card-file">19-ml-location.html</span></a>
+      <a class="card" href="20-context-rules.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">20</span><span class="card-title">맥락 판별 규칙</span><span class="card-file">20-context-rules.html</span></a>
+      <a class="card" href="21-scoring.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">21</span><span class="card-title">점수 공식 · 튜닝</span><span class="card-file">21-scoring.html</span></a>
+      <a class="card" href="22-event-deltas.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">22</span><span class="card-title">이벤트 가감점 매트릭스</span><span class="card-file">22-event-deltas.html</span></a>
+      <a class="card" href="23-mode.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">23</span><span class="card-title">실행 모드 결정</span><span class="card-file">23-mode.html</span></a>
+      <a class="card" href="24-sim.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">24</span><span class="card-title">시나리오 시뮬레이션</span><span class="card-file">24-sim.html</span><span class="badge-interactive">🎛️</span></a>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-header"><span class="num-range">16</span> 마무리 <span class="owner">전유성</span></div>
+    <div class="section-header"><span class="num-range">25–27</span> 마무리 <span class="owner">전유성</span></div>
     <div class="grid">
-      <a class="card" href="16-qna.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">16</span><span class="card-title">Q&amp;A</span><span class="card-file">16-qna.html</span></a>
+      <a class="card" href="25-summary.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">25</span><span class="card-title">핵심 정리</span><span class="card-file">25-summary.html</span></a>
+      <a class="card" href="26-team.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">26</span><span class="card-title">팀 소개</span><span class="card-file">26-team.html</span></a>
+      <a class="card" href="27-qna.html" onclick="event.preventDefault(); navigateTo(this.href)"><span class="card-num">27</span><span class="card-title">Q&A</span><span class="card-file">27-qna.html</span></a>
     </div>
   </div>
 </div>

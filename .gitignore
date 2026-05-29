@@ -55,3 +55,6 @@ exports/phone-frames/
 
 # 덱 export 압축본 (산출물)
 exports/*.zip
+
+# 덱 영상 자산 (대용량, 로컬 발표용 — git 추적 X). 폰트(assets/fonts)는 추적함.
+exports/rehearsal-deck/assets/*.mp4

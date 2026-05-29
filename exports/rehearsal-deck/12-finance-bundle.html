@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=1280">
+<title>3-1 IoT 번들</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root{--bg:oklch(0.99 0 0);--card:#fff;--border:oklch(0.85 0 0);--text:oklch(0.12 0 0);--sub:oklch(0.55 0 0);--muted:oklch(0.70 0 0);--ag:linear-gradient(135deg,oklch(0.12 0 0),oklch(0.42 0 0));--font:'Pretendard Variable',Pretendard,-apple-system,sans-serif;--purple:#5b21b6;--purple-lt:#ede9fe;--green:#166534;--green-lt:#dcfce7;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-bottom:52px}
+.slide{width:1100px;padding:36px 0;display:flex;flex-direction:column;align-items:center;gap:24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+.headline{font-size:42px;font-weight:900;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2}
+.desc{font-size:14.5px;color:var(--sub);text-align:center;line-height:1.6}
+/* 번들 센터 */
+.bundle-center{display:flex;align-items:center;gap:32px;width:100%;justify-content:center}
+.robot-box{background:#1e293b;border-radius:20px;padding:28px 36px;text-align:center;color:white;min-width:200px}
+.robot-icon{font-size:52px;margin-bottom:8px}
+.robot-name{font-size:18px;font-weight:900;margin-bottom:4px}
+.robot-price{font-size:24px;font-weight:900;color:#86efac}
+.robot-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:4px}
+.plus-icon{font-size:32px;font-weight:900;color:var(--muted)}
+.sensors{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1}
+.sensor{background:var(--purple-lt);border:1px solid #c4b5fd;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.sensor-icon{font-size:24px}
+.sensor-name{font-size:13px;font-weight:700;color:var(--purple)}
+.sensor-count{font-size:11px;color:var(--purple);opacity:.7}
+.sensor-use{font-size:11px;color:var(--sub);line-height:1.4;margin-top:2px}
+.sensor-price{font-size:13px;font-weight:700;color:var(--purple);margin-top:4px}
+/* 결론 */
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
+.sc{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--card);text-align:center}
+.sc.hl{border-color:#c4b5fd;background:var(--purple-lt)}
+.sc-label{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.sc.hl .sc-label{color:var(--purple)}
+.sc-val{font-size:26px;font-weight:900}
+.sc.hl .sc-val{color:var(--purple)}
+.sc-sub{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.4}
+.src{font-size:10.5px;color:var(--muted);text-align:center}
+.nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:999}
+.nav-in{width:1100px;display:flex;align-items:center;justify-content:space-between}
+.nav-in a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text)}
+.nav-in a:hover{opacity:.6}
+.nav-in .nc{font-size:12px;color:var(--muted)}
+body{opacity:0;animation:fi .4s ease forwards}
+body.fo{animation:fo .3s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fo{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+</style>
+<style>
+.slide-nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:oklch(0.99 0 0 / .95);backdrop-filter:blur(12px);border-top:1px solid var(--border,oklch(0.85 0 0));display:flex;align-items:center;justify-content:center;z-index:9999}
+.slide-nav-inner{width:1280px;display:flex;align-items:center;justify-content:space-between;padding:0 60px}
+.slide-nav a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text,oklch(0.12 0 0))}
+.slide-nav .nav-center a{color:var(--muted,oklch(0.70 0 0));font-size:13px;font-weight:400}
+.slide-nav .nav-disabled{font-size:14px;font-weight:700;color:oklch(0.80 0 0);cursor:default}
+body{opacity:0;animation:fadeIn .4s ease forwards}body.fade-out{animation:fadeOut .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="eyebrow">FINANCIAL 3-1</div>
+  <h1 class="headline">AI가 제대로 작동하려면<br>센서가 필요하다</h1>
+  <p class="desc">LUMOS 구매자 100% 동시 구매 가정 · 생활맥락 AI 작동의 필수 인프라</p>
+
+  <div class="bundle-center">
+    <div class="robot-box">
+      <div class="robot-icon">🤖</div>
+      <div class="robot-name">LUMOS</div>
+      <div class="robot-price">$1,170</div>
+      <div class="robot-sub">AI 로봇청소기 본체</div>
+    </div>
+    <div class="plus-icon">+</div>
+    <div class="sensors">
+      <div class="sensor">
+        <div class="sensor-icon">🔦</div>
+        <div class="sensor-name">모션·조명 센서</div>
+        <div class="sensor-count">×3개</div>
+        <div class="sensor-use">거실·침실·현관<br>외출·귀가·취침 자동 판단</div>
+        <div class="sensor-price">$90</div>
+      </div>
+      <div class="sensor">
+        <div class="sensor-icon">💧</div>
+        <div class="sensor-name">온습도 센서</div>
+        <div class="sensor-count">×2개</div>
+        <div class="sensor-use">화장실·베란다<br>환기 시점 자동 판단</div>
+        <div class="sensor-price">$63</div>
+      </div>
+      <div class="sensor">
+        <div class="sensor-icon">🚪</div>
+        <div class="sensor-name">도어 센서</div>
+        <div class="sensor-count">×1개</div>
+        <div class="sensor-use">현관문 — 외출 확인 즉시<br>자동 청소 트리거</div>
+        <div class="sensor-price">$31</div>
+      </div>
+      <div class="sensor">
+        <div class="sensor-icon">🔌</div>
+        <div class="sensor-name">스마트 플러그</div>
+        <div class="sensor-count">×1개</div>
+        <div class="sensor-use">전력 패턴으로<br>생활 루틴 학습</div>
+        <div class="sensor-price">$31</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="sc">
+      <div class="sc-label">번들 구성</div>
+      <div class="sc-val">7종</div>
+      <div class="sc-sub">LG ThinQ ON 기기 기준<br>아시아경제 2025.10.22</div>
+    </div>
+    <div class="sc hl">
+      <div class="sc-label">번들 단가</div>
+      <div class="sc-val">$220</div>
+      <div class="sc-sub">LUMOS 구매자 100% 동시 구매<br>OPM ~7% (공시 기반)</div>
+    </div>
+    <div class="sc">
+      <div class="sc-label">Y1→Y5 IoT 매출</div>
+      <div class="sc-val">$4M→$35M</div>
+      <div class="sc-sub">판매대수 × $220<br>LUMOS 매출 성장과 연동</div>
+    </div>
+  </div>
+  <div class="src">출처: LG ThinQ ON 기기 출고가 (아시아경제 2025.10.22) · Arlo SEC 8-K · ASSA ABLOY Annual Report 2024</div>
+</div>
+
+
+<script>
+function go(u){document.body.classList.add('fo');setTimeout(()=>location.href=u,300)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go('3-2.html');
+  if(e.key==='ArrowLeft')go('2-3.html');
+})
+</script>
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="11-finance-revenue.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">12 / 27</a></div>
+    <div class="nav-right"><a href="13-finance-fcf.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('13-finance-fcf.html');
+  if (e.key === 'ArrowLeft') navigateTo('11-finance-revenue.html');
+});
+</script>
+</body>
+</html>

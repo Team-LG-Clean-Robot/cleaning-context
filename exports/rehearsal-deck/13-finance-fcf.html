@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=1280">
+<title>3-2 FCF</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:oklch(0.99 0 0);--card:#fff;--border:oklch(0.85 0 0);--text:oklch(0.12 0 0);--sub:oklch(0.55 0 0);--muted:oklch(0.70 0 0);--ag:linear-gradient(135deg,oklch(0.12 0 0),oklch(0.42 0 0));--font:'Pretendard Variable',Pretendard,-apple-system,sans-serif;--red:#991b1b;--red-lt:#fee2e2;--green:#166534;--green-lt:#dcfce7;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-bottom:52px}
+.slide{width:1100px;padding:36px 0;display:flex;flex-direction:column;align-items:center;gap:24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+.headline{font-size:42px;font-weight:900;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2}
+.desc{font-size:14.5px;color:var(--sub);text-align:center;line-height:1.6}
+.body{width:100%;display:grid;grid-template-columns:1.8fr 1fr;gap:20px;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 28px}
+.card-t{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:16px}
+.chart-wrap{height:320px;position:relative}
+/* 연도별 FCF 요약 */
+.fcf-list{display:flex;flex-direction:column;gap:0}
+.fl-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);font-size:13.5px}
+.fl-row:last-child{border-bottom:none}
+.fl-year{font-weight:700;color:var(--sub);width:40px}
+.fl-bar{flex:1;mx:8px;height:6px;background:#f1f5f9;border-radius:3px;margin:0 12px;position:relative}
+.fl-fill{height:100%;border-radius:3px;position:absolute;top:0}
+.fl-fill.neg{background:#fca5a5;right:0}
+.fl-fill.pos{background:#86efac;left:0}
+.fl-val{font-weight:700;width:70px;text-align:right}
+.fl-val.neg{color:var(--red)}
+.fl-val.pos{color:var(--green)}
+.fl-cum{font-size:11px;color:var(--muted);width:70px;text-align:right}
+.fl-cum.pos{color:var(--green)}
+/* 연두 흑자 표시 */
+.fl-row.y4{background:var(--green-lt);border-radius:8px;padding:10px 8px;margin:-2px 0}
+.src{font-size:10.5px;color:var(--muted);text-align:center}
+.nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:999}
+.nav-in{width:1100px;display:flex;align-items:center;justify-content:space-between}
+.nav-in a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text)}
+.nav-in a:hover{opacity:.6}
+.nav-in .nc{font-size:12px;color:var(--muted)}
+body{opacity:0;animation:fi .4s ease forwards}
+body.fo{animation:fo .3s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fo{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+</style>
+<style>
+.slide-nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:oklch(0.99 0 0 / .95);backdrop-filter:blur(12px);border-top:1px solid var(--border,oklch(0.85 0 0));display:flex;align-items:center;justify-content:center;z-index:9999}
+.slide-nav-inner{width:1280px;display:flex;align-items:center;justify-content:space-between;padding:0 60px}
+.slide-nav a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text,oklch(0.12 0 0))}
+.slide-nav .nav-center a{color:var(--muted,oklch(0.70 0 0));font-size:13px;font-weight:400}
+.slide-nav .nav-disabled{font-size:14px;font-weight:700;color:oklch(0.80 0 0);cursor:default}
+body{opacity:0;animation:fadeIn .4s ease forwards}body.fade-out{animation:fadeOut .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="eyebrow">FINANCIAL 3-2</div>
+  <h1 class="headline">Y4(2029) 누적 흑자 전환<br>5년 누적 +$17.3M</h1>
+  <p class="desc">초기 투자 $10M · OPM 로봇청소기 12% / IoT 7% (경쟁사 공시 기반)</p>
+
+  <div class="body">
+    <div class="card">
+      <div class="card-t">순 FCF 및 누적 FCF ($M)</div>
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-t">연도별 FCF 요약</div>
+      <div class="fcf-list">
+        <div class="fl-row">
+          <div class="fl-year">Y0</div>
+          <div class="fl-bar"><div class="fl-fill neg" style="width:60%"></div></div>
+          <div class="fl-val neg">−$6.0M</div>
+          <div class="fl-cum neg">누적 −6.0</div>
+        </div>
+        <div class="fl-row">
+          <div class="fl-year">Y1</div>
+          <div class="fl-bar"><div class="fl-fill neg" style="width:32%"></div></div>
+          <div class="fl-val neg">−$3.2M</div>
+          <div class="fl-cum neg">누적 −9.2</div>
+        </div>
+        <div class="fl-row">
+          <div class="fl-year">Y2</div>
+          <div class="fl-bar"><div class="fl-fill pos" style="width:10%"></div></div>
+          <div class="fl-val pos">+$1.0M</div>
+          <div class="fl-cum neg">누적 −8.2</div>
+        </div>
+        <div class="fl-row">
+          <div class="fl-year">Y3</div>
+          <div class="fl-bar"><div class="fl-fill pos" style="width:47%"></div></div>
+          <div class="fl-val pos">+$4.7M</div>
+          <div class="fl-cum neg">누적 −3.5</div>
+        </div>
+        <div class="fl-row y4">
+          <div class="fl-year" style="color:var(--green)">Y4 ✓</div>
+          <div class="fl-bar"><div class="fl-fill pos" style="width:82%"></div></div>
+          <div class="fl-val pos">+$8.2M</div>
+          <div class="fl-cum pos">누적 +4.7</div>
+        </div>
+        <div class="fl-row">
+          <div class="fl-year">Y5</div>
+          <div class="fl-bar"><div class="fl-fill pos" style="width:100%"></div></div>
+          <div class="fl-val pos">+$12.5M</div>
+          <div class="fl-cum pos">누적 +17.3</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">FCF = NOPAT(합산 EBIT×75%) − ΔNWC(매출증분×9%) − 투자 · CAPEX=0 (JDM) · 세율 25%</div>
+</div>
+
+
+<script>
+function go(u){document.body.classList.add('fo');setTimeout(()=>location.href=u,300)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go('3-3.html');
+  if(e.key==='ArrowLeft')go('3-1.html');
+})
+const fcfD=[-6,-3.2,1.0,4.7,8.2,12.5]
+const cumD=[-6,-9.2,-8.2,-3.5,4.7,17.3]
+new Chart(document.getElementById('chart'),{
+  type:'bar',
+  data:{
+    labels:['Y0','Y1','Y2','Y3','Y4','Y5'],
+    datasets:[
+      {label:'순 FCF',data:fcfD,backgroundColor:fcfD.map(v=>v<0?'#fca5a5':'#86efac'),borderWidth:0,borderRadius:5,order:2},
+      {label:'누적 FCF',type:'line',data:cumD,borderColor:'#1e293b',backgroundColor:'transparent',
+       borderWidth:2,borderDash:[5,3],pointRadius:5,
+       pointBackgroundColor:cumD.map(v=>v>=0?'#166534':'#991b1b'),
+       pointBorderColor:'#fff',pointBorderWidth:2,tension:.3,order:1}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{font:{size:11},boxWidth:12,padding:14}},
+      tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed.y;return ctx.dataset.label+': '+(v>0?'+':'')+v.toFixed(1)+'M'}}}
+    },
+    scales:{
+      x:{grid:{display:false},ticks:{font:{size:11}}},
+      y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>(v>0?'+':'')+v+'M'}}
+    }
+  }
+})
+</script>
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="12-finance-bundle.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">13 / 27</a></div>
+    <div class="nav-right"><a href="14-finance-irr.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('14-finance-irr.html');
+  if (e.key === 'ArrowLeft') navigateTo('12-finance-bundle.html');
+});
+</script>
+</body>
+</html>

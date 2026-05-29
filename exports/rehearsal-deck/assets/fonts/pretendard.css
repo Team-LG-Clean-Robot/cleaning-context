@@ -1,0 +1,8 @@
+/* Pretendard Variable — 로컬 자체 호스팅 (오프라인 발표용). OFL 라이선스. */
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url('PretendardVariable.woff2') format('woff2-variations');
+}

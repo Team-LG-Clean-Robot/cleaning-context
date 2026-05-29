@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>알고리즘 3단계 파이프라인</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: oklch(0.99 0 0); --bg-card: oklch(0.97 0 0); --surface-raised: #ffffff; --border-card: oklch(0.85 0 0);
+  --text-primary: oklch(0.12 0 0); --text-secondary: oklch(0.55 0 0); --text-muted: oklch(0.70 0 0); --text-sub: oklch(0.30 0 0);
+  --accent-start: oklch(0.12 0 0); --accent-end: oklch(0.42 0 0); --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end)); --accent-soft: oklch(0.95 0 0); --accent-border: oklch(0.80 0 0);
+  --nav-bg: oklch(0.99 0 0 / 0.95); --nav-border: oklch(0.85 0 0); --nav-accent: oklch(0.12 0 0); --nav-hover: oklch(0.42 0 0); --nav-disabled: oklch(0.80 0 0);
+  --font-main: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); font-family: var(--font-main); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding-bottom: 50px; }
+.container { width: 1280px; padding: 40px 80px; display: flex; flex-direction: column; align-items: center; }
+.title { font-size: 42px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 6px; line-height: 1.3; }
+.deck-meta { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 44px; }
+.pipeline { display: flex; align-items: center; gap: 20px; width: 100%; max-width: 1040px; position: relative; }
+.step { flex: 1; background: var(--surface-raised); border: 1px solid var(--border-card); border-radius: 24px; padding: 32px; text-align: center; position: relative; z-index: 2; }
+.step h3 { font-size: 20px; font-weight: 800; margin-bottom: 12px; color: var(--accent-start); }
+.step p { font-size: 15px; color: var(--text-secondary); line-height: 1.5; }
+.arrow { font-size: 24px; color: var(--text-muted); font-weight: 900; }
+.principles { margin-top: 56px; display: flex; gap: 40px; width: 100%; max-width: 1040px; }
+.principle-card { flex: 1; display: flex; gap: 20px; }
+.p-num { font-size: 32px; font-weight: 900; color: var(--accent-start); opacity: 0.3; }
+.p-content h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.p-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+.slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
+.slide-nav a { text-decoration: none; font-size: 14px; font-weight: 700; color: var(--nav-accent); transition: color 0.2s; }
+.slide-nav a:hover { color: var(--nav-hover); }
+.slide-nav .nav-center a { color: var(--text-secondary); font-size: 13px; font-weight: 400; }
+body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { animation: fadeOut 0.3s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="title">지능형 의사결정 3단계 파이프라인</h1>
+  <div class="deck-meta">ML · 박주상</div>
+  <div class="pipeline">
+    <div class="step">
+      <h3>1단계: ML 위치 추정</h3>
+      <p>센서 데이터를 기반으로<br><b>사용자 현재 위치</b> 판별</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="step">
+      <h3>2단계: Rule 의사결정</h3>
+      <p>맥락 판별 및 방별 점수 합산으로<br><b>청소 우선순위</b> 결정</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="step">
+      <h3>3단계: 시나리오 시뮬레이션</h3>
+      <p>실제 시나리오 테스트 및<br><b>시스템 추론 결과</b> 확인</p>
+    </div>
+  </div>
+  <div class="principles">
+    <div class="principle-card">
+      <div class="p-num">01</div>
+      <div class="p-content">
+        <h4>ML의 단일 역할</h4>
+        <p>ML은 오직 '사용자 위치'만 추정하며, 복합 맥락은 Rule-base에서 담당하여 복잡도 제어</p>
+      </div>
+    </div>
+    <div class="principle-card">
+      <div class="p-num">02</div>
+      <div class="p-content">
+        <h4>실시간 관측 중심</h4>
+        <p>현재 시점에 관측 가능한 데이터만 사용하여 불확실한 미래 예측 리스크 최소화</p>
+      </div>
+    </div>
+    <div class="principle-card">
+      <div class="p-num">03</div>
+      <div class="p-content">
+        <h4>설명 가능한 결과</h4>
+        <p>최종 결정은 항상 방별 점수와 구체적인 사유(Context)로 설명 가능해야 함</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="17-scoring-axes.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">18 / 27</a></div>
+    <div class="nav-right"><a href="19-ml-location.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('19-ml-location.html');
+  if (e.key === 'ArrowLeft') navigateTo('17-scoring-axes.html');
+});
+</script>
+</body>
+</html>

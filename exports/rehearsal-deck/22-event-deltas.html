@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>이벤트 가감점 규칙</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: oklch(0.99 0 0); --bg-card: oklch(0.97 0 0); --surface-raised: #ffffff; --border-card: oklch(0.85 0 0);
+  --text-primary: oklch(0.12 0 0); --text-secondary: oklch(0.55 0 0); --text-muted: oklch(0.70 0 0); --text-sub: oklch(0.30 0 0);
+  --accent-start: oklch(0.12 0 0); --accent-end: oklch(0.42 0 0); --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end)); --accent-soft: oklch(0.95 0 0); --accent-border: oklch(0.80 0 0);
+  --nav-bg: oklch(0.99 0 0 / 0.95); --nav-border: oklch(0.85 0 0); --nav-accent: oklch(0.12 0 0); --nav-hover: oklch(0.42 0 0); --nav-disabled: oklch(0.80 0 0);
+  --font-main: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); font-family: var(--font-main); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding-bottom: 50px; }
+.container { width: 1280px; padding: 32px 80px; display: flex; flex-direction: column; align-items: center; }
+.title { font-size: 42px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 6px; line-height: 1.3; }
+.deck-meta { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 24px; }
+table { width: 100%; border-collapse: collapse; background: var(--surface-raised); border: 1px solid var(--border-card); border-radius: 16px; overflow: hidden; font-size: 13px; }
+th, td { padding: 11px 16px; text-align: center; border-bottom: 1px solid var(--border-card); }
+tbody tr:last-child td { border-bottom: none; }
+th { background: var(--bg-card); font-weight: 800; color: var(--text-secondary); }
+.event-name { text-align: left; font-weight: 800; color: var(--accent-start); }
+.positive { color: #2e7d32; font-weight: 700; }
+.negative { color: #c62828; font-weight: 700; }
+.design-intent { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; }
+.intent-card { background: var(--bg-card); border: 1px solid var(--border-card); padding: 16px; border-radius: 12px; }
+.intent-card h5 { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+.intent-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.45; }
+.slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
+.slide-nav a { text-decoration: none; font-size: 14px; font-weight: 700; color: var(--nav-accent); transition: color 0.2s; }
+.slide-nav a:hover { color: var(--nav-hover); }
+.slide-nav .nav-center a { color: var(--text-secondary); font-size: 13px; font-weight: 400; }
+body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { animation: fadeOut 0.3s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="title">Step 2 · 이벤트별 가감점 규칙</h1>
+  <div class="deck-meta">ML · 박주상</div>
+  <table>
+    <thead>
+      <tr>
+        <th>event_id (맥락)</th>
+        <th>현관</th>
+        <th>거실</th>
+        <th>주방</th>
+        <th>침실</th>
+        <th>욕실</th>
+        <th>Axis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="event-name">rain (비)</td><td class="positive">+25</td><td class="positive">+5</td><td>-</td><td>-</td><td>-</td><td>Need</td></tr>
+      <tr><td class="event-name">user_returned (귀가)</td><td class="positive">+15</td><td class="positive">+5</td><td>-</td><td>-</td><td>-</td><td>Need</td></tr>
+      <tr><td class="event-name">cooking_done (요리 후)</td><td>-</td><td class="positive">+5</td><td class="positive">+35</td><td>-</td><td>-</td><td>Need</td></tr>
+      <tr><td class="event-name">cooking_active (요리 중)</td><td class="positive">+5</td><td class="positive">+15</td><td class="negative">-40</td><td class="positive">+5</td><td class="positive">+5</td><td>Need</td></tr>
+      <tr><td class="event-name">meal_finished (식사 후)</td><td>-</td><td class="positive">+15</td><td class="positive">+35</td><td>-</td><td>-</td><td>Need</td></tr>
+      <tr><td class="event-name">recent_shower (샤워 후)</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="positive">+25</td><td>Need</td></tr>
+      <tr><td class="event-name">tv_watching (거실 휴식)</td><td>-</td><td class="negative">-20</td><td class="positive">+5</td><td>-</td><td>-</td><td>Need</td></tr>
+      <tr><td class="event-name">guest_arriving_2h (손님)</td><td class="positive">+15</td><td class="positive">+30</td><td class="positive">+10</td><td class="negative">-5</td><td class="positive">+15</td><td>Opp.</td></tr>
+      <tr><td class="event-name">pre_sleep_30min (취침전)</td><td>-</td><td class="positive">+5</td><td>-</td><td class="negative">-40</td><td class="positive">+15</td><td>Opp.</td></tr>
+    </tbody>
+  </table>
+  <div class="design-intent">
+    <div class="intent-card">
+      <h5>① rain 독립 이벤트화</h5>
+      <p>비 신호만으로 현관 오염 가능성을 독립적으로 반영 (단일 책임 원칙)</p>
+    </div>
+    <div class="intent-card">
+      <h5>② 다중 방 효과 분산</h5>
+      <p>요리 중 거실 이동 가능성 등 인접 공간에 대한 미세 가중치 반영</p>
+    </div>
+    <div class="intent-card">
+      <h5>③ 신규 시나리오 확장</h5>
+      <p>택배 도착(package), 식사 종료(meal_finished) 등 신규 이벤트 추가</p>
+    </div>
+  </div>
+</div>
+
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="21-scoring.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">22 / 27</a></div>
+    <div class="nav-right"><a href="23-mode.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('23-mode.html');
+  if (e.key === 'ArrowLeft') navigateTo('21-scoring.html');
+});
+</script>
+</body>
+</html>

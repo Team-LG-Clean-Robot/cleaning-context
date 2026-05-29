@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=1280">
+<title>1-2 보안 이탈 → LG 점유율 확대</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root{--bg:oklch(0.99 0 0);--card:#fff;--border:oklch(0.85 0 0);--text:oklch(0.12 0 0);--sub:oklch(0.55 0 0);--muted:oklch(0.70 0 0);--ag:linear-gradient(135deg,oklch(0.12 0 0),oklch(0.42 0 0));--font:'Pretendard Variable',Pretendard,-apple-system,sans-serif;--red:#991b1b;--red-lt:#fee2e2;--green:#166534;--green-lt:#dcfce7;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-bottom:52px}
+.slide{width:1100px;padding:28px 0;display:flex;flex-direction:column;align-items:center;gap:18px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+.headline{font-size:40px;font-weight:900;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2}
+.quote{background:#f8fafc;border-left:4px solid #1e293b;border-radius:0 10px 10px 0;padding:12px 18px;font-size:13.5px;line-height:1.6;color:var(--sub);width:100%}
+.quote strong{color:var(--text)}.quote .qsrc{margin-top:4px;font-size:10.5px;color:var(--muted)}
+
+/* 3열 레이아웃 */
+.cols{display:grid;grid-template-columns:1.5fr 0.8fr 0.8fr;gap:14px;width:100%;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.card-t{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.card-sub{font-size:10px;color:var(--muted);margin-bottom:12px}
+
+/* 미국 테이블 */
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{border-bottom:1.5px solid #1e293b}
+th{padding:7px 8px;text-align:right;font-weight:600;font-size:10.5px;color:var(--sub)}
+th.l{text-align:left}
+td{padding:6px 8px;text-align:right;border-bottom:.5px solid #f1f5f9;font-variant-numeric:tabular-nums}
+td.l{text-align:left;font-weight:500}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;font-size:9.5px;padding:1px 6px;border-radius:4px;font-weight:600;margin-left:4px}
+.b-cn{background:#fee2e2;color:#991b1b}
+.b-us{background:#dbeafe;color:#1e40af}
+.b-uk{background:#f3f4f6;color:#374151}
+.b-kr{background:#dcfce7;color:#166534}
+.b-etc{background:#f3f4f6;color:#6b7280}
+tr.hl-red td{background:#fef2f2}
+tr.hl-red td.l{color:var(--red);font-weight:700}
+tr.hl-green td{background:#f0fdf4}
+tr.hl-green td.l{color:var(--green);font-weight:700}
+tr.hl-gray td{background:#f8fafc;font-weight:600}
+.neg{color:var(--red);font-weight:700}
+.pos{color:var(--green);font-weight:700}
+.dim{color:var(--muted)}
+
+/* 유럽·일본·한국 카드 */
+.region-card{border:1px solid var(--border);border-radius:10px;padding:13px 14px;margin-bottom:10px;background:var(--card)}
+.region-card:last-child{margin-bottom:0}
+.region-card.hl{border-color:#86efac;background:var(--green-lt)}
+.rc-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.rc-flag{font-size:13px}
+.rc-title{font-size:12.5px;font-weight:700}
+.rc-sub{font-size:10.5px;color:var(--sub);line-height:1.5;margin-bottom:8px}
+.rc-numbers{display:flex;align-items:center;gap:10px}
+.rc-before{font-size:13px;color:var(--sub)}
+.rc-arrow{font-size:11px;color:var(--muted);flex-shrink:0}
+.rc-after{font-size:22px;font-weight:900;color:var(--green)}
+.rc-gain{font-size:11px;font-weight:700;color:var(--green);background:#dcfce7;border-radius:4px;padding:1px 6px;margin-left:4px}
+
+.src{font-size:10.5px;color:var(--muted);text-align:center}
+.nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:999}
+.nav-in{width:1100px;display:flex;align-items:center;justify-content:space-between}
+.nav-in a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text)}
+.nav-in a:hover{opacity:.6}
+.nav-in .nc{font-size:12px;color:var(--muted)}
+body{opacity:0;animation:fi .4s ease forwards}
+body.fo{animation:fo .3s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fo{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+</style>
+<style>
+.slide-nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:oklch(0.99 0 0 / .95);backdrop-filter:blur(12px);border-top:1px solid var(--border,oklch(0.85 0 0));display:flex;align-items:center;justify-content:center;z-index:9999}
+.slide-nav-inner{width:1280px;display:flex;align-items:center;justify-content:space-between;padding:0 60px}
+.slide-nav a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text,oklch(0.12 0 0))}
+.slide-nav .nav-center a{color:var(--muted,oklch(0.70 0 0));font-size:13px;font-weight:400}
+.slide-nav .nav-disabled{font-size:14px;font-weight:700;color:oklch(0.80 0 0);cursor:default}
+body{opacity:0;animation:fadeIn .4s ease forwards}body.fade-out{animation:fadeOut .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="eyebrow">FINANCIAL 1-2</div>
+  <h1 class="headline">iRobot 이탈 수요<br>LG 점유율 확대로 이어진다</h1>
+
+  <div class="quote">
+    <strong>"카메라 기반 내비게이션 모델에 대해 약 40%의 잠재 구매자가 사이버보안 취약성을 이유로 구매를 주저한다"</strong>
+    <div class="qsrc">Technavio 2026.03 · iRobot 중국 Picea 인수 후 동일 우려 적용 → 이탈 수요 비중국 브랜드 비례 배분</div>
+  </div>
+
+  <div class="cols">
+    <!-- 미국 테이블 -->
+    <div class="card">
+      <div class="card-t">🇺🇸 미국 — 브랜드별 점유율 이탈 전후</div>
+      <div class="card-sub">iRobot 이탈분: 42% × 40% = 16.8%p → 비중국 합산 33%로 비례 배분</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="l">브랜드</th>
+            <th class="l">국적</th>
+            <th>인수 전</th>
+            <th>이탈 후</th>
+            <th>변화</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hl-red">
+            <td class="l">iRobot (Roomba)</td>
+            <td class="l"><span class="badge b-cn">중국</span><span class="badge b-etc">구미국</span></td>
+            <td>42%</td><td>25.2%</td><td class="neg">−16.8%p</td>
+          </tr>
+          <tr>
+            <td class="l">SharkNinja</td>
+            <td class="l"><span class="badge b-us">미국</span></td>
+            <td>22%</td><td>33.4%</td><td class="pos">+11.4%p</td>
+          </tr>
+          <tr>
+            <td class="l">Roborock</td>
+            <td class="l"><span class="badge b-cn">중국</span></td>
+            <td>14%</td><td>14%</td><td class="dim">—</td>
+          </tr>
+          <tr>
+            <td class="l">Ecovacs</td>
+            <td class="l"><span class="badge b-cn">중국</span></td>
+            <td>7%</td><td>7%</td><td class="dim">—</td>
+          </tr>
+          <tr>
+            <td class="l">Dreame</td>
+            <td class="l"><span class="badge b-cn">중국</span></td>
+            <td>4%</td><td>4%</td><td class="dim">—</td>
+          </tr>
+          <tr>
+            <td class="l">Dyson</td>
+            <td class="l"><span class="badge b-uk">영국</span></td>
+            <td>4%</td><td>6.0%</td><td class="pos">+2.0%p</td>
+          </tr>
+          <tr>
+            <td class="l">Samsung</td>
+            <td class="l"><span class="badge b-kr">한국</span></td>
+            <td>3%</td><td>4.5%</td><td class="pos">+1.5%p</td>
+          </tr>
+          <tr class="hl-green">
+            <td class="l"><strong>LG</strong></td>
+            <td class="l"><span class="badge b-kr">한국</span></td>
+            <td>2%</td><td><strong>3.0%</strong></td><td class="pos"><strong>+1.0%p</strong></td>
+          </tr>
+          <tr>
+            <td class="l">기타 비중국</td>
+            <td class="l"><span class="badge b-etc">기타</span></td>
+            <td>2%</td><td>3.0%</td><td class="pos">+1.0%p</td>
+          </tr>
+          <tr class="hl-gray">
+            <td class="l">비중국 합산</td>
+            <td class="l"></td>
+            <td>33%</td><td>49.8%</td><td class="pos">+16.8%p</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 유럽·일본 -->
+    <div>
+      <div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:10px">유럽 · 일본 — iRobot 이탈로 LG 점유율 확대</div>
+      <div class="region-card hl">
+        <div class="rc-header">
+          <div class="rc-flag">🇪🇺</div>
+          <div class="rc-title">유럽</div>
+        </div>
+        <div class="rc-sub">iRobot 12% × 40% 이탈<br>비중국 브랜드 비례 배분</div>
+        <div class="rc-numbers">
+          <div class="rc-before">2.0%</div>
+          <div class="rc-arrow">→</div>
+          <div class="rc-after">2.4%</div>
+          <span class="rc-gain">+0.4%p</span>
+        </div>
+      </div>
+      <div class="region-card hl" style="margin-top:10px">
+        <div class="rc-header">
+          <div class="rc-flag">🇯🇵</div>
+          <div class="rc-title">일본</div>
+        </div>
+        <div class="rc-sub">iRobot 35% × 40% 이탈<br>비중국 브랜드 비례 배분</div>
+        <div class="rc-numbers">
+          <div class="rc-before">2.0%</div>
+          <div class="rc-arrow">→</div>
+          <div class="rc-after">2.8%</div>
+          <span class="rc-gain">+0.8%p</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 한국 -->
+    <div>
+      <div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:10px">한국 — 중국 보안 리스크로 LG 점유율 확대</div>
+      <div class="region-card hl">
+        <div class="rc-header">
+          <div class="rc-flag">🇰🇷</div>
+          <div class="rc-title">한국</div>
+        </div>
+        <div class="rc-sub">iRobot 이탈 수요 없음<br>중국 브랜드(Roborock 46%) 보안 리스크 우려 확산<br>+ 올인원 신제품 출시 효과<br>GfK 2025E 실측 기반</div>
+        <div class="rc-numbers">
+          <div class="rc-before">9.0%</div>
+          <div class="rc-arrow">→</div>
+          <div class="rc-after">20%</div>
+          <span class="rc-gain">+11%p</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="src">출처: TheStreet 2025.12 · Technavio 2026.03 · IDC Q4 2024 · GfK Korea · iRobot SEC 8-K 2026.01.23</div>
+</div>
+
+
+<script>
+function go(u){document.body.classList.add('fo');setTimeout(()=>location.href=u,300)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go('2-1.html');
+  if(e.key==='ArrowLeft')go('1-1.html');
+})
+</script>
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="07-finance-irobot.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">8 / 27</a></div>
+    <div class="nav-right"><a href="09-finance-demand.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('09-finance-demand.html');
+  if (e.key === 'ArrowLeft') navigateTo('07-finance-irobot.html');
+});
+</script>
+</body>
+</html>

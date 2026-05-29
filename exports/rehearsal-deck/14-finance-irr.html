@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=1280">
+<title>3-3 IRR 결론</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root{--bg:oklch(0.99 0 0);--card:#fff;--border:oklch(0.85 0 0);--text:oklch(0.12 0 0);--sub:oklch(0.55 0 0);--muted:oklch(0.70 0 0);--ag:linear-gradient(135deg,oklch(0.12 0 0),oklch(0.42 0 0));--font:'Pretendard Variable',Pretendard,-apple-system,sans-serif;--red:#991b1b;--red-lt:#fee2e2;--green:#166634;--green-lt:#dcfce7;--amber:#92400e;--amber-lt:#fef3c7;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-bottom:52px}
+.slide{width:1100px;padding:36px 0;display:flex;flex-direction:column;align-items:center;gap:32px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+.headline{font-size:42px;font-weight:900;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2}
+.desc{font-size:14.5px;color:var(--sub);text-align:center;line-height:1.6}
+/* IRR 메인 */
+.irr-main{display:flex;align-items:center;justify-content:center;gap:40px;width:100%}
+.irr-box{background:var(--red-lt);border:2px solid #fca5a5;border-radius:24px;
+  padding:40px 60px;text-align:center}
+.irr-label{font-size:14px;color:var(--red);opacity:.8;margin-bottom:8px}
+.irr-num{font-size:96px;font-weight:900;color:var(--red);line-height:1;letter-spacing:-4px}
+.irr-sub{font-size:18px;color:var(--red);margin-top:10px;font-weight:600}
+.vs-section{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.vs-row{display:flex;align-items:center;gap:14px}
+.vs-label{font-size:14px;color:var(--sub);width:120px}
+.vs-bar-wrap{width:240px;height:10px;background:#f1f5f9;border-radius:5px;position:relative}
+.vs-bar{height:100%;border-radius:5px}
+.vs-val{font-size:16px;font-weight:700;width:60px}
+.gap-badge{background:#1e293b;color:#fff;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;margin-top:8px;text-align:center}
+/* 요약 카드 */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%}
+.sc{border:1px solid var(--border);border-radius:14px;padding:16px 20px;background:var(--card);text-align:center}
+.sc-icon{font-size:22px;margin-bottom:6px}
+.sc-label{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+.sc-val{font-size:20px;font-weight:900}
+.sc-sub{font-size:11px;color:var(--sub);margin-top:3px;line-height:1.4}
+.closing{background:#1e293b;border-radius:16px;padding:24px 36px;width:100%;text-align:center;color:white}
+.closing-main{font-size:20px;font-weight:700;line-height:1.6;margin-bottom:6px}
+.closing-sub{font-size:13px;color:rgba(255,255,255,.55)}
+.nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:999}
+.nav-in{width:1100px;display:flex;align-items:center;justify-content:space-between}
+.nav-in a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text)}
+.nav-in a:hover{opacity:.6}
+.nav-in .nc{font-size:12px;color:var(--muted)}
+.nav-in .nd{font-size:14px;font-weight:700;color:oklch(.80 0 0);cursor:default}
+body{opacity:0;animation:fi .4s ease forwards}
+body.fo{animation:fo .3s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fo{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+</style>
+<style>
+.slide-nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:oklch(0.99 0 0 / .95);backdrop-filter:blur(12px);border-top:1px solid var(--border,oklch(0.85 0 0));display:flex;align-items:center;justify-content:center;z-index:9999}
+.slide-nav-inner{width:1280px;display:flex;align-items:center;justify-content:space-between;padding:0 60px}
+.slide-nav a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text,oklch(0.12 0 0))}
+.slide-nav .nav-center a{color:var(--muted,oklch(0.70 0 0));font-size:13px;font-weight:400}
+.slide-nav .nav-disabled{font-size:14px;font-weight:700;color:oklch(0.80 0 0);cursor:default}
+body{opacity:0;animation:fadeIn .4s ease forwards}body.fade-out{animation:fadeOut .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="eyebrow">FINANCIAL 3-3</div>
+  <h1 class="headline">IRR ~32%<br>허들레이트 20% 대비 +12%p 초과</h1>
+  <p class="desc">충분히 사업성이 있다고 판단 · 세부 논리 및 데이터는 첨부 보고서 참조</p>
+
+  <div class="irr-main">
+    <div class="irr-box">
+      <div class="irr-label">IRR — SW $10M / OPM 12%+7%</div>
+      <div class="irr-num">~32%</div>
+      <div class="irr-sub">허들레이트 20% 대비 +12%p 통과</div>
+    </div>
+    <div class="vs-section">
+      <div class="vs-row">
+        <div class="vs-label">IRR</div>
+        <div class="vs-bar-wrap">
+          <div class="vs-bar" style="width:100%;background:#fca5a5"></div>
+        </div>
+        <div class="vs-val" style="color:#991b1b">~32%</div>
+      </div>
+      <div class="vs-row">
+        <div class="vs-label">허들레이트</div>
+        <div class="vs-bar-wrap">
+          <div class="vs-bar" style="width:62.5%;background:#1e293b"></div>
+        </div>
+        <div class="vs-val">~20%</div>
+      </div>
+      <div class="gap-badge">+12%p 초과 통과 ✓</div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="sc">
+      <div class="sc-icon">💰</div>
+      <div class="sc-label">초기 투자</div>
+      <div class="sc-val">$10M</div>
+      <div class="sc-sub">SW 개발만 (≈150억)<br>JDM → HW CAPEX 0</div>
+    </div>
+    <div class="sc">
+      <div class="sc-icon">📅</div>
+      <div class="sc-label">누적 흑자 전환</div>
+      <div class="sc-val">Y4</div>
+      <div class="sc-sub">2029년<br>투자 회수 시작</div>
+    </div>
+    <div class="sc">
+      <div class="sc-icon">📈</div>
+      <div class="sc-label">5년 누적 FCF</div>
+      <div class="sc-val">+$17.3M</div>
+      <div class="sc-sub">Y1~Y5 합산<br>투자 대비 1.7배</div>
+    </div>
+    <div class="sc">
+      <div class="sc-icon">🔗</div>
+      <div class="sc-label">추가 가치</div>
+      <div class="sc-val">확장성</div>
+      <div class="sc-sub">SW 성공 시 전 가전<br>라인업 확대 가능</div>
+    </div>
+  </div>
+
+  <div class="closing">
+    <div class="closing-main">
+      세부 매출 논리 · 데이터 출처 · 가정은 첨부 보고서 참조<br>
+      핵심 ① iRobot 이탈 → ② Q×P 증분 → ③ 번들 + IRR ~32%
+    </div>
+    <div class="closing-sub">초기 투자 $10M · OPM 시장 자료 기반 · 허들레이트 20% 통과</div>
+  </div>
+</div>
+
+
+<script>
+function go(u){document.body.classList.add('fo');setTimeout(()=>location.href=u,300)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft')go('3-2.html');
+})
+</script>
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="13-finance-fcf.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">14 / 27</a></div>
+    <div class="nav-right"><a href="15-design.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('15-design.html');
+  if (e.key === 'ArrowLeft') navigateTo('13-finance-fcf.html');
+});
+</script>
+</body>
+</html>

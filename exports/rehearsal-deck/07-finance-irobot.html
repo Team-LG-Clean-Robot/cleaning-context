@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=1280">
+<title>1-1 iRobot 타임라인</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:oklch(0.99 0 0);--card:#fff;--border:oklch(0.85 0 0);--text:oklch(0.12 0 0);--sub:oklch(0.55 0 0);--muted:oklch(0.70 0 0);--ag:linear-gradient(135deg,oklch(0.12 0 0),oklch(0.42 0 0));--font:'Pretendard Variable',Pretendard,-apple-system,sans-serif;--red:#991b1b;--red-lt:#fee2e2;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-bottom:52px}
+.slide{width:1100px;padding:36px 0;display:flex;flex-direction:column;align-items:center;gap:24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+.headline{font-size:42px;font-weight:900;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2}
+.desc{font-size:14.5px;color:var(--sub);text-align:center;line-height:1.6}
+.body{width:100%;display:grid;grid-template-columns:1fr 1.4fr;gap:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 28px}
+.card-t{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:16px}
+/* 타임라인 */
+.tl{display:flex;flex-direction:column;gap:0}
+.ti{display:flex;gap:0;position:relative}
+.ti-left{display:flex;flex-direction:column;align-items:center;width:72px;flex-shrink:0}
+.ti-date{font-size:11.5px;font-weight:700;color:var(--muted);padding-top:3px}
+.ti-line{width:1.5px;background:#e2e8f0;flex:1;margin-top:4px}
+.ti.hl .ti-date{color:var(--red)}
+.ti-dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;flex-shrink:0;margin-top:5px;margin-left:-4px;position:absolute;left:72px}
+.ti.hl .ti-dot{background:var(--red)}
+.ti-body{padding:2px 0 18px 20px;font-size:13.5px;line-height:1.5;color:var(--sub)}
+.ti-body strong{color:var(--text);font-weight:700}
+.ti.hl .ti-body{color:var(--red);font-weight:600}
+.chart-wrap{height:300px;position:relative}
+.src{font-size:10.5px;color:var(--muted);text-align:center}
+.nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:999}
+.nav-in{width:1100px;display:flex;align-items:center;justify-content:space-between}
+.nav-in a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text)}
+.nav-in a:hover{opacity:.6}
+.nav-in .nc{font-size:12px;color:var(--muted)}
+body{opacity:0;animation:fi .4s ease forwards}
+body.fo{animation:fo .3s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fo{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+</style>
+<style>
+.slide-nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:oklch(0.99 0 0 / .95);backdrop-filter:blur(12px);border-top:1px solid var(--border,oklch(0.85 0 0));display:flex;align-items:center;justify-content:center;z-index:9999}
+.slide-nav-inner{width:1280px;display:flex;align-items:center;justify-content:space-between;padding:0 60px}
+.slide-nav a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text,oklch(0.12 0 0))}
+.slide-nav .nav-center a{color:var(--muted,oklch(0.70 0 0));font-size:13px;font-weight:400}
+.slide-nav .nav-disabled{font-size:14px;font-weight:700;color:oklch(0.80 0 0);cursor:default}
+body{opacity:0;animation:fadeIn .4s ease forwards}body.fade-out{animation:fadeOut .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="eyebrow">FINANCIAL 1-1</div>
+  <h1 class="headline">iRobot, 4년 만에 75%에서<br>파산까지</h1>
+  <p class="desc">미국 1위 브랜드의 몰락 — 중국 인수로 보안 우려 확산 → 비중국 브랜드 수혜</p>
+
+  <div class="body">
+    <div class="card">
+      <div class="card-t">iRobot 파산 타임라인</div>
+      <div class="tl">
+        <div class="ti">
+          <div class="ti-left"><div class="ti-date">2020</div><div class="ti-line"></div></div>
+          <div class="ti-dot"></div>
+          <div class="ti-body">미국 점유율 <strong>75%</strong> — 압도적 1위</div>
+        </div>
+        <div class="ti">
+          <div class="ti-left"><div class="ti-date">2022</div><div class="ti-line"></div></div>
+          <div class="ti-dot"></div>
+          <div class="ti-body">Amazon $1.7B 인수 발표</div>
+        </div>
+        <div class="ti">
+          <div class="ti-left"><div class="ti-date">2024 Q1</div><div class="ti-line"></div></div>
+          <div class="ti-dot"></div>
+          <div class="ti-body">EU 반독점으로 인수 무산<br>점유율 <strong>42%</strong>로 하락</div>
+        </div>
+        <div class="ti">
+          <div class="ti-left"><div class="ti-date">2025 Q3</div><div class="ti-line"></div></div>
+          <div class="ti-dot"></div>
+          <div class="ti-body">미국 매출 YoY <strong>−33%</strong></div>
+        </div>
+        <div class="ti hl">
+          <div class="ti-left"><div class="ti-date">2025.12</div><div class="ti-line"></div></div>
+          <div class="ti-dot"></div>
+          <div class="ti-body"><strong>Chapter 11 파산 신청</strong></div>
+        </div>
+        <div class="ti hl">
+          <div class="ti-left"><div class="ti-date">2026.01</div></div>
+          <div class="ti-dot"></div>
+          <div class="ti-body"><strong>중국 Picea 100% 인수 완료</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t">미국 로봇청소기 시장 성장 & iRobot 점유율 추이</div>
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </div>
+  </div>
+  <div class="src">출처: TheStreet 2025.12 · iRobot SEC 8-K 2026.01.23 · Virtue MR / Coherent MI</div>
+</div>
+
+
+<script>
+function go(u){document.body.classList.add('fo');setTimeout(()=>location.href=u,300)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go('1-2.html');
+  if(e.key==='ArrowLeft')go('0.html');
+})
+new Chart(document.getElementById('chart'),{
+  type:'bar',
+  data:{
+    labels:['2020','2022','2024','2026E','2028E','2030E'],
+    datasets:[
+      {label:'미국 시장 규모',data:[1.1,1.4,1.7,2.0,2.55,3.26],backgroundColor:'#e2e8f0',yAxisID:'y',order:2,borderRadius:4},
+      {label:'iRobot 점유율',type:'line',data:[75,60,42,25,null,null],borderColor:'#991b1b',backgroundColor:'#fee2e220',borderWidth:2.5,fill:true,pointRadius:5,pointBackgroundColor:'#991b1b',tension:.3,yAxisID:'y2',order:1}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{font:{size:11},boxWidth:12,padding:16}}},
+    scales:{
+      x:{ticks:{font:{size:11}},grid:{display:false}},
+      y:{position:'left',title:{display:true,text:'시장 규모 ($B)',font:{size:10}},ticks:{font:{size:10},callback:v=>'$'+v+'B'},grid:{color:'rgba(0,0,0,.06)'}},
+      y2:{position:'right',min:0,max:100,title:{display:true,text:'iRobot 점유율',font:{size:10}},ticks:{font:{size:10},color:'#991b1b',callback:v=>v+'%'},grid:{display:false}}
+    }
+  }
+})
+</script>
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="06-finance-overview.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">7 / 27</a></div>
+    <div class="nav-right"><a href="08-finance-share.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('08-finance-share.html');
+  if (e.key === 'ArrowLeft') navigateTo('06-finance-overview.html');
+});
+</script>
+</body>
+</html>

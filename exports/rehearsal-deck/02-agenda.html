@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280">
 <title>목차</title>
-<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
 <style>
 :root {
   --bg-primary: oklch(0.99 0 0); --bg-card: oklch(0.97 0 0); --surface-raised: #ffffff; --border-card: oklch(0.85 0 0);
@@ -19,12 +19,15 @@ body { background: var(--bg-primary); font-family: var(--font-main); color: var(
 .eyebrow { font-size: 14px; font-weight: 800; letter-spacing: 0.2em; color: var(--text-secondary); margin-bottom: 10px; }
 .eyebrow .lg { color: var(--text-primary); }
 .title { font-size: 46px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 40px; line-height: 1.3; }
-.agenda { width: 100%; max-width: 880px; display: flex; flex-direction: column; gap: 14px; }
-.item { display: flex; align-items: center; gap: 20px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 14px; padding: 20px 26px; }
-.item .no { font-size: 26px; font-weight: 900; color: var(--accent-start); min-width: 44px; }
+.agenda { width: 100%; max-width: 880px; display: flex; flex-direction: column; }
+.item { position: relative; display: flex; align-items: center; gap: 20px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 14px; padding: 20px 26px; }
+.item + .item { margin-top: 22px; }
+/* A. 카드 사이 여정 연결선 (번호 열에 정렬) */
+.item:not(:last-child)::after { content: ""; position: absolute; left: 48px; bottom: -22px; width: 2px; height: 22px; transform: translateX(-50%); background: var(--border-card); }
+.item .no { font-size: 26px; font-weight: 900; color: var(--accent-start); min-width: 44px; text-align: center; }
 .item .body { flex: 1; }
 .item .h { font-size: 19px; font-weight: 800; }
-.item .d { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+.item .d { font-size: 14px; color: var(--text-secondary); margin-top: 3px; }
 .item .who { font-size: 13px; font-weight: 700; color: var(--text-muted); }
 .slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 .slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
@@ -41,16 +44,17 @@ body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { anima
   <div class="eyebrow"><span class="lg">LG</span> · Lumos</div>
   <h1 class="title">목차</h1>
   <div class="agenda">
-    <div class="item"><div class="no">01</div><div class="body"><div class="h">서비스 · 시장</div><div class="d">무엇을 하는 서비스인가 · 시장조사 결과</div></div><div class="who">조현서</div></div>
-    <div class="item"><div class="no">02</div><div class="body"><div class="h">사업성</div><div class="d">수익 모델 · 단위경제 · 3년 손익 — 돈이 되는가</div></div><div class="who">김준성</div></div>
-    <div class="item"><div class="no">03</div><div class="body"><div class="h">라이브 데모 · 설계</div><div class="d">실제 작동 시연 + 알고리즘 설계 개괄</div></div><div class="who">전유성</div></div>
-    <div class="item"><div class="no">04</div><div class="body"><div class="h">ML</div><div class="d">사용자 위치 추정 — 학습 결과와 역할</div></div><div class="who">박주상</div></div>
+    <div class="item"><div class="no">01</div><div class="body"><div class="h">무엇을, 왜 만들었나</div><div class="d">미래 로봇청소기의 '두뇌'- 어떤 서비스이고 어떤 문제를 푸는가</div></div><div class="who">조현서</div></div>
+    <div class="item"><div class="no">02</div><div class="body"><div class="h">돈이 되는가</div><div class="d">시장 규모와 경쟁, 얼마를 써서 얼마를 버는 구조인가</div></div><div class="who">김준성</div></div>
+    <div class="item"><div class="no">03</div><div class="body"><div class="h">어떻게 작동하나</div><div class="d">실제 작동하는 웹 데모로 보는 의사결정 과정</div></div><div class="who">전유성</div></div>
+    <div class="item"><div class="no">04</div><div class="body"><div class="h">어떻게 더 똑똑해지나</div><div class="d">센서만으로 사용자 위치를 추정하는 머신러닝 한 계층</div></div><div class="who">박주상</div></div>
   </div>
 </div>
+
 <nav class="slide-nav">
   <div class="slide-nav-inner">
     <div class="nav-left"><a href="01-title.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
-    <div class="nav-center"><a href="index.html">02 / 16</a></div>
+    <div class="nav-center"><a href="index.html">2 / 27</a></div>
     <div class="nav-right"><a href="03-service-video.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
   </div>
 </nav>

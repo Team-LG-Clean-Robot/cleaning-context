@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=1280">
+<title>2-2 ASP</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root{--bg:oklch(0.99 0 0);--card:#fff;--border:oklch(0.85 0 0);--text:oklch(0.12 0 0);--sub:oklch(0.55 0 0);--muted:oklch(0.70 0 0);--ag:linear-gradient(135deg,oklch(0.12 0 0),oklch(0.42 0 0));--font:'Pretendard Variable',Pretendard,-apple-system,sans-serif;--blue:#1e40af;--blue-lt:#dbeafe;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-bottom:52px}
+.slide{width:1100px;padding:36px 0;display:flex;flex-direction:column;align-items:center;gap:28px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+.headline{font-size:42px;font-weight:900;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2}
+.desc{font-size:14.5px;color:var(--sub);text-align:center;line-height:1.6}
+/* 가격 밴드 */
+.band{display:grid;grid-template-columns:repeat(4,1fr);gap:0;width:100%;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+.seg{padding:28px 22px;display:flex;flex-direction:column;gap:8px;border-right:1px solid var(--border);position:relative}
+.seg:last-child{border-right:none}
+.seg.active{background:var(--blue-lt);border-top:3px solid var(--blue)}
+.seg-tier{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.seg.active .seg-tier{color:var(--blue)}
+.seg-price{font-size:28px;font-weight:900;line-height:1}
+.seg.active .seg-price{color:var(--blue)}
+.seg-range{font-size:12px;color:var(--sub);margin-top:2px}
+.seg-examples{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.ex{font-size:11.5px;color:var(--sub);padding:4px 8px;background:#f8fafc;border-radius:6px;border:1px solid var(--border)}
+.ex.hl{background:var(--blue-lt);border-color:#93c5fd;color:var(--blue);font-weight:600}
+.seg-pct{position:absolute;top:12px;right:12px;font-size:12px;font-weight:700;
+  background:#1e293b;color:#fff;padding:2px 8px;border-radius:20px}
+.seg.active .seg-pct{background:var(--blue)}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--muted);padding:0 4px}
+/* 결론 */
+.conclusion{display:flex;gap:16px;width:100%}
+.co{flex:1;border:1px solid var(--border);border-radius:12px;padding:18px 22px;background:var(--card)}
+.co.hl{border-color:#93c5fd;background:var(--blue-lt)}
+.co-label{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.co.hl .co-label{color:var(--blue)}
+.co-val{font-size:28px;font-weight:900}
+.co.hl .co-val{color:var(--blue)}
+.co-sub{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5}
+.src{font-size:10.5px;color:var(--muted);text-align:center}
+.nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:999}
+.nav-in{width:1100px;display:flex;align-items:center;justify-content:space-between}
+.nav-in a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text)}
+.nav-in a:hover{opacity:.6}
+.nav-in .nc{font-size:12px;color:var(--muted)}
+body{opacity:0;animation:fi .4s ease forwards}
+body.fo{animation:fo .3s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fo{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+</style>
+<style>
+.slide-nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:oklch(0.99 0 0 / .95);backdrop-filter:blur(12px);border-top:1px solid var(--border,oklch(0.85 0 0));display:flex;align-items:center;justify-content:center;z-index:9999}
+.slide-nav-inner{width:1280px;display:flex;align-items:center;justify-content:space-between;padding:0 60px}
+.slide-nav a{text-decoration:none;font-size:14px;font-weight:700;color:var(--text,oklch(0.12 0 0))}
+.slide-nav .nav-center a{color:var(--muted,oklch(0.70 0 0));font-size:13px;font-weight:400}
+.slide-nav .nav-disabled{font-size:14px;font-weight:700;color:oklch(0.80 0 0);cursor:default}
+body{opacity:0;animation:fadeIn .4s ease forwards}body.fade-out{animation:fadeOut .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="eyebrow">FINANCIAL 2-2</div>
+  <h1 class="headline">프리미엄 밴드 하단 +30%<br>Samsung보다 $530 저렴</h1>
+  <p class="desc">AI 생활맥락 기능 탑재 → 미드 티어에서 프리미엄 진입 · 경쟁력 유지 포지션</p>
+
+  <div class="band">
+    <div class="seg">
+      <div class="seg-tier">미드 티어</div>
+      <div class="seg-price">$500~700</div>
+      <div class="seg-range">LG 현재 라인업</div>
+      <div class="seg-examples">
+        <div class="ex">LG CordZero R9 $600</div>
+        <div class="ex">Ecovacs T30S $650</div>
+      </div>
+    </div>
+    <div class="seg active">
+      <div class="seg-pct">+30%</div>
+      <div class="seg-tier">프리미엄</div>
+      <div class="seg-price">$900~1,200</div>
+      <div class="seg-range">LUMOS 목표 포지션</div>
+      <div class="seg-examples">
+        <div class="ex hl">LUMOS $1,170 ← 채택</div>
+        <div class="ex">LG CordZero AiO $900</div>
+      </div>
+    </div>
+    <div class="seg">
+      <div class="seg-pct">+40~80%</div>
+      <div class="seg-tier">울트라</div>
+      <div class="seg-price">$1,400~1,700</div>
+      <div class="seg-range">경쟁 상단</div>
+      <div class="seg-examples">
+        <div class="ex">Samsung Bespoke $1,700</div>
+        <div class="ex">Roborock Saros 10R $1,600</div>
+      </div>
+    </div>
+    <div class="seg">
+      <div class="seg-pct">+40~100%</div>
+      <div class="seg-tier">AI 플래그십</div>
+      <div class="seg-price">$2,000~2,500</div>
+      <div class="seg-range">최고가 라인</div>
+      <div class="seg-examples">
+        <div class="ex">Roborock Saros Z70 $2,500</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conclusion">
+    <div class="co">
+      <div class="co-label">LG 현재 최고가</div>
+      <div class="co-val">$900</div>
+      <div class="co-sub">CordZero AiO 2024</div>
+    </div>
+    <div class="co hl">
+      <div class="co-label">LUMOS 목표가 (+30%)</div>
+      <div class="co-val">$1,170</div>
+      <div class="co-sub">프리미엄 밴드 하단 · 보수적 채택<br>Samsung $1,700 대비 $530 저렴</div>
+    </div>
+    <div class="co">
+      <div class="co-label">Samsung Bespoke AI</div>
+      <div class="co-val">$1,700</div>
+      <div class="co-sub">Bixby 명령형 — 자율 판단 없음</div>
+    </div>
+    <div class="co">
+      <div class="co-label">Roborock Saros Z70</div>
+      <div class="co-val">$2,500</div>
+      <div class="co-sub">보안 리스크 (중국 서버)</div>
+    </div>
+  </div>
+  <div class="src">출처: VacuumWars · RoboVacGuide 2025~2026 미국 실거래가 · LG 공식몰 · SamMobile</div>
+</div>
+
+
+<script>
+function go(u){document.body.classList.add('fo');setTimeout(()=>location.href=u,300)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go('2-3.html');
+  if(e.key==='ArrowLeft')go('2-1.html');
+})
+</script>
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="09-finance-demand.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">10 / 27</a></div>
+    <div class="nav-right"><a href="11-finance-revenue.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('11-finance-revenue.html');
+  if (e.key === 'ArrowLeft') navigateTo('09-finance-demand.html');
+});
+</script>
+</body>
+</html>

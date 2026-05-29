@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>점수 계산 및 튜닝</title>
+<link href="assets/fonts/pretendard.css" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: oklch(0.99 0 0); --bg-card: oklch(0.97 0 0); --surface-raised: #ffffff; --border-card: oklch(0.85 0 0);
+  --text-primary: oklch(0.12 0 0); --text-secondary: oklch(0.55 0 0); --text-muted: oklch(0.70 0 0); --text-sub: oklch(0.30 0 0);
+  --accent-start: oklch(0.12 0 0); --accent-end: oklch(0.42 0 0); --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end)); --accent-soft: oklch(0.95 0 0); --accent-border: oklch(0.80 0 0);
+  --nav-bg: oklch(0.99 0 0 / 0.95); --nav-border: oklch(0.85 0 0); --nav-accent: oklch(0.12 0 0); --nav-hover: oklch(0.42 0 0); --nav-disabled: oklch(0.80 0 0);
+  --font-main: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); font-family: var(--font-main); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding-bottom: 50px; }
+.container { width: 1280px; padding: 36px 80px; display: flex; flex-direction: column; align-items: center; }
+.title { font-size: 42px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 6px; line-height: 1.3; }
+.deck-meta { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 28px; }
+.formula-card { width: 100%; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 26px; margin-bottom: 28px; text-align: center; }
+.formula-card code { font-family: var(--font-main); font-size: 20px; color: var(--accent-start); }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; width: 100%; }
+.room-card { background: var(--surface-raised); border: 1px solid var(--border-card); border-radius: 16px; padding: 22px; text-align: center; }
+.room-name { font-size: 16px; font-weight: 800; margin-bottom: 10px; }
+.base-score { font-size: 34px; font-weight: 900; color: var(--accent-start); margin-bottom: 8px; }
+.noise-label { font-size: 12px; color: var(--text-muted); }
+.tuning-note { margin-top: 28px; width: 100%; padding: 22px; border-radius: 14px; background: var(--accent-soft); border: 1px dashed var(--accent-border); }
+.tuning-note h4 { font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); }
+.tuning-note p { font-size: 13.5px; color: var(--text-sub); line-height: 1.6; }
+.tuning-note b { color: var(--accent-start); }
+/* 이모지 대체 인라인 CSS 아이콘 (currentColor 상속) — 튜닝/설정 슬라이더 */
+.ic { display: inline-block; position: relative; width: 0.95em; height: 0.95em; vertical-align: -0.12em; margin-right: 0.4em; }
+.ic-sliders i { position: absolute; left: 0.04em; right: 0.04em; height: 0.11em; background: currentColor; border-radius: 0.06em; }
+.ic-sliders .l1 { top: 0.26em; }
+.ic-sliders .l2 { top: 0.62em; }
+.ic-sliders b { position: absolute; width: 0.26em; height: 0.26em; border-radius: 50%; background: currentColor; }
+.ic-sliders .k1 { top: 0.18em; left: 0.6em; }
+.ic-sliders .k2 { top: 0.54em; left: 0.16em; }
+.slide-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--nav-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--nav-border); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.slide-nav-inner { width: 1280px; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; }
+.slide-nav a { text-decoration: none; font-size: 14px; font-weight: 700; color: var(--nav-accent); transition: color 0.2s; }
+.slide-nav a:hover { color: var(--nav-hover); }
+.slide-nav .nav-center a { color: var(--text-secondary); font-size: 13px; font-weight: 400; }
+body { opacity: 0; animation: fadeIn 0.4s ease forwards; } body.fade-out { animation: fadeOut 0.3s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-12px); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="title">Step 2 · 점수 계산 공식 및 튜닝</h1>
+  <div class="deck-meta">ML · 박주상</div>
+  <div class="formula-card">
+    <code>final_score = base + Σ(event_delta) + Σ(modifier)</code>
+  </div>
+  <div class="grid-5">
+    <div class="room-card">
+      <div class="room-name">주방</div>
+      <div class="base-score">28</div>
+      <div class="noise-label">소음 민감: 4</div>
+    </div>
+    <div class="room-card">
+      <div class="room-name">현관</div>
+      <div class="base-score">22</div>
+      <div class="noise-label">소음 민감: 2</div>
+    </div>
+    <div class="room-card">
+      <div class="room-name">거실</div>
+      <div class="base-score">20</div>
+      <div class="noise-label">소음 민감: 5</div>
+    </div>
+    <div class="room-card">
+      <div class="room-name">욕실</div>
+      <div class="base-score">18</div>
+      <div class="noise-label">소음 민감: 3</div>
+    </div>
+    <div class="room-card">
+      <div class="room-name">침실</div>
+      <div class="base-score">12</div>
+      <div class="noise-label">소음 민감: 9</div>
+    </div>
+  </div>
+  <div class="tuning-note">
+    <h4><span class="ic ic-sliders"><i class="l1"></i><i class="l2"></i><b class="k1"></b><b class="k2"></b></span>주요 변경 사항 (설계 및 구현 정합 완료)</h4>
+    <p>
+      특정 공간(현관)에 쏠리던 설계값을 <b>ML Feature Importance</b> 기준으로 평탄화했습니다.
+      이를 통해 6개 데모 시나리오에서 5개 방이 골고루 1위 청소 대상이 되도록 정밀하게 튜닝했습니다.
+    </p>
+  </div>
+</div>
+
+<nav class="slide-nav">
+  <div class="slide-nav-inner">
+    <div class="nav-left"><a href="20-context-rules.html" onclick="event.preventDefault(); navigateTo(this.href)">← 이전</a></div>
+    <div class="nav-center"><a href="index.html">21 / 27</a></div>
+    <div class="nav-right"><a href="22-event-deltas.html" onclick="event.preventDefault(); navigateTo(this.href)">다음 →</a></div>
+  </div>
+</nav>
+<script>
+function navigateTo(url) { document.body.classList.add('fade-out'); setTimeout(function() { window.location.href = url; }, 300); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') navigateTo('22-event-deltas.html');
+  if (e.key === 'ArrowLeft') navigateTo('20-context-rules.html');
+});
+</script>
+</body>
+</html>
