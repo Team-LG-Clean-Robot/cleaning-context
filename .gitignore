@@ -58,3 +58,12 @@ exports/*.zip
 
 # 덱 영상 자산 (대용량, 로컬 발표용 — git 추적 X). 폰트(assets/fonts)는 추적함.
 exports/rehearsal-deck/assets/*.mp4
+
+# 프로젝트 종료(2026-05-30) 시 트래킹 해제한 팀 내부 운영 문서 — 로컬에만 보관.
+# 팀원별 과제 배정·원자료 리서치·발표 대본·내부 브리핑은 공개 레포에서 제외.
+docs/onboarding/
+docs/research/
+docs/TEAM_BRIEF.md
+docs/DEMO_SCRIPT.md
+exports/kickoff/
+exports/team-brief/

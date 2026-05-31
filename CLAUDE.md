@@ -1,5 +1,9 @@
 # CLAUDE.md — 생활 맥락 로봇청소기 (Lucky-GS)
 
+> **⏹️ 프로젝트 종료 (2026-05-30 최종 발표 완료).** 본 문서는 개발 당시의 아키텍처·컨벤션·AI 행동 규칙을 보존한 동결본이다. 활성 개발은 종료됐고, 포트폴리오/참고 목적으로 유지한다. 최종 회고는 [`ROADMAP.md`](./ROADMAP.md), 외부 소개는 [`README.md`](./README.md).
+>
+> ※ 팀 운영용 내부 문서(`docs/onboarding/`, `docs/research/`, `docs/TEAM_BRIEF.md`, `docs/DEMO_SCRIPT.md`, `exports/kickoff/`, `exports/team-brief/`)는 종료 시점에 공개 레포 트래킹에서 제외(gitignore)하고 로컬에만 보관한다 — 아래 §0 문서 지도의 일부 링크는 레포에 더 이상 없을 수 있다.
+
 > 본 프로젝트의 모든 AI 에이전트(Claude / Gemini / ChatGPT / Codex)는 **이 파일이 단일 진입점**.
 > 사람이 읽는 외부 소개는 `README.md`.
 
