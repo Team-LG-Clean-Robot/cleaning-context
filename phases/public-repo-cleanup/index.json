@@ -1,0 +1,15 @@
+{
+  "project": "cleaning-context",
+  "phase": "public-repo-cleanup",
+  "mode": "product",
+  "steps": [
+    {
+      "step": 0,
+      "name": "public-docs-surface",
+      "status": "completed",
+      "started_at": "2026-06-18T02:14:28+09:00",
+      "summary": "Public repo docs surface cleaned: README now explains public entrypoints/exports/frozen agent docs, backend README port matches frontend proxy at 8123, TRD env example matches TIMELY settings, personal local paths/private wording were removed, and backend pytest plus targeted exposure scans passed.",
+      "completed_at": "2026-06-18T02:16:43+09:00"
+    }
+  ]
+}

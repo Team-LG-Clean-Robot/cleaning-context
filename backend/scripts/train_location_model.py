@@ -40,8 +40,7 @@ def main() -> None:
     if not CSV_PATH.exists():
         raise SystemExit(
             f"CASAS 데이터 없음: {CSV_PATH}\n"
-            "  Windows 에서: scp windows:C:/Users/yusun/projects/cleaning-context/"
-            "backend/data/casas/labeled/hh106.csv backend/data/casas/labeled/"
+            "  예: backend/data/casas/labeled/hh106.csv 파일을 준비한 뒤 다시 실행하세요."
         )
 
     print(f"[1/4] CASAS hh106 로드 — {CSV_PATH}")

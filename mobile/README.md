@@ -67,7 +67,7 @@ keytool -genkey -v -keystore ~/.android/robotic.jks \
   -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 
 # 2. mobile/android/key.properties 작성 (gitignore)
-# storePassword=… keyPassword=… keyAlias=upload storeFile=/Users/luma2/.android/robotic.jks
+# storePassword=… keyPassword=… keyAlias=upload storeFile=<absolute-path-to>/robotic.jks
 
 # 3. 릴리즈 APK
 flutter build apk --release \

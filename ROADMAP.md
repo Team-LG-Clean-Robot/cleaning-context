@@ -3,6 +3,22 @@
 > **프로젝트 종료**: 2026-05-30 (최종 발표 완료) · 성균관대 RISE × LG전자 가전 멘토링 · 팀 럭키 금성 4인
 > 이 문서는 진행 중 sprint 보드에서 **종료 후 회고**로 다듬은 것이다. 제품 개요는 [README](./README.md), 트랙별 상세는 [TECHNICAL_PLAN](./TECHNICAL_PLAN.md) / [BUSINESS_PLAN](./BUSINESS_PLAN.md).
 
+## Current Horizon
+
+<!-- harness:goal id="portfolio-public-readiness" -->
+목표: 공개 포트폴리오 레포로서 외부인이 README와 문서만 보고 프로젝트 범위, 실행법, 산출물 위치를 이해할 수 있게 정리한다.
+
+## Active Milestones
+
+<!-- harness:milestone id="P1-public-repo-cleanup" status="completed" priority="P0" evidence="python -m pytest (backend): 57 passed, 4 xpassed; targeted rg scan: no matches" -->
+### P1 — 공개 포트폴리오 레포 정리
+- DoD: README/하위 README/문서의 실행 경로와 환경변수 설명이 일치하고, 공개 레포에 부적절한 내부 운영 흔적과 개인 로컬 경로가 제거 또는 명확히 격리됨.
+- Evidence: python -m pytest (backend): 57 passed, 4 xpassed; targeted rg scan: no matches
+- Gap: 현재 레포는 외부 공개 상태지만 회고/AI 운영 문서/exports/실행 안내가 섞여 있어 포트폴리오 독자의 진입점이 흐려짐.
+- Status: [x]
+
+- Completed at: 2026-06-18
+- Summary: Public repo docs surface aligned for portfolio readers
 ## 한눈에
 
 2026년 5월, 약 4주 동안 **IoT 맥락 인식 + Privacy-on-Edge** 두 축의 로봇청소기 의사결정 시뮬레이터를 기획부터 라이브 데모·발표까지 완주했다. 멘토 1차 피드백을 받아 한 차례 크게 피벗했고, 발표 직전까지 데모 UX·발표 덱을 다듬었다.

@@ -94,6 +94,8 @@
 
 ## 디렉터리
 
+공개 포트폴리오용 핵심 진입점은 `README.md`, `frontend/`, `backend/`, `mobile/`, `docs/`다. `exports/`는 제출·발표 산출물을 보존한 폴더라 실행에 필수는 아니다.
+
 ```
 backend/    FastAPI — routers · schemas · services · data(JSON 카탈로그) · tests
 frontend/   Next.js 웹 시뮬레이터
@@ -101,6 +103,8 @@ mobile/     Flutter 앱
 docs/       PRD · TRD · IOT_DOMAIN · SCORING_RULES · CLEANING_DECISION_ALGORITHM …
 exports/    Typst 기획서·발표 덱 (kickoff · planning-v2 · technical-plan · rehearsal-deck)
 ```
+
+보존 문서: `CLAUDE.md`는 개발 당시 AI 에이전트 작업 규칙을 남긴 동결본이고, `ROADMAP.md`는 종료 후 회고와 현재 공개 정리 milestone을 함께 담는다.
 
 ## 로컬 실행
 
@@ -122,6 +126,8 @@ cd backend && pytest              # 룰·스코어링·센서·시나리오
 cd frontend && pnpm typecheck
 cd mobile && flutter analyze && flutter test
 ```
+
+`TIMELY_API_KEY`가 없어도 rule-based scoring과 캐시된 데모 응답은 동작한다. 실시간 LLM 설명만 fallback으로 전환된다.
 
 ## 팀 — 럭키 금성
 

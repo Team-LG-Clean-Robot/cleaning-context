@@ -32,8 +32,8 @@ archive/
 
 # 팀 내부 메모 (팀장 세션 컨텍스트)
 CLAUDE.local.md
-# CLAUDE.md 는 팀 공유 AI 진입점 → 추적함 (2026-05-17, private 팀 레포라 노출 위험 없음)
-# ROADMAP.md 는 글로벌 CLAUDE.md 규칙상 루트 필수 파일 → 추적함 (2026-05-16)
+# CLAUDE.md 는 개발 당시 AI 작업 규칙을 보존한 동결본으로 추적함.
+# ROADMAP.md 는 종료 후 회고와 공개 정리 milestone을 담는 공개 문서로 추적함.
 
 # 빌드 산출물
 .playwright-mcp/

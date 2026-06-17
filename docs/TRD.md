@@ -270,11 +270,12 @@ def generate_explanation(
 ## 8. 환경변수 (`.env.example`)
 
 ```
-OPENAI_API_KEY=sk-...
+TIMELY_API_KEY=
+TIMELY_BASE_URL=https://hello.timelygpt.co.kr/api/v2/chat/bridge/openai
 OPENAI_MODEL=gpt-4o-mini
 LLM_TIMEOUT_SEC=10
-CACHE_DIR=./cache/scenarios
-CORS_ORIGINS=http://localhost:3000
+CACHE_DIR=./app/data/cached_responses
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001
 ```
 
 ## 9. 테스트 전략
@@ -288,7 +289,7 @@ CORS_ORIGINS=http://localhost:3000
 
 ## 10. 배포 순서 (실행 시점)
 
-1. 백엔드 로컬 검증 → Render 배포 (이때 OPENAI_API_KEY env 등록)
+1. 백엔드 로컬 검증 → Render 배포 (이때 TIMELY_API_KEY env 등록)
 2. 프론트엔드 `NEXT_PUBLIC_API_URL` env 설정 → Vercel 배포
 3. Vercel URL을 백엔드 CORS_ORIGINS에 추가 → 재배포
 
