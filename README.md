@@ -20,7 +20,7 @@
 | 항목 | 내용 |
 |---|---|
 | 내 역할 | 팀장 · 제품/기술 기획 · FastAPI 백엔드 · LLM 설명 레이어 · Next.js 웹 · Flutter 앱 · 배포 · 발표 스토리/덱 |
-| 핵심 결과 | 8개 생활 시나리오, IoT 센서 추론 모드, 24h 타임라인 재생, rule-based scoring, LLM explanation fallback |
+| 핵심 결과 | 8개 생활 시나리오, IoT 센서 추론 모드, ML 사용자 위치 추정, 24h 타임라인 재생, rule-based scoring, LLM explanation fallback |
 | 기술 포인트 | raw 센서는 edge에 두고 high-level event만 API로 넘기는 Privacy-on-Edge 경계, JSON 카탈로그 기반 확장 구조 |
 | 검증 | backend pytest 57 passed, deterministic scoring golden tests, cached LLM responses for demo resilience |
 | 산출물 | [라이브 데모](https://robot-cleaner.askewly.com/) · [최종 산출물](./exports/) · [기술 기획서](./TECHNICAL_PLAN.md) |
@@ -49,7 +49,7 @@
 [IoT 센서 — 도어락 · 인덕션 · 냉장고 · 에어컨 · CO₂ · 모션 · …]
    │  raw readings                                    (Sensor Layer)
    ▼
-[Rule + (설계) ML 추론]
+[ML 위치 추정 + Rule 이벤트 추론]
    │  high-level events: cooking_done · user_returned · pre_sleep_30min …   (Event Layer)
    ▼
 [Rule-based Scoring]  ← 결정론적 · 재현 가능 · golden test 고정     (Decision Layer)
@@ -94,7 +94,7 @@
 | LLM | OpenAI SDK (Timely GPT bridge) · gpt-4o-mini |
 | 웹 | Next.js 15 (App Router · React 19) · TypeScript strict · Tailwind v4 · inline SVG(차트 라이브러리 없음) |
 | 모바일 | Flutter 3 · Riverpod · Dio · go_router |
-| ML | scikit-learn — 사용자 위치 추정 분류기 *(설계 완료, 운영은 heuristic fallback — 아래 참조)* |
+| ML | scikit-learn — 사용자 위치 추정 RandomForest *(CASAS hh106 학습, confidence fallback 포함)* |
 | 배포 | Render(백엔드) · Vercel(웹) — `main` push 시 자동 |
 
 ## 결과
@@ -103,7 +103,7 @@
 - ✅ **결정론적 스코어링** — 동일 입력 우선순위 일치 100%, golden test로 고정
 - ✅ **응답 ≤ 5s** (캐시 적중 시 즉시), LLM 장애에도 룰 기반 폴백
 - ✅ **확장성** — 센서·이벤트 JSON 추가만으로 신규 시나리오 반영
-- 🔶 **ML 위치 추정** — CASAS hh106 데이터셋 기반 v3 설계 완료(`docs/CLEANING_DECISION_ALGORITHM.md`). 학부 일정상 모델 학습은 미완으로, 운영은 동등 입력을 받는 **heuristic fallback**으로 동작. ML 경로 테스트는 학습 모델 도입을 게이트로 둠.
+- ✅ **ML 위치 추정** — CASAS hh106 데이터셋 기반 v3 구현 완료(`backend/app/ml/`). RandomForest 모델(`location_model.joblib`)과 지표(`location_metrics.json`)를 추적하며, holdout accuracy 98.9% / 5-fold CV 99.0%. confidence가 낮거나 모델을 쓸 수 없을 때는 heuristic fallback으로 안전하게 동작.
 
 ## 디렉터리
 
@@ -148,7 +148,7 @@ cd mobile && flutter analyze && flutter test
 |---|---|
 | **전유성** (팀장) | 총괄 · 백엔드 · LLM · 웹/모바일 · 배포 · 발표 스토리·덱 |
 | **김준성** | 데이터 · 시장·재무 분석 · 사업 기획서 |
-| **박주상** | ML 위치 추정 모델 설계 · LLM 프롬프트 |
+| **박주상** | ML 위치 추정 모델 설계·학습 · LLM 프롬프트 |
 | **조현서** | 외부 리서치 · 발표 도입부 · 멘토 Q&A 대응 |
 
 ## 라이선스
