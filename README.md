@@ -15,11 +15,10 @@
 
 ---
 
-## 포트폴리오 요약
+## 요약
 
 | 항목 | 내용 |
 |---|---|
-| 내 역할 | 팀장 · 제품/기술 기획 · FastAPI 백엔드 · LLM 설명 레이어 · Next.js 웹 · Flutter 앱 · 배포 · 발표 스토리/덱 |
 | 핵심 결과 | 8개 생활 시나리오, IoT 센서 추론 모드, ML 사용자 위치 추정, 24h 타임라인 재생, rule-based scoring, LLM explanation fallback |
 | 기술 포인트 | raw 센서는 edge에 두고 high-level event만 API로 넘기는 Privacy-on-Edge 경계, JSON 카탈로그 기반 확장 구조 |
 | 검증 | backend pytest 57 passed, deterministic scoring golden tests, cached LLM responses for demo resilience |
@@ -107,7 +106,7 @@
 
 ## 디렉터리
 
-공개 포트폴리오용 핵심 진입점은 `README.md`, `frontend/`, `backend/`, `mobile/`, `docs/`다. `exports/`는 제출·발표 최종 산출물을 보존한 폴더라 실행에 필수는 아니다.
+공개 포트폴리오용 핵심 진입점은 `README.md`, `frontend/`, `backend/`, `mobile/`, `docs/`다. `exports/`는 제출·발표 최종 산출물을 보존한 폴더.
 
 ```
 backend/    FastAPI — routers · schemas · services · data(JSON 카탈로그) · tests
@@ -153,4 +152,4 @@ cd mobile && flutter analyze && flutter test
 
 ## 라이선스
 
-성균관대 RISE × LG전자 가전 멘토링 학내 프로젝트. 외부 활용 시 팀 문의.
+성균관대 RISE × LG전자 가전 멘토링 학내 프로젝트.
