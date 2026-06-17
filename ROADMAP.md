@@ -19,6 +19,15 @@
 
 - Completed at: 2026-06-18
 - Summary: Public repo docs surface aligned for portfolio readers
+
+<!-- harness:milestone id="P2-portfolio-surface-diet" status="completed" priority="P0" evidence="README screenshot/link checks passed; git ls-files exports shows final PDFs plus interactive deck only; targeted rg scan no matches" -->
+### P2 — 포트폴리오 표면 다이어트
+- DoD: `exports/`에는 최종 발표/제출 산출물과 이를 여는 README만 남기고, README 첫 화면에 데모 이미지와 역할/성과 요약이 추가됨.
+- Evidence: README screenshot/link checks passed; git ls-files exports shows final PDFs plus interactive deck only; targeted rg scan no matches
+- Gap: P1로 문서 정합성은 맞췄지만, 산출물 폴더와 README 첫인상이 여전히 작업 중간물 중심으로 보임.
+- Status: [x]
+- Completed at: 2026-06-18
+- Summary: Portfolio README and exports surface tightened
 ## 한눈에
 
 2026년 5월, 약 4주 동안 **IoT 맥락 인식 + Privacy-on-Edge** 두 축의 로봇청소기 의사결정 시뮬레이터를 기획부터 라이브 데모·발표까지 완주했다. 멘토 1차 피드백을 받아 한 차례 크게 피벗했고, 발표 직전까지 데모 UX·발표 덱을 다듬었다.

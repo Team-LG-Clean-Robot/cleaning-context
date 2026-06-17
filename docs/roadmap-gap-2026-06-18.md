@@ -7,6 +7,7 @@ Date: 2026-06-18
 
 ## Current State
 - P1-public-repo-cleanup: P1 — 공개 포트폴리오 레포 정리 (evidence: python -m pytest (backend): 57 passed, 4 xpassed; targeted rg scan: no matches)
+- P2-portfolio-surface-diet: P2 — 포트폴리오 표면 다이어트 (evidence: README screenshot/link checks passed; git ls-files exports shows final PDFs plus interactive deck only; targeted rg scan no matches)
 
 ## Gap
 - Active harness milestones are exhausted.

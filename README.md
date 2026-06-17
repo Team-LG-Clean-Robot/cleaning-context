@@ -5,12 +5,25 @@
 
 <p>
   <a href="https://robot-cleaner.askewly.com/">라이브 데모</a> ·
+  <a href="./exports/rehearsal-deck/index.html">발표 덱</a> ·
   <a href="./TECHNICAL_PLAN.md">기술 기획서</a> ·
   <a href="./BUSINESS_PLAN.md">사업 기획서</a> ·
   <a href="./ROADMAP.md">4주 회고</a>
 </p>
 
+![Lumos web simulator dashboard](./docs/assets/lumos-dashboard.png)
+
 ---
+
+## 포트폴리오 요약
+
+| 항목 | 내용 |
+|---|---|
+| 내 역할 | 팀장 · 제품/기술 기획 · FastAPI 백엔드 · LLM 설명 레이어 · Next.js 웹 · Flutter 앱 · 배포 · 발표 스토리/덱 |
+| 핵심 결과 | 8개 생활 시나리오, IoT 센서 추론 모드, 24h 타임라인 재생, rule-based scoring, LLM explanation fallback |
+| 기술 포인트 | raw 센서는 edge에 두고 high-level event만 API로 넘기는 Privacy-on-Edge 경계, JSON 카탈로그 기반 확장 구조 |
+| 검증 | backend pytest 57 passed, deterministic scoring golden tests, cached LLM responses for demo resilience |
+| 산출물 | [라이브 데모](https://robot-cleaner.askewly.com/) · [최종 산출물](./exports/) · [기술 기획서](./TECHNICAL_PLAN.md) |
 
 ## 무엇을 만들었나
 
@@ -94,14 +107,14 @@
 
 ## 디렉터리
 
-공개 포트폴리오용 핵심 진입점은 `README.md`, `frontend/`, `backend/`, `mobile/`, `docs/`다. `exports/`는 제출·발표 산출물을 보존한 폴더라 실행에 필수는 아니다.
+공개 포트폴리오용 핵심 진입점은 `README.md`, `frontend/`, `backend/`, `mobile/`, `docs/`다. `exports/`는 제출·발표 최종 산출물을 보존한 폴더라 실행에 필수는 아니다.
 
 ```
 backend/    FastAPI — routers · schemas · services · data(JSON 카탈로그) · tests
 frontend/   Next.js 웹 시뮬레이터
 mobile/     Flutter 앱
 docs/       PRD · TRD · IOT_DOMAIN · SCORING_RULES · CLEANING_DECISION_ALGORITHM …
-exports/    Typst 기획서·발표 덱 (kickoff · planning-v2 · technical-plan · rehearsal-deck)
+exports/    최종 PDF · 인터랙티브 발표 덱
 ```
 
 보존 문서: `CLAUDE.md`는 개발 당시 AI 에이전트 작업 규칙을 남긴 동결본이고, `ROADMAP.md`는 종료 후 회고와 현재 공개 정리 milestone을 함께 담는다.

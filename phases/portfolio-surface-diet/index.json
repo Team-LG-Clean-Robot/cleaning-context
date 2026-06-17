@@ -1,0 +1,15 @@
+{
+  "project": "cleaning-context",
+  "phase": "portfolio-surface-diet",
+  "mode": "product",
+  "steps": [
+    {
+      "step": 0,
+      "name": "exports-and-readme-portfolio-pass",
+      "status": "completed",
+      "started_at": "2026-06-18T02:20:00+09:00",
+      "summary": "Portfolio surface tightened: README now has a demo screenshot and contribution summary, exports gained a README and now tracks final PDFs plus the interactive deck only, Typst/intermediate markdown/analysis assets were moved to local archive, and targeted link/path scans passed.",
+      "completed_at": "2026-06-18T02:27:57+09:00"
+    }
+  ]
+}

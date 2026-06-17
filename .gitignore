@@ -58,6 +58,13 @@ exports/*.zip
 
 # 덱 영상 자산 (대용량, 로컬 발표용 — git 추적 X). 폰트(assets/fonts)는 추적함.
 exports/rehearsal-deck/assets/*.mp4
+exports/rehearsal-deck/assets/analysis-contact-sheet.jpg
+exports/rehearsal-deck/assets/analysis-shots/
+
+# 문서 생성 중간 산출물 — 공개 레포에는 최종 PDF/덱만 추적.
+exports/**/*.typ
+exports/**/*.md
+!exports/README.md
 
 # 프로젝트 종료(2026-05-30) 시 트래킹 해제한 팀 내부 운영 문서 — 로컬에만 보관.
 # 팀원별 과제 배정·원자료 리서치·발표 대본·내부 브리핑은 공개 레포에서 제외.
