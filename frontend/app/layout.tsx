@@ -35,6 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-surface-base text-text-default font-sans antialiased min-h-screen">
         {children}
+        <footer className="py-4 text-center text-sm text-text-default">
+          <a href="https://askewly.com/">← Askewly</a>
+        </footer>
       </body>
     </html>
   );
