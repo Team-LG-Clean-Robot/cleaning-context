@@ -62,7 +62,7 @@ export function AskPanel({ response }: Props) {
       aria-label="AI 후속 질문"
       className="p-5 space-y-3"
     >
-      <div className="flex items-baseline justify-between gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5 sm:gap-2">
         <h2 className="text-[16px] font-semibold text-text-default">
           {grounded ? "이 결과에 대해 묻기" : "AI 어시스턴트"}
         </h2>

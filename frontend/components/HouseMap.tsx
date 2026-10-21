@@ -648,6 +648,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
       )}
 
       <button type="button" onClick={() => setShowOverlay((v) => !v)}
+        aria-label={showOverlay ? "히트맵 숨기기" : "히트맵 보기"}
         className="absolute top-3 left-3 flex items-center gap-1.5 rounded-lg bg-white/80 backdrop-blur-sm border border-border-default px-2.5 py-1.5 text-[11px] font-medium text-gray-600 shadow-sm hover:bg-white/95 transition-colors">
         <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           {showOverlay ? (
@@ -658,7 +659,7 @@ export function HouseMap({ rooms, userLocation, onRoomClick, paused = false, cur
               <line x1={1} y1={1} x2={23} y2={23} /></>
           )}
         </svg>
-        {showOverlay ? "히트맵 숨기기" : "히트맵 보기"}
+        <span className="hidden sm:inline">{showOverlay ? "히트맵 숨기기" : "히트맵 보기"}</span>
       </button>
 
       {controllable && (

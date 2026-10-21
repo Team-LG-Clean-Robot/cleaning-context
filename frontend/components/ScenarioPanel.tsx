@@ -38,7 +38,7 @@ export function ScenarioPanel({
             onClick={() => onSelect(s.id)}
             disabled={loading}
             aria-pressed={active}
-            className={`p-4 rounded-xl border text-left transition duration-150 ease-out
+            className={`p-4 rounded-xl border text-left flex flex-col justify-start items-stretch transition duration-150 ease-out
               ${
                 active
                   ? "bg-action-primary text-white border-action-primary shadow-md"
